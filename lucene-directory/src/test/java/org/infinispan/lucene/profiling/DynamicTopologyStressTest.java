@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -70,7 +71,7 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
    private static final int SECONDS_TOTAL = 15;
 
    /** How many Documents to write in each second **/
-   private static final int WRITES_PER_SECOND = 100;
+   private static final int DELAY_BETWEEN_WRITES = 5;
 
    /** Number of Terms written in the index **/
    private static final int INITIAL_INDEX_TERMS = 2000;
@@ -82,6 +83,8 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
    private static final int READERS = 5;
 
    private final AtomicBoolean failed = new AtomicBoolean(false);
+   private final AtomicInteger reads = new AtomicInteger(0);
+   private final AtomicInteger writes = new AtomicInteger(0);
    private volatile int lastWrittenTermId = 0;
 
    /** Registry of clustered CacheManagers used as readers **/
@@ -100,15 +103,16 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
       for (int i = 0; i < READERS; i++) {
          readers[i] = addClusterEnabledCacheManager(defaultClusteredConfig, transportFlags);
          Cache<Object, Object> cache = readers[i].getCache();
-         discardPerNode[i] = TestingUtil.getDiscardForCache(cache);
-         TestingUtil.setDelayForCache(cache, 1, 1);
+//         discardPerNode[i] = TestingUtil.getDiscardForCache(cache);
+//         TestingUtil.setDelayForCache(cache, 1, 1);
          TestingUtil.blockUntilViewReceived(cache, i + 1, 1000);
       }
    }
 
    @Test
    void testDirectoryUnstableCluster() throws IOException {
-      InfinispanDirectory masterDirectory = new InfinispanDirectory(writingNode.getCache(), INDEX_NAME);
+      final Cache<Object, Object> cache = writingNode.getCache();
+      InfinispanDirectory masterDirectory = new InfinispanDirectory(cache, cache,cache, INDEX_NAME, 15*1024*1024);
       SharedState sharedIndexState = IndexReadingStressTest.fillDirectory(masterDirectory, INITIAL_INDEX_TERMS);
 
       ExecutorService executor = Executors.newFixedThreadPool(READERS + 1);
@@ -118,7 +122,7 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
             executor.execute(new ConstantReadingThread(masterDirectory, sharedIndexState));
          }
          executor.shutdown();
-         executor.awaitTermination(SECONDS_TOTAL * 2, TimeUnit.SECONDS); //wait for all jobs to finish
+         executor.awaitTermination(SECONDS_TOTAL, TimeUnit.SECONDS); //wait for all jobs to finish
       } catch (InterruptedException e) {
          log.error(e);
          assert false : "unexpected interruption";
@@ -137,7 +141,7 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
 
       @Override
       public void run() {
-         while (lastWrittenTermId < (SECONDS_TOTAL * WRITES_PER_SECOND) && failed.get() == false) {
+         while (lastWrittenTermId < (SECONDS_TOTAL * DELAY_BETWEEN_WRITES) && failed.get() == false) {
             IndexWriter writer = null;
             try {
                int toWrite = lastWrittenTermId + 1;
@@ -149,12 +153,14 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
                writer.commit();
                lastWrittenTermId = toWrite;
                if (VISUAL_PROGRESS_FEEDBACK) System.out.println("Written: " + doc);
-               Thread.sleep( 1000 / WRITES_PER_SECOND );
+               Thread.sleep( DELAY_BETWEEN_WRITES );
+               int writesDone = writes.incrementAndGet();
+               if (writesDone%10==0) System.out.println("Writes performed: " + writesDone);
             } catch (IOException e) {
-               failed(e);
+               failed(e, false);
                return;
             } catch (InterruptedException e) {
-               failed(e);
+               failed(e, false);
                return;
             } finally {
                try {
@@ -162,7 +168,7 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
                      writer.close();
                   }
                } catch (IOException e) {
-                  failed(e);
+                  failed(e, false);
                   return;
                }
             }
@@ -171,8 +177,13 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
 
    }
 
-   private void failed(Exception e) {
-      log.error(e);
+   private void failed(Exception e, boolean silent) {
+      if (silent) {
+         log.error(e.getMessage());
+      }
+      else {
+         log.error(e);
+      }
       if (! KEEP_GOING) {
          failed.set(true);
       }
@@ -188,7 +199,7 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
 
       @Override
       public void run() {
-         while (lastWrittenTermId < (SECONDS_TOTAL * WRITES_PER_SECOND) && failed.get() == false) {
+         while (lastWrittenTermId < (SECONDS_TOTAL * DELAY_BETWEEN_WRITES) && failed.get() == false) {
             IndexReader indexReader = null;
             try {
                int i = lastWrittenTermId;
@@ -203,20 +214,24 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
                   log.error("String '" + termValue + "' should exist but was not found in index");
                }
                if (VISUAL_PROGRESS_FEEDBACK) System.out.print(".");
+               int readerDone = reads.incrementAndGet();
+               if (readerDone%100==0) System.out.println("Reads performed: " + readerDone);
                Thread.sleep( 1 );
             } catch (IOException e) {
-               failed(e);
+               failed(e, false);
                return;
             } catch (InterruptedException e) {
-               failed(e);
+               failed(e, false);
                return;
+            } catch (IllegalStateException e) {
+               failed(e, true);//To almost hide the annoying exceptions at shutdown
             } finally {
                try {
                   if (indexReader != null) {
                      indexReader.close();
                   }
                } catch (IOException e) {
-                  failed(e);
+                  failed(e, false);
                   return;
                }
             }
