@@ -24,13 +24,10 @@
 package org.infinispan.distribution;
 
 import org.infinispan.config.Configuration;
-import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Mircea Markus
@@ -72,7 +69,7 @@ public class MultipleNodesLeavingTest extends MultipleCacheManagersTest {
       eventually(new Condition() {
          @Override
          public boolean isSatisfied() throws Exception {
-            List<Address> members = advancedCache(0).getRpcManager().getTransport().getMembers();
+            AddressCollection members = advancedCache(0).getRpcManager().getTransport().getMembers();
             System.out.println("members = " + members);
             return members.size() == 1;
          }
@@ -82,7 +79,7 @@ public class MultipleNodesLeavingTest extends MultipleCacheManagersTest {
 
       TestingUtil.blockUntilViewsReceived(60000, false, cache(0));
       TestingUtil.waitForRehashToComplete(cache(0));
-      Set<Address> caches = advancedCache(0).getDistributionManager().getConsistentHash().getCaches();
+      AddressCollection caches = advancedCache(0).getDistributionManager().getConsistentHash().getCaches();
       System.out.println("caches = " + caches);
       int size = caches.size();
       assert size == 1;

@@ -37,6 +37,7 @@ import org.infinispan.remoting.responses.Response;
 import org.infinispan.remoting.responses.SuccessfulResponse;
 import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
@@ -101,7 +102,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
    private Transport transport;
 
    private volatile boolean running = false;
-   private volatile List<Address> members;
+   private volatile AddressCollection members;
    private volatile Address self;
    private volatile Address coordinator;
    private volatile boolean isCoordinator;
@@ -195,7 +196,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
    }
 
    @Override
-   public Set<Address> getLeavers(String cacheName) {
+   public AddressCollection getLeavers(String cacheName) {
       return viewsInfo.get(cacheName).getPendingChanges().getLeavers();
    }
 
@@ -211,7 +212,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
          final CacheViewControlCommand cmd = new CacheViewControlCommand(cacheName,
                CacheViewControlCommand.Type.REQUEST_JOIN, self);
          // If we get a SuspectException we can ignore it, the new coordinator will come asking for our state anyway
-         Map<Address,Response> rspList = transport.invokeRemotely(Collections.singleton(coordinator), cmd,
+         Map<Address,Response> rspList = transport.invokeRemotely(AddressCollection.singleton(coordinator), cmd,
                ResponseMode.SYNCHRONOUS_IGNORE_LEAVERS, timeout, false, null, false);
          checkRemoteResponse(cacheName, cmd, rspList);
       }
@@ -249,7 +250,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
          log.debugf("Installing new view %s for cache %s", newView, cacheName);
          clusterPrepareView(cacheName, newView);
 
-         Set<Address> leavers = cacheViewInfo.getPendingChanges().getLeavers();
+         AddressCollection leavers = cacheViewInfo.getPendingChanges().getLeavers();
          if (cacheViewInfo.getPendingView().containsAny(leavers)) {
             log.debugf("Cannot commit cache view %s, some nodes already left the cluster: %s",
                   cacheViewInfo.getPendingView(), leavers);
@@ -291,7 +292,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
             CacheViewControlCommand.Type.PREPARE_VIEW, self, pendingView.getViewId(),
             pendingView.getMembers(), committedView.getViewId(), committedView.getMembers());
 
-      Set<Address> leavers = cacheViewInfo.getPendingChanges().getLeavers();
+      AddressCollection leavers = cacheViewInfo.getPendingChanges().getLeavers();
       if (pendingView.containsAny(leavers))
          throw new IllegalStateException("Cannot prepare cache view " + pendingView + ", some nodes already left the cluster: " + leavers);
 
@@ -326,14 +327,13 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
    /**
     * The rollback phase of view installation.
     */
-   private void clusterRollbackView(final String cacheName, int committedViewId, List<Address> targets, boolean includeCoordinator) {
+   private void clusterRollbackView(final String cacheName, int committedViewId, AddressCollection targets, boolean includeCoordinator) {
       final CacheViewInfo cacheViewInfo = viewsInfo.get(cacheName);
       // TODO Remove the rollback view id and instead add a pending view to the recovery response
       // If the coordinator dies while sending the rollback commands, some nodes may install the new view id and some may not.
       // If that happens the recovery process will try to commit the highest view id, which is wrong because we need to rollback.
       final int newViewId = cacheViewInfo.getPendingChanges().getRollbackViewId();
-      final List<Address> validTargets = new ArrayList<Address>(targets);
-      validTargets.removeAll(cacheViewInfo.getPendingChanges().getLeavers());
+      AddressCollection validTargets = targets.withoutAll(cacheViewInfo.getPendingChanges().getLeavers());
       log.tracef("%s: Rolling back to cache view %d on members %s, new view id is %d", cacheName, committedViewId, validTargets, newViewId);
 
       try {
@@ -362,11 +362,10 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
    /**
     * The commit phase of view installation.
     */
-   private void clusterCommitView(final String cacheName, final int viewId, List<Address> targets, boolean includeCoordinator) {
+   private void clusterCommitView(final String cacheName, final int viewId, AddressCollection targets, boolean includeCoordinator) {
       CacheViewInfo cacheViewInfo = viewsInfo.get(cacheName);
-      final List<Address> validTargets = new ArrayList<Address>(targets);
       // TODO Retry the commit if one of the targets left the cluster (even with this precaution)
-      validTargets.removeAll(cacheViewInfo.getPendingChanges().getLeavers());
+      final AddressCollection validTargets = targets.withoutAll(cacheViewInfo.getPendingChanges().getLeavers());
       log.tracef("%s: Committing cache view %d on members %s", cacheName, viewId, targets);
 
       try {
@@ -432,11 +431,11 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
 
    @Override
    public void handleRequestLeave(Address sender, String cacheName) {
-      handleLeavers(Collections.singleton(sender), cacheName);
+      handleLeavers(AddressCollection.singleton(sender), cacheName);
       viewTriggerThread.wakeUp();
    }
 
-   private void handleLeavers(Collection<Address> leavers, String cacheName) {
+   private void handleLeavers(AddressCollection leavers, String cacheName) {
       CacheViewInfo cacheViewInfo = viewsInfo.get(cacheName);
       if (cacheViewInfo == null)
          return;
@@ -559,7 +558,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
       return result;
    }
 
-   private void handleNewView(List<Address> newMembers, boolean mergeView, boolean initialView) {
+   private void handleNewView(AddressCollection newMembers, boolean mergeView, boolean initialView) {
       boolean wasCoordinator = isCoordinator;
       coordinator = transport.getCoordinator();
       isCoordinator = transport.isCoordinator();
@@ -654,20 +653,19 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
                DUMMY_CACHE_NAME_FOR_GLOBAL_COMMANDS, CacheViewControlCommand.Type.RECOVER_VIEW, self);
 
          // use unicast instead of broadcast so that the message doesn't reach the target before the merged view is installed
-         List<Address> tempMembers = members;
-         List<Future<Map<Address, Response>>> futures = new ArrayList<Future<Map<Address, Response>>>(tempMembers.size());
-         for (final Address member : tempMembers) {
+         List<Future<Map<Address, Response>>> futures = new ArrayList<Future<Map<Address, Response>>>(members.size());
+         for (final Address member : members) {
             Future<Map<Address, Response>> future = asyncTransportExecutor.submit(new Callable<Map<Address, Response>>() {
                @Override
                public Map<Address, Response> call() throws Exception {
-                  return transport.invokeRemotely(Collections.singleton(member), cmd,
+                  return transport.invokeRemotely(AddressCollection.singleton(member), cmd,
                         ResponseMode.SYNCHRONOUS_IGNORE_LEAVERS, timeout, true, null, false);
                }
             });
             futures.add(future);
          }
 
-         Map<Address, Response> rspList = new HashMap<Address, Response>(tempMembers.size());
+         Map<Address, Response> rspList = new HashMap<Address, Response>(members.size());
          for (Future<Map<Address, Response>> future : futures) {
             rspList.putAll(future.get());
          }
@@ -715,7 +713,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
 
             // iterate on the nodes, taking all the nodes in a view as a partition
             int partitionCount = 0;
-            List<Address> membersToProcess = new ArrayList<Address>(recoveredMembers);
+            AddressCollection membersToProcess = new AddressCollection(recoveredMembers);
             List<CacheView> partitions = new ArrayList(2);
             while (!membersToProcess.isEmpty()) {
                Address node = membersToProcess.get(0);
@@ -729,7 +727,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
                }
 
 
-               final List<Address> partitionMembers = new ArrayList<Address>(committedView.getMembers());
+               final AddressCollection partitionMembers = committedView.getMembers();
                // exclude from this group nodes that didn't send recovery info
                // or that were included in previous groups
                partitionMembers.retainAll(membersToProcess);
@@ -828,7 +826,7 @@ public class CacheViewsManagerImpl implements CacheViewsManager {
                // add leave requests for all the leavers x all the caches
                for (CacheViewInfo cacheViewInfo : viewsInfo.values()) {
                   // need to let the listener know about leavers first
-                  List<Address> leavers = MembershipArithmetic.getMembersLeft(cacheViewInfo.getCommittedView().getMembers(),
+                  AddressCollection leavers = MembershipArithmetic.getMembersLeft(cacheViewInfo.getCommittedView().getMembers(),
                         members);
                   if (!leavers.isEmpty()) {
                      handleLeavers(leavers, cacheViewInfo.getCacheName());

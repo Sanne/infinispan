@@ -29,6 +29,7 @@ import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.factories.scopes.Scope;
 import org.infinispan.factories.scopes.Scopes;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.Collection;
 import java.util.List;
@@ -73,7 +74,7 @@ public interface DistributionManager {
     * @param key key to test
     * @return a list of addresses where the key may reside
     */
-   List<Address> locate(Object key);
+   AddressCollection locate(Object key);
 
    /**
     * Locates a list of keys in a cluster.  Like {@link #locate(Object)} the returned addresses <i>may not</i> be owners
@@ -151,6 +152,6 @@ public interface DistributionManager {
     * @param affectedKeys keys to locate
     * @return a list of addresses which represent a combined set of all addresses affected by the set of keys.
     */
-   Collection<Address> getAffectedNodes(Collection<Object> affectedKeys);
+   AddressCollection getAffectedNodes(Collection<Object> affectedKeys);
 }
 

@@ -143,7 +143,7 @@ public abstract class AbstractCrashTest extends MultipleCacheManagersTest {
    protected void prepareCache(final CountDownLatch releaseLocksLatch) {
       RpcManager rpcManager = new ControlledRpcManager(advancedCache(1).getRpcManager()) {
          @Override
-         public Map<Address, Response> invokeRemotely(Collection<Address> recipients, ReplicableCommand rpcCommand, boolean sync, boolean usePriorityQueue) {
+         public Map<Address, Response> invokeRemotely(AddressCollection recipients, ReplicableCommand rpcCommand, boolean sync, boolean usePriorityQueue) {
             if (rpcCommand instanceof TxCompletionNotificationCommand) {
                releaseLocksLatch.countDown();
                return null;

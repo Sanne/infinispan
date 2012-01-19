@@ -41,6 +41,7 @@ import org.infinispan.loaders.CacheStore;
 import org.infinispan.notifications.cachelistener.CacheNotifier;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.transaction.LockingMode;
 import org.infinispan.util.concurrent.NotifyingNotifiableFuture;
 import org.infinispan.util.concurrent.ReclosableLatch;
@@ -49,7 +50,6 @@ import org.infinispan.util.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -139,7 +139,7 @@ public abstract class BaseStateTransferManagerImpl implements StateTransferManag
       cacheViewsManager.join(configuration.getName(), this);
    }
 
-   protected abstract ConsistentHash createConsistentHash(List<Address> members);
+   protected abstract ConsistentHash createConsistentHash(AddressCollection members);
 
    // To avoid blocking other components' start process, wait last, if necessary, for join to complete.
    @Start(priority = 1000)
@@ -252,7 +252,7 @@ public abstract class BaseStateTransferManagerImpl implements StateTransferManag
    /**
     * @return <code>true</code> if the state transfer started successfully, <code>false</code> otherwise
     */
-   public boolean startStateTransfer(int viewId, Collection<Address> members, boolean initialView) throws TimeoutException, InterruptedException, StateTransferCancelledException {
+   public boolean startStateTransfer(int viewId, AddressCollection members, boolean initialView) throws TimeoutException, InterruptedException, StateTransferCancelledException {
       if (newView == null || viewId != newView.getViewId()) {
          log.debugf("Cannot start state transfer for view %d, we should be starting state transfer for view %s", viewId, newView);
          return false;
@@ -263,7 +263,7 @@ public abstract class BaseStateTransferManagerImpl implements StateTransferManag
 
    public abstract CacheStore getCacheStoreForStateTransfer();
 
-   public void pushStateToNode(NotifyingNotifiableFuture<Object> stateTransferFuture, int viewId, Collection<Address> targets,
+   public void pushStateToNode(NotifyingNotifiableFuture<Object> stateTransferFuture, int viewId, AddressCollection targets,
                                Collection<InternalCacheEntry> state) throws StateTransferCancelledException {
       log.debugf("Pushing to nodes %s %d keys", targets, state.size());
       log.tracef("Pushing to nodes %s keys: %s", targets, keys(state));
@@ -358,7 +358,7 @@ public abstract class BaseStateTransferManagerImpl implements StateTransferManag
       joinCompletedLatch.countDown();
    }
 
-   protected abstract BaseStateTransferTask createStateTransferTask(int viewId, List<Address> members, boolean initialView);
+   protected abstract BaseStateTransferTask createStateTransferTask(int viewId, AddressCollection members, boolean initialView);
 
    private static interface CommandBuilder {
       PutKeyValueCommand buildPut(InvocationContext ctx, CacheEntry e);

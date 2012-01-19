@@ -20,16 +20,9 @@
 package org.infinispan.cacheviews;
 
 import org.infinispan.remoting.transport.Address;
-import org.infinispan.util.Immutables;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This class is used on the coordinator to keep track of changes since the last merge.
@@ -48,19 +41,19 @@ public class PendingCacheViewChanges {
    private int lastViewId;
    // The join requests since the last COMMIT_VIEW
    // These are only used if we are the coordinator.
-   private final Set<Address> joiners;
+   private volatile AddressCollection joiners;
    // The leave requests are also used on normal nodes to compute the valid members set
-   private final Set<Address> leavers;
+   private volatile AddressCollection leavers;
    // True if there was a merge since the last committed view
-   private Set<Address> recoveredMembers;
+   private AddressCollection recoveredMembers;
 
    private boolean viewInstallationInProgress;
 
    public PendingCacheViewChanges(String cacheName) {
       this.cacheName = cacheName;
-      this.joiners = new HashSet<Address>();
-      this.leavers = new HashSet<Address>();
-      this.recoveredMembers = Collections.emptySet();
+      this.joiners = new AddressCollection();
+      this.leavers = new AddressCollection();
+      this.recoveredMembers = new AddressCollection();
    }
 
    /**
@@ -74,20 +67,18 @@ public class PendingCacheViewChanges {
             log.tracef("Cannot create a new view, there is another view installation in progress");
             return null;
          }
-         if (leavers.size() == 0 && joiners.size() == 0 && recoveredMembers == null) {
+         if (leavers.isEmpty() && joiners.isEmpty() && recoveredMembers == null) {
             log.tracef("Cannot create a new view, we have no joiners or leavers");
             return null;
          }
 
-         Collection<Address> baseMembers = recoveredMembers != null ? recoveredMembers : committedView.getMembers();
+         AddressCollection baseMembers = recoveredMembers != null ? recoveredMembers : committedView.getMembers();
          log.tracef("Previous members are %s, joiners are %s, leavers are %s, recovered after merge = %s",
                baseMembers, joiners, leavers, recoveredMembers != null);
-         List<Address> members = new ArrayList<Address>(baseMembers);
          // If a node is both in leavers and in joiners we should install a view without it first
          // so that other nodes don't consider it an old owner, so we first add it as a joiner
          // and then we remove it as a leaver.
-         members.addAll(joiners);
-         members.removeAll(leavers);
+         AddressCollection members = baseMembers.withAllWithoutAll(joiners, leavers);
 
          viewInstallationInProgress = true;
 
@@ -117,16 +108,15 @@ public class PendingCacheViewChanges {
          // the list of valid members remains the same
          if (log.isDebugEnabled()) {
             // if a node was both a joiner and a leaver, the committed view should not contain it
-            List<Address> bothJoinerAndLeavers = new ArrayList<Address>(joiners);
-            bothJoinerAndLeavers.retainAll(leavers);
+            AddressCollection bothJoinerAndLeavers = joiners.retainAll(leavers);
             for (Address node : bothJoinerAndLeavers) {
                if (committedView.contains(node)) {
                   log.debugf("Node %s should not be a member in view %s, left and then joined before the view was installed");
                }
             }
          }
-         leavers.retainAll(committedView.getMembers());
-         joiners.removeAll(committedView.getMembers());
+         leavers = leavers.retainAll(committedView.getMembers());
+         joiners = joiners.withoutAll(committedView.getMembers());
          recoveredMembers = null;
 
          viewInstallationInProgress = false;
@@ -144,24 +134,23 @@ public class PendingCacheViewChanges {
          log.tracef("%s: Node %s is joining", cacheName, joiner);
          // if the node wanted to leave earlier, we don't remove it from the list of leavers
          // since it has already left, it won't have the latest data and so it's not a valid member
-         joiners.add(joiner);
+         joiners = joiners.with(joiner);
       }
    }
 
    /**
     * Signal a leave.
     */
-   public Set<Address> requestLeave(Collection<Address> leavers) {
+   public AddressCollection requestLeave(AddressCollection leavers) {
       synchronized (lock) {
          log.tracef("%s: Nodes %s are leaving", cacheName, leavers);
 
          // if the node wanted to join earlier, just remove it from the list of joiners
-         Set<Address> leavers2 = new HashSet<Address>(leavers);
-         joiners.removeAll(leavers2);
-         leavers2.removeAll(joiners);
+         joiners = joiners.withoutAll(leavers);
+         AddressCollection leavers2 = leavers.withoutAll(joiners);
          log.tracef("%s: After pruning nodes that have joined but have never installed a view, leavers are %s", cacheName, leavers2);
 
-         this.leavers.addAll(leavers2);
+         this.leavers = leavers.withAll(leavers2);
          return leavers2;
       }
    }
@@ -169,14 +158,12 @@ public class PendingCacheViewChanges {
    /**
     * Signal a merge
     */
-   public void recoveredViews(Collection<Address> newMembers, Collection<Address> recoveredJoiners) {
+   public void recoveredViews(AddressCollection newMembers, AddressCollection recoveredJoiners) {
       synchronized (lock) {
          log.tracef("%s: Coordinator changed, this node is the current coordinator", cacheName);
-         recoveredMembers = new HashSet<Address>(newMembers);
          // Apply any changes that we may have received before we realized we're the coordinator
-         recoveredMembers.removeAll(leavers);
-         joiners.addAll(recoveredJoiners);
-         joiners.removeAll(recoveredMembers);
+         recoveredMembers = newMembers.withoutAll(leavers);
+         joiners = joiners.withAllWithoutAll(recoveredJoiners, recoveredMembers);
          log.tracef("%s: Members after coordinator change: %s, joiners: %s, leavers: %s",
                cacheName, recoveredMembers, joiners, leavers);
       }
@@ -197,9 +184,9 @@ public class PendingCacheViewChanges {
    /**
     * @return the nodes that left since the last {@code resetChanges} call
     */
-   public Set<Address> getLeavers() {
+   public AddressCollection getLeavers() {
       synchronized (lock) {
-         return Immutables.immutableSetCopy(leavers);
+         return leavers;
       }
    }
 

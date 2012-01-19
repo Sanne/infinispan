@@ -24,6 +24,7 @@ package org.infinispan.remoting.responses;
 
 import org.infinispan.remoting.rpc.ResponseFilter;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,11 +43,11 @@ import java.util.Set;
  */
 public final class IgnoreExtraResponsesValidityFilter implements ResponseFilter {
 
-   private final Set<Address> targets;
+   private final AddressCollection targets;
    private int missingResponses;
 
-   public IgnoreExtraResponsesValidityFilter(Collection<Address> targets, Address self) {
-      this.targets = new HashSet<Address>(targets);
+   public IgnoreExtraResponsesValidityFilter(AddressCollection targets, Address self) {
+      this.targets = targets;
       this.missingResponses = targets.size();
       if (this.targets.contains(self)) {
          missingResponses--;

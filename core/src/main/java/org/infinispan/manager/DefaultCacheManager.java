@@ -54,6 +54,7 @@ import org.infinispan.lifecycle.Lifecycle;
 import org.infinispan.notifications.cachemanagerlistener.CacheManagerNotifier;
 import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.FileLookupFactory;
 import org.infinispan.util.Immutables;
@@ -582,7 +583,7 @@ public class DefaultCacheManager implements EmbeddedCacheManager, CacheManager {
    /**
     * {@inheritDoc}
     */
-   public List<Address> getMembers() {
+   public AddressCollection getMembers() {
       Transport t = getTransport();
       return t == null ? null : t.getMembers();
    }
@@ -891,7 +892,7 @@ public class DefaultCacheManager implements EmbeddedCacheManager, CacheManager {
    public String getClusterMembers() {
       Transport t = getTransport();
       if (t == null) return "local";
-      List<Address> addressList = t.getMembers();
+      AddressCollection addressList = t.getMembers();
       return addressList.toString();
    }
 

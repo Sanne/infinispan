@@ -33,6 +33,7 @@ import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.rpc.RpcManagerImpl;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
@@ -160,9 +161,9 @@ public class RpcManagerMBeanTest extends MultipleCacheManagersTest {
          memberList.add(mockAddress1);
          memberList.add(mockAddress2);
          Transport transport = createMock(Transport.class);
-         expect(transport.getMembers()).andReturn(memberList).anyTimes();
+         expect(transport.getMembers()).andReturn(new AddressCollection(memberList)).anyTimes();
          expect(transport.getAddress()).andReturn(null).anyTimes();
-         expect(transport.invokeRemotely(EasyMock.<Collection<Address>>anyObject(), EasyMock.<ReplicableCommand>anyObject(),
+         expect(transport.invokeRemotely(EasyMock.<AddressCollection>anyObject(), EasyMock.<ReplicableCommand>anyObject(),
                                                   EasyMock.<ResponseMode>anyObject(), anyLong(), anyBoolean(), EasyMock.<ResponseFilter>anyObject(),
                                                   anyBoolean())).andThrow(new RuntimeException()).anyTimes();
          replay(transport);

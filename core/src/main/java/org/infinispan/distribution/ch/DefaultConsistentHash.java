@@ -25,6 +25,7 @@ package org.infinispan.distribution.ch;
 import org.infinispan.commons.hash.Hash;
 import org.infinispan.marshall.Ids;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Util;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class DefaultConsistentHash extends AbstractWheelConsistentHash {
       setHashFunction(hash);
    }
 
-   public List<Address> locate(Object key, int replCount) {
+   public AddressCollection locate(Object key, int replCount) {
       return locateInternal(key, replCount, null);
    }
 
@@ -55,7 +56,7 @@ public class DefaultConsistentHash extends AbstractWheelConsistentHash {
     * Locate <code>replCount</code> owners for key <code>key</code> and return the list.
     * If one of the owners is identical to <code>target</code>, return <code>null</code> instead.
     */
-   private List<Address> locateInternal(Object key, int replCount, Address target) {
+   private AddressCollection locateInternal(Object key, int replCount, Address target) {
       int actualReplCount = Math.min(replCount, caches.size());
       int normalizedHash;
       normalizedHash = getNormalizedHash(getGrouping(key));

@@ -39,7 +39,6 @@ import org.infinispan.remoting.rpc.ResponseFilter;
 import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.util.logging.Log;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -89,7 +88,7 @@ public interface Transport extends Lifecycle {
     * @return a map of responses from each member contacted.
     * @throws Exception in the event of problems.
     */
-   Map<Address, Response> invokeRemotely(Collection<Address> recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout,
+   Map<Address, Response> invokeRemotely(AddressCollection recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout,
                                  boolean usePriorityQueue, ResponseFilter responseFilter, boolean supportReplay) throws Exception;
 
    /**
@@ -124,7 +123,7 @@ public interface Transport extends Lifecycle {
     *
     * @return a list of members.  Typically, this would be defensively copied.
     */
-   List<Address> getMembers();
+   AddressCollection getMembers();
 
    /**
     * Tests whether the transport supports true multicast

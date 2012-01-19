@@ -33,6 +33,7 @@ import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.rpc.RpcManagerImpl;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.ReplListener;
@@ -100,7 +101,7 @@ public class PutForExternalReadTest extends MultipleCacheManagersTest {
       assertEquals("PFER should have been a no-op", value, cache2.get(key));
    }
 
-   private List<Address> anyAddresses() {
+   private AddressCollection anyAddresses() {
       anyObject();
       return null;
    }
@@ -163,7 +164,7 @@ public class PutForExternalReadTest extends MultipleCacheManagersTest {
          memberList.add(mockAddress1);
          memberList.add(mockAddress2);
 
-         expect(mockTransport.getMembers()).andReturn(memberList).anyTimes();
+         expect(mockTransport.getMembers()).andReturn(new AddressCollection(memberList)).anyTimes();
          rpcManager.setTransport(mockTransport);
 
          expect(mockTransport.getViewId()).andReturn(originalTransport.getViewId()).anyTimes();

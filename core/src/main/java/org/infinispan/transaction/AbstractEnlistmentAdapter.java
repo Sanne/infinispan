@@ -25,6 +25,7 @@ import org.infinispan.config.Configuration;
 import org.infinispan.interceptors.locking.ClusteringDependentLogic;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.transaction.xa.CacheTransaction;
 import org.infinispan.transaction.xa.GlobalTransaction;
 import org.infinispan.util.logging.Log;
@@ -76,7 +77,7 @@ public abstract class AbstractEnlistmentAdapter {
    private void removeTransactionInfoRemotely(LocalTransaction localTransaction, GlobalTransaction gtx) {
       if (mayHaveRemoteLocks(localTransaction) && isClustered() && !config.isSecondPhaseAsync()) {
          final TxCompletionNotificationCommand command = commandsFactory.buildTxCompletionNotificationCommand(null, gtx);
-         final Collection<Address> owners = clusteringLogic.getOwners(localTransaction.getAffectedKeys());
+         final AddressCollection owners = clusteringLogic.getOwners(localTransaction.getAffectedKeys());
          log.tracef("About to invoke tx completion notification on nodes %s", owners);
          rpcManager.invokeRemotely(owners, command, false, true);
       }

@@ -28,6 +28,7 @@ import org.infinispan.notifications.cachemanagerlistener.event.CacheStoppedEvent
 import org.infinispan.notifications.cachemanagerlistener.event.Event;
 import org.infinispan.notifications.cachemanagerlistener.event.ViewChangedEvent;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.AbstractInfinispanTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -50,7 +51,7 @@ public class CacheManagerNotifierImplTest extends AbstractInfinispanTest {
 
    public void testNotifyViewChanged() {
       Address a = EasyMock.createNiceMock(Address.class);
-      List<Address> addresses = Collections.emptyList();
+      AddressCollection addresses = AddressCollection.emptyList();
       n.notifyViewChange(addresses, addresses, a, 100);
 
       assert cl.invocationCount == 1;

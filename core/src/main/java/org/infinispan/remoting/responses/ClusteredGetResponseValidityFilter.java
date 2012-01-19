@@ -24,6 +24,7 @@ package org.infinispan.remoting.responses;
 
 import org.infinispan.remoting.rpc.ResponseFilter;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,10 +43,10 @@ public class ClusteredGetResponseValidityFilter implements ResponseFilter {
    private int validResponses;
    private int missingResponses;
 
-   public ClusteredGetResponseValidityFilter(Collection<Address> targets, Address self) {
-      this.targets = new HashSet<Address>(targets);
-      this.validResponses = 0;
-      this.missingResponses = targets.size();
+   public ClusteredGetResponseValidityFilter(AddressCollection members, Address self) {
+//      this.targets = new HashSet<Address>(members);
+//      this.validResponses = 0;
+//      this.missingResponses = members.size();
       if (this.targets.contains(self)) {
          this.missingResponses--;
       }

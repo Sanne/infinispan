@@ -26,11 +26,10 @@ import org.infinispan.Cache;
 import org.infinispan.config.Configuration;
 import org.infinispan.config.Configuration.CacheMode;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 @Test(groups = "functional", testName = "api.CacheClusterJoinTest")
 public class CacheClusterJoinTest extends MultipleCacheManagersTest {
@@ -52,7 +51,7 @@ public class CacheClusterJoinTest extends MultipleCacheManagersTest {
 
    public void testGetMembers() throws Exception {
       cm1.getCache("cache"); // this will make sure any lazy components are started.
-      List memb1 = cm1.getMembers();
+      AddressCollection memb1 = cm1.getMembers();
       assert 1 == memb1.size() : "Expected 1 member; was " + memb1;
 
       Object coord = memb1.get(0);
@@ -62,7 +61,7 @@ public class CacheClusterJoinTest extends MultipleCacheManagersTest {
       cm2.getCache("cache"); // this will make sure any lazy components are started.
       TestingUtil.blockUntilViewsReceived(50000, true, cm1, cm2);
       memb1 = cm1.getMembers();
-      List memb2 = cm2.getMembers();
+      AddressCollection memb2 = cm2.getMembers();
       assert 2 == memb1.size();
       assert memb1.equals(memb2);
 

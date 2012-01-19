@@ -24,6 +24,7 @@ import org.infinispan.config.Configuration;
 import org.infinispan.config.GlobalConfiguration;
 import org.infinispan.lifecycle.ComponentStatus;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 
 import java.util.List;
@@ -70,7 +71,7 @@ public class AbstractDelegatingEmbeddedCacheManager implements EmbeddedCacheMana
    }
 
    @Override
-   public List<Address> getMembers() {
+   public AddressCollection getMembers() {
       return cm.getMembers();
    }
 

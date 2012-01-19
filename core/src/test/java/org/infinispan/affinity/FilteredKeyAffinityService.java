@@ -22,11 +22,9 @@
  */
 package org.infinispan.affinity;
 
-import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
@@ -39,7 +37,7 @@ import java.util.concurrent.ThreadFactory;
  */
 @Test (groups = "functional", testName = "affinity.FilteredKeyAffinityService")
 public class FilteredKeyAffinityService extends BaseFilterKeyAffinityServiceTest {
-   private List<Address> filter;
+   private AddressCollection filter;
 
    @Override
    protected void createService() {
@@ -49,9 +47,9 @@ public class FilteredKeyAffinityService extends BaseFilterKeyAffinityServiceTest
             return new Thread(r, "KeyGeneratorThread");
          }
       };
-      filter = new ArrayList<Address>();
-      filter.add(caches.get(0).getAdvancedCache().getRpcManager().getTransport().getAddress());
-      filter.add(caches.get(1).getAdvancedCache().getRpcManager().getTransport().getAddress());
+      filter = new AddressCollection(
+            caches.get(0).getAdvancedCache().getRpcManager().getTransport().getAddress(),
+            caches.get(1).getAdvancedCache().getRpcManager().getTransport().getAddress());
       cacheManager = caches.get(0).getCacheManager();
       keyAffinityService = (KeyAffinityServiceImpl) KeyAffinityServiceFactory.
             newKeyAffinityService(cacheManager.getCache(cacheName), filter, new RndKeyGenerator(),
@@ -59,7 +57,7 @@ public class FilteredKeyAffinityService extends BaseFilterKeyAffinityServiceTest
    }
 
    @Override
-   protected List<Address> getAddresses() {
+   protected AddressCollection getAddresses() {
       return filter;
    }
 

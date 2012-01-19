@@ -35,6 +35,7 @@ import org.infinispan.notifications.cachemanagerlistener.annotation.ViewChanged;
 import org.infinispan.notifications.cachemanagerlistener.event.Event;
 import org.infinispan.notifications.cachemanagerlistener.event.ViewChangedEvent;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.transaction.xa.GlobalTransaction;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
@@ -264,7 +265,7 @@ public class SingletonStore extends AbstractDelegatingStore {
     * @param newView View instance containing the new view of the cluster
     * @return whether the current cache is the coordinator or not.
     */
-   private boolean isCoordinator(List<Address> newView, Address currentAddress) {
+   private boolean isCoordinator(AddressCollection newView, Address currentAddress) {
       if (!currentAddress.equals(localAddress)) localAddress = currentAddress;
       if (localAddress != null) {
          return !newView.isEmpty() && localAddress.equals(newView.get(0));

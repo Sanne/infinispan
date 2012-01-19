@@ -29,6 +29,7 @@ import org.infinispan.loaders.CacheStore;
 import org.infinispan.notifications.cachelistener.CacheNotifier;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Immutables;
 import org.infinispan.util.ReadOnlyDataContainerBackedKeySet;
 import org.infinispan.util.logging.Log;
@@ -67,21 +68,21 @@ public class DistributedStateTransferTask extends BaseStateTransferTask {
    private final DistributionManager dm;
    private final DistributedStateTransferManagerImpl stateTransferManager;
    private List<Object> keysToRemove;
-   private Collection<Address> oldCacheSet;
-   private Collection<Address> newCacheSet;
+   private AddressCollection oldCacheSet;
+   private AddressCollection newCacheSet;
 
    public DistributedStateTransferTask(RpcManager rpcManager, Configuration configuration, DataContainer dataContainer,
                                        DistributedStateTransferManagerImpl stateTransferManager,
                                        DistributionManager dm, StateTransferLock stateTransferLock,
-                                       CacheNotifier cacheNotifier, int newViewId, Collection<Address> members,
+                                       CacheNotifier cacheNotifier, int newViewId, AddressCollection members,
                                        ConsistentHash chOld, ConsistentHash chNew, boolean initialView) {
       super(stateTransferManager, rpcManager, stateTransferLock, cacheNotifier, configuration, dataContainer, members, newViewId, chNew, chOld, initialView);
       this.dm = dm;
       this.stateTransferManager = stateTransferManager;
 
       // Cache sets for notification
-      oldCacheSet = chOld != null ? Immutables.immutableCollectionWrap(chOld.getCaches()) : Collections.<Address>emptySet();
-      newCacheSet = Immutables.immutableCollectionWrap(chNew.getCaches());
+      oldCacheSet = chOld != null ? chOld.getCaches() : AddressCollection.emptyList();
+      newCacheSet = chNew.getCaches();
    }
 
 
@@ -93,8 +94,8 @@ public class DistributedStateTransferTask extends BaseStateTransferTask {
       if (log.isDebugEnabled())
          log.debugf("Commencing rehash %d on node: %s. Before start, data container had %d entries",
                newViewId, self, dataContainer.size());
-      newCacheSet = Collections.emptySet();
-      oldCacheSet = Collections.emptySet();
+      newCacheSet = AddressCollection.emptyList();
+      oldCacheSet = AddressCollection.emptyList();
       keysToRemove = new ArrayList<Object>();
 
       // Don't need to log anything, all transactions will be blocked
@@ -135,7 +136,7 @@ public class DistributedStateTransferTask extends BaseStateTransferTask {
 
          // Push any remaining state chunks
          for (Map.Entry<Address, Collection<InternalCacheEntry>> entry : states.entrySet()) {
-            pushPartialState(Collections.singleton(entry.getKey()), entry.getValue());
+            pushPartialState(AddressCollection.singleton(entry.getKey()), entry.getValue());
          }
          // And wait for all the push RPCs to end
          finishPushingState();
@@ -219,7 +220,7 @@ public class DistributedStateTransferTask extends BaseStateTransferTask {
 
                // if we have a full chunk, start pushing it to the new owner
                if (map.size() >= stateTransferChunkSize) {
-                  pushPartialState(Collections.singleton(server), map);
+                  pushPartialState(AddressCollection.singleton(server), map);
                   states.remove(server);
                }
             }

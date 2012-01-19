@@ -22,6 +22,7 @@ import org.infinispan.Cache;
 import org.infinispan.config.Configuration;
 import org.infinispan.config.Configuration.CacheMode;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
 import org.testng.annotations.Test;
@@ -50,10 +51,10 @@ public class ParallelCacheStartTest extends MultipleCacheManagersTest {
    public void testParallelStartup() throws Exception {
       // start both caches in parallel
       cm1.startCaches("cache1", "cache2");
-      List memb1 = cm1.getMembers();
+      AddressCollection memb1 = cm1.getMembers();
       assert 1 == memb1.size() : "Expected 1 member; was " + memb1;
 
-      Object coord = memb1.get(0);
+      Object coord = memb1.getFirstAddress();
 
       cm2 = addClusterEnabledCacheManager();
       cm2.defineConfiguration("cache1", cfg);
@@ -64,7 +65,7 @@ public class ParallelCacheStartTest extends MultipleCacheManagersTest {
 
       TestingUtil.blockUntilViewsReceived(50000, true, cm1, cm2);
       memb1 = cm1.getMembers();
-      List memb2 = cm2.getMembers();
+      AddressCollection memb2 = cm2.getMembers();
       assert 2 == memb1.size();
       assert memb1.equals(memb2);
 
@@ -73,6 +74,6 @@ public class ParallelCacheStartTest extends MultipleCacheManagersTest {
 
       memb2 = cm2.getMembers();
       assert 1 == memb2.size();
-      assert !coord.equals(memb2.get(0));
+      assert !coord.equals(memb2.getFirstAddress());
    }
 }

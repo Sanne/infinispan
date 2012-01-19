@@ -25,6 +25,7 @@ package org.infinispan.distribution.ch;
 import org.infinispan.commons.hash.Hash;
 import org.infinispan.marshall.AbstractExternalizer;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Util;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
@@ -66,7 +67,7 @@ public abstract class AbstractWheelConsistentHash extends AbstractConsistentHash
    protected Hash hashFunction;
    protected int numVirtualNodes = 1;
 
-   protected Set<Address> caches;
+   protected AddressCollection caches;
    // A map of normalized hashes -> cache addresses, represented as two arrays for performance considerations
    // positionKeys.length == positionValues.length == caches.size() * numVirtualNodes
    // positionKeys is sorted so we can search in it using binary search, see getPositionIndex(int)
@@ -96,8 +97,8 @@ public abstract class AbstractWheelConsistentHash extends AbstractConsistentHash
    }
 
    @Override
-   public void setCaches(Set<Address> newCaches) {
-      if (newCaches.size() == 0 || newCaches.contains(null))
+   public void setCaches(AddressCollection newCaches) {
+      if (newCaches.isEmpty())
          throw new IllegalArgumentException("Invalid cache list for consistent hash: " + newCaches);
 
       if (((long) newCaches.size()) * numVirtualNodes > Integer.MAX_VALUE)
@@ -125,16 +126,17 @@ public abstract class AbstractWheelConsistentHash extends AbstractConsistentHash
       log.tracef("Positions are: %s", positions);
 
       // then populate caches, positionKeys and positionValues with the correct values (and in the correct order)
-      caches = new LinkedHashSet<Address>(newCaches.size());
       positionKeys = new int[positions.size()];
       positionValues = new Address[positions.size()];
       int i = 0;
+      List<Address> moreAddresses = new ArrayList<Address>(positions.size());
       for (Map.Entry<Integer, Address> position : positions.entrySet()) {
-         caches.add(position.getValue());
+         moreAddresses.add(position.getValue());
          positionKeys[i] = position.getKey();
          positionValues[i] = position.getValue();
          i++;
       }
+      caches = newCaches.withAll(moreAddresses);
       log.tracef("Consistent hash initialized: %s", this);
    }
 
@@ -150,7 +152,7 @@ public abstract class AbstractWheelConsistentHash extends AbstractConsistentHash
    }
 
    @Override
-   public Set<Address> getCaches() {
+   public AddressCollection getCaches() {
       return caches;
    }
 
@@ -276,7 +278,7 @@ public abstract class AbstractWheelConsistentHash extends AbstractConsistentHash
          instance.numVirtualNodes = unmarshaller.readInt();
          Hash hash = (Hash) unmarshaller.readObject();
          instance.setHashFunction(hash);
-         Set<Address> caches = (Set<Address>) unmarshaller.readObject();
+         AddressCollection caches = (AddressCollection) unmarshaller.readObject();
          instance.setCaches(caches);
          return instance;
       }

@@ -25,6 +25,7 @@ package org.infinispan.context.impl;
 import org.infinispan.commands.write.WriteCommand;
 import org.infinispan.container.entries.CacheEntry;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.transaction.AbstractCacheTransaction;
 import org.infinispan.transaction.LocalTransaction;
 import org.infinispan.transaction.xa.GlobalTransaction;
@@ -116,7 +117,7 @@ public class LocalTxInvocationContext extends AbstractTxInvocationContext {
       return localTransaction != null && localTransaction.ownsLock(key);
    }
 
-   public void remoteLocksAcquired(Collection<Address> nodes) {
+   public void remoteLocksAcquired(AddressCollection nodes) {
       localTransaction.locksAcquired(nodes);
    }
 

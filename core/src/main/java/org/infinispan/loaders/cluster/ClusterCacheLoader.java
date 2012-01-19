@@ -41,6 +41,7 @@ import org.infinispan.remoting.rpc.ResponseFilter;
 import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
@@ -125,7 +126,7 @@ public class ClusterCacheLoader extends AbstractCacheLoader {
    }
 
    private Collection<Response> doRemoteCall(ClusteredGetCommand clusteredGetCommand) throws CacheLoaderException {
-      Set<Address> members = new HashSet<Address>(rpcManager.getTransport().getMembers());
+      AddressCollection members = rpcManager.getTransport().getMembers();
       Address self = rpcManager.getTransport().getAddress();
       ResponseFilter filter = new ClusteredGetResponseValidityFilter(members, self);
       try {

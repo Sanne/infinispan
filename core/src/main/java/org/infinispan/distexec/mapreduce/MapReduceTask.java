@@ -39,6 +39,7 @@ import org.infinispan.remoting.responses.Response;
 import org.infinispan.remoting.responses.SuccessfulResponse;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Util;
 import org.infinispan.util.concurrent.AbstractInProcessFuture;
 import org.infinispan.util.concurrent.FutureListener;
@@ -258,7 +259,7 @@ public class MapReduceTask<KIn, VIn, KOut, VOut> {
                   log.debugf("Invoking %s on %s", cmd, address);
                   MapReduceFuture future = new MapReduceFuture();
                   futures.add(future);
-                  rpc.invokeRemotelyInFuture(Collections.singleton(address), cmd, future);                  
+                  rpc.invokeRemotelyInFuture(AddressCollection.singleton(address), cmd, future);
                   log.debugf("Invoked %s on %s ", cmd, address);
                } catch (Exception ex) {
                   throw new CacheException("Could not invoke MapReduceTask on remote node " + address, ex);
@@ -268,7 +269,7 @@ public class MapReduceTask<KIn, VIn, KOut, VOut> {
          for (MapReduceFuture future : futures) {
             Map<Address, Response> result;
             try {
-               result = (Map<Address, Response>) future.get();               
+               result = (Map<Address, Response>) future.get();
                results.putAll(result);
                log.debugf("Received result from future %s", result);
             } catch (Exception e1) {
@@ -406,7 +407,7 @@ public class MapReduceTask<KIn, VIn, KOut, VOut> {
       DistributionManager dm = cache.getDistributionManager();
       Map<Address, List<KIn>> addressToKey = new HashMap<Address, List<KIn>>();
       for (KIn key : keys) {
-         List<Address> nodesForKey = dm.locate(key);
+         AddressCollection nodesForKey = dm.locate(key);
          Address ownerOfKey = nodesForKey.get(0);
          List<KIn> keysAtNode = addressToKey.get(ownerOfKey);
          if (keysAtNode == null) {

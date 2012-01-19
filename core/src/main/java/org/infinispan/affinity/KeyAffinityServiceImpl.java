@@ -31,6 +31,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.notifications.cachelistener.event.TopologyChangedEvent;
 import org.infinispan.notifications.cachemanagerlistener.event.CacheStoppedEvent;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.concurrent.ConcurrentHashSet;
 import org.infinispan.util.concurrent.ReclosableLatch;
 import org.infinispan.util.logging.Log;
@@ -157,7 +158,7 @@ public class KeyAffinityServiceImpl implements KeyAffinityService {
          log.debug("Service already started, ignoring call to start!");
          return;
       }
-      List<Address> existingNodes = getExistingNodes();
+      AddressCollection existingNodes = getExistingNodes();
       maxNumberInvariant.writeLock().lock();
       try {
          addQueuesForAddresses(existingNodes);
@@ -339,12 +340,13 @@ public class KeyAffinityServiceImpl implements KeyAffinityService {
    /**
     * Important: this *MUST* be called with WL on {@link #address2key}.
     */
-   private void addQueuesForAddresses(Collection<Address> addresses) {
+   private void addQueuesForAddresses(AddressCollection addresses) {
+      final boolean traceEnabled = log.isTraceEnabled();
       for (Address address : addresses) {
          if (interestedInAddress(address)) {
             address2key.put(address, new ArrayBlockingQueue(bufferSize));
          } else {
-            if (log.isTraceEnabled())
+            if (traceEnabled)
                log.tracef("Skipping address: %s", address);
          }
       }
@@ -354,7 +356,7 @@ public class KeyAffinityServiceImpl implements KeyAffinityService {
       return filter == null || filter.contains(address);
    }
 
-   private List<Address> getExistingNodes() {
+   private AddressCollection getExistingNodes() {
       return cache.getAdvancedCache().getRpcManager().getTransport().getMembers();
    }
 

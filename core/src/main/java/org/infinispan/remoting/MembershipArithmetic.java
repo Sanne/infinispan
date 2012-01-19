@@ -22,12 +22,7 @@
  */
 package org.infinispan.remoting;
 
-import org.infinispan.remoting.transport.Address;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.infinispan.remoting.transport.AddressCollection;
 
 /**
  * A helper to perform common arithmetic functions with membership lists
@@ -36,27 +31,13 @@ import java.util.Set;
  * @since 4.0
  */
 public class MembershipArithmetic {
-   public static List<Address> getMembersJoined(List<Address> oldList, List<Address> newList) {
-      Set<Address> tmp = new HashSet<Address>(newList);
-      tmp.removeAll(oldList);
-      return new ArrayList<Address>(tmp);
-   }
-   
-   public static List<Address> getMembersLeft(List<Address> oldList, List<Address> newList) {
-      Set<Address> tmp = new HashSet<Address>(oldList);
-      tmp.removeAll(newList);
-      return new ArrayList<Address>(tmp);
+
+   public static AddressCollection getMembersJoined(AddressCollection oldList, AddressCollection newList) {
+      return newList.withoutAll(oldList);
    }
 
-   public static Set<Address> getMembersJoined(Set<Address> oldSet, Set<Address> newSet) {
-      Set<Address> result = new HashSet<Address>(newSet);
-      result.removeAll(oldSet);
-      return result;
+   public static AddressCollection getMembersLeft(AddressCollection oldList, AddressCollection newList) {
+      return oldList.withoutAll(newList);
    }
 
-   public static Set<Address> getMembersLeft(Set<Address> oldSet, Set<Address> newSet) {
-      Set<Address> result = new HashSet<Address>(oldSet);
-      result.removeAll(newSet);
-      return result;
-   }
 }

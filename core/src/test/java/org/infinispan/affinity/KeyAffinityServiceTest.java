@@ -145,7 +145,7 @@ public class KeyAffinityServiceTest extends BaseKeyAffinityServiceTest {
 
       private final int keysToConsume;
       private CountDownLatch consumersStart;
-      private final List<Address> topology = topology();
+      private final List<Address> topology = topology().toAddressList();
       private final Random rnd = new Random();
 
       public KeyConsumer(int keysToConsume, CountDownLatch consumersStart) {

@@ -27,6 +27,7 @@ import org.infinispan.distribution.TestAddress;
 import org.infinispan.distribution.ch.ConsistentHashHelper;
 import org.infinispan.distribution.ch.DefaultConsistentHash;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.AbstractInfinispanTest;
 import org.testng.annotations.Test;
 
@@ -38,7 +39,7 @@ import static org.testng.Assert.assertEquals;
 @Test(groups = "unit", testName = "distribution.VNodesDefaultConsistentHashTest", enabled = true)
 public class VNodesDefaultConsistentHashTest extends AbstractInfinispanTest {
 
-   public DefaultConsistentHash createConsistentHash(List<Address> servers, int numVirtualNodes) {
+   public DefaultConsistentHash createConsistentHash(AddressCollection servers, int numVirtualNodes) {
       Configuration c = new Configuration().fluent()
             .hash().consistentHashClass(DefaultConsistentHash.class).numVirtualNodes(numVirtualNodes)
             .build();
@@ -54,8 +55,8 @@ public class VNodesDefaultConsistentHashTest extends AbstractInfinispanTest {
                servers.add(new TestAddress(i * 1000));
             }
 
-            DefaultConsistentHash ch = createConsistentHash(servers, numVirtualNodes);
-            List<Address> sortedServers = new ArrayList<Address>(ch.getCaches());
+            DefaultConsistentHash ch = createConsistentHash(new AddressCollection(servers), numVirtualNodes);
+            AddressCollection sortedServers = ch.getCaches();
 
             // check that we get numOwners servers for numOwners in 1..nodesCount
             for (int numOwners = 1; numOwners < nodesCount; numOwners++) {

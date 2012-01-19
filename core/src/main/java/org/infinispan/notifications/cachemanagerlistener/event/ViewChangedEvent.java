@@ -23,8 +23,7 @@
 package org.infinispan.notifications.cachemanagerlistener.event;
 
 import org.infinispan.remoting.transport.Address;
-
-import java.util.List;
+import org.infinispan.remoting.transport.AddressCollection;
 
 /**
  * This event is passed in to any method annotated with {@link org.infinispan.notifications.cachemanagerlistener.annotation.ViewChanged}.
@@ -36,9 +35,9 @@ public interface ViewChangedEvent extends Event {
    /**
     * @return the new view associated with this view change.
     */
-   List<Address> getNewMembers();
+   AddressCollection getNewMembers();
 
-   List<Address> getOldMembers();
+   AddressCollection getOldMembers();
 
    Address getLocalAddress();
 

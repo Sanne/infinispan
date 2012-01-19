@@ -36,6 +36,7 @@ import org.infinispan.notifications.cachemanagerlistener.event.EventImpl;
 import org.infinispan.notifications.cachemanagerlistener.event.MergeEvent;
 import org.infinispan.notifications.cachemanagerlistener.event.ViewChangedEvent;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
@@ -83,7 +84,7 @@ public class CacheManagerNotifierImpl extends AbstractListenerImpl implements Ca
       this.cacheManager = cacheManager;
    }
 
-   public void notifyViewChange(List<Address> members, List<Address> oldMembers, Address myAddress, int viewId) {
+   public void notifyViewChange(AddressCollection members, AddressCollection oldMembers, Address myAddress, int viewId) {
       if (!viewChangedListeners.isEmpty()) {
          EventImpl e = new EventImpl();
          e.setLocalAddress(myAddress);
@@ -97,7 +98,7 @@ public class CacheManagerNotifierImpl extends AbstractListenerImpl implements Ca
       }
    }
 
-   public void notifyMerge(List<Address> members, List<Address> oldMembers, Address myAddress, int viewId, List<List<Address>> subgroupsMerged) {
+   public void notifyMerge(AddressCollection members, AddressCollection oldMembers, Address myAddress, int viewId, List<AddressCollection> subgroupsMerged) {
       if (!mergeListeners.isEmpty()) {
          EventImpl e = new EventImpl();
          e.setLocalAddress(myAddress);

@@ -22,11 +22,9 @@
  */
 package org.infinispan.affinity;
 
-import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
@@ -56,8 +54,8 @@ public class LocalKeyAffinityServiceTest extends BaseFilterKeyAffinityServiceTes
    }
 
    @Override
-   protected List<Address> getAddresses() {
-      return Collections.singletonList(cacheManager.getAddress());
+   protected AddressCollection getAddresses() {
+      return AddressCollection.singleton(cacheManager.getAddress());
    }
 
    public void testFilteredSingleKey() throws InterruptedException {

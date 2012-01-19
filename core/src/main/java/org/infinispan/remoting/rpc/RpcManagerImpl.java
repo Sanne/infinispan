@@ -39,6 +39,7 @@ import org.infinispan.remoting.RpcException;
 import org.infinispan.remoting.responses.IgnoreExtraResponsesValidityFilter;
 import org.infinispan.remoting.responses.Response;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.concurrent.NotifyingNotifiableFuture;
 import org.infinispan.util.logging.Log;
@@ -117,11 +118,12 @@ public class RpcManagerImpl implements RpcManager {
       return !sync && replicationQueue != null && replicationQueue.isEnabled();
    }
 
-   public final Map<Address, Response> invokeRemotely(Collection<Address> recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout, boolean usePriorityQueue, ResponseFilter responseFilter) {
+   @Override
+   public final Map<Address, Response> invokeRemotely(AddressCollection recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout, boolean usePriorityQueue, ResponseFilter responseFilter) {
       if (!configuration.getCacheMode().isClustered())
          throw new IllegalStateException("Trying to invoke a remote command but the cache is not clustered");
 
-      List<Address> clusterMembers = t.getMembers();
+      AddressCollection clusterMembers = t.getMembers();
       if (clusterMembers.size() < 2) {
          log.tracef("We're the only member in the cluster; Don't invoke remotely.");
          return Collections.emptyMap();
@@ -133,7 +135,7 @@ public class RpcManagerImpl implements RpcManager {
             // but only if the target is the whole cluster and the call is synchronous
             // if strict peer-to-peer is enabled we have to wait for replies from everyone, not just cache members
             if (recipients == null && mode.isSynchronous() && !configuration.getGlobalConfiguration().isStrictPeerToPeer()) {
-               List<Address> cacheMembers =  cvm.getCommittedView(configuration.getName()).getMembers();
+               AddressCollection cacheMembers =  cvm.getCommittedView(configuration.getName()).getMembers();
                // the filter won't work if there is no other member in the cache, so we have to 
                if (cacheMembers.size() < 2) {
                   log.tracef("We're the only member of cache %s; Don't invoke remotely.", configuration.getName());
@@ -165,11 +167,11 @@ public class RpcManagerImpl implements RpcManager {
       }
    }
 
-   public final Map<Address, Response> invokeRemotely(Collection<Address> recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout, boolean usePriorityQueue) {
+   public final Map<Address, Response> invokeRemotely(AddressCollection recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout, boolean usePriorityQueue) {
       return invokeRemotely(recipients, rpcCommand, mode, timeout, usePriorityQueue, null);
    }
 
-   public final Map<Address, Response> invokeRemotely(Collection<Address> recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout) {
+   public final Map<Address, Response> invokeRemotely(AddressCollection recipients, ReplicableCommand rpcCommand, ResponseMode mode, long timeout) {
       return invokeRemotely(recipients, rpcCommand, mode, timeout, false, null);
    }
 
@@ -193,15 +195,15 @@ public class RpcManagerImpl implements RpcManager {
       invokeRemotelyInFuture(null, rpc, usePriorityQueue, l);
    }
 
-   public final void invokeRemotely(Collection<Address> recipients, ReplicableCommand rpc, boolean sync) throws RpcException {
+   public final void invokeRemotely(AddressCollection recipients, ReplicableCommand rpc, boolean sync) throws RpcException {
       invokeRemotely(recipients, rpc, sync, false);
    }
 
-   public final Map<Address, Response> invokeRemotely(Collection<Address> recipients, ReplicableCommand rpc, boolean sync, boolean usePriorityQueue) throws RpcException {
+   public final Map<Address, Response> invokeRemotely(AddressCollection recipients, ReplicableCommand rpc, boolean sync, boolean usePriorityQueue) throws RpcException {
       return invokeRemotely(recipients, rpc, sync, usePriorityQueue, configuration.getSyncReplTimeout());
    }
 
-   public final Map<Address, Response> invokeRemotely(Collection<Address> recipients, ReplicableCommand rpc, boolean sync, boolean usePriorityQueue, long timeout) throws RpcException {
+   public final Map<Address, Response> invokeRemotely(AddressCollection recipients, ReplicableCommand rpc, boolean sync, boolean usePriorityQueue, long timeout) throws RpcException {
       if (trace) log.tracef("%s broadcasting call %s to recipient list %s", t.getAddress(), rpc, recipients);
 
       if (useReplicationQueue(sync)) {
@@ -218,15 +220,15 @@ public class RpcManagerImpl implements RpcManager {
       }
    }
 
-   public final void invokeRemotelyInFuture(Collection<Address> recipients, ReplicableCommand rpc, NotifyingNotifiableFuture<Object> l) {
+   public final void invokeRemotelyInFuture(AddressCollection recipients, ReplicableCommand rpc, NotifyingNotifiableFuture<Object> l) {
       invokeRemotelyInFuture(recipients, rpc, false, l);
    }
 
-   public final void invokeRemotelyInFuture(final Collection<Address> recipients, final ReplicableCommand rpc, final boolean usePriorityQueue, final NotifyingNotifiableFuture<Object> l) {
+   public final void invokeRemotelyInFuture(final AddressCollection recipients, final ReplicableCommand rpc, final boolean usePriorityQueue, final NotifyingNotifiableFuture<Object> l) {
       invokeRemotelyInFuture(recipients, rpc, usePriorityQueue, l, configuration.getSyncReplTimeout());
    }
 
-   public final void invokeRemotelyInFuture(final Collection<Address> recipients, final ReplicableCommand rpc, final boolean usePriorityQueue, final NotifyingNotifiableFuture<Object> l, final long timeout) {
+   public final void invokeRemotelyInFuture(final AddressCollection recipients, final ReplicableCommand rpc, final boolean usePriorityQueue, final NotifyingNotifiableFuture<Object> l, final long timeout) {
       if (trace) log.tracef("%s invoking in future call %s to recipient list %s", t.getAddress(), rpc, recipients);
       final CountDownLatch futureSet = new CountDownLatch(1);
       Callable<Object> c = new Callable<Object>() {

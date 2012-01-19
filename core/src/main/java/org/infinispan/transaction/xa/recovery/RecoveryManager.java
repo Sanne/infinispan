@@ -23,6 +23,7 @@
 package org.infinispan.transaction.xa.recovery;
 
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.transaction.xa.GlobalTransaction;
 
 import javax.transaction.xa.Xid;
@@ -74,13 +75,13 @@ public interface RecoveryManager {
     * @param sync execute sync or async (false)
     * @param gtx
     */
-   void removeRecoveryInformationFromCluster(Collection<Address> where, Xid xid, boolean sync, GlobalTransaction gtx);
+   void removeRecoveryInformationFromCluster(AddressCollection where, Xid xid, boolean sync, GlobalTransaction gtx);
 
    /**
     * Same as {@link #removeRecoveryInformationFromCluster(java.util.Collection} but the transaction
     * is identified by its internal id, and not by its xid.
     */
-   void removeRecoveryInformationFromCluster(Collection<Address> where, long internalId, boolean sync);
+   void removeRecoveryInformationFromCluster(AddressCollection where, long internalId, boolean sync);
 
    /**
     * Local call that returns a list containing:

@@ -25,6 +25,7 @@ package org.infinispan.distribution.ch;
 import org.infinispan.commons.hash.Hash;
 import org.infinispan.marshall.Ids;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.TopologyAwareAddress;
 import org.infinispan.util.Util;
 
@@ -70,7 +71,7 @@ public class TopologyAwareConsistentHash extends AbstractWheelConsistentHash {
    }
 
    @Override
-   public void setCaches(Set<Address> newCaches) {
+   public void setCaches(AddressCollection newCaches) {
       super.setCaches(newCaches);
 
       siteIdChangeIndexes.clear();

@@ -37,6 +37,7 @@ import org.infinispan.distribution.ch.UnionConsistentHash;
 import org.infinispan.distribution.group.Grouper;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.transaction.LockingMode;
@@ -122,7 +123,7 @@ public abstract class BaseDistFunctionalTest extends MultipleCacheManagersTest {
       return configuration;
    }
 
-   protected static ConsistentHash createNewConsistentHash(Collection<Address> servers) {
+   protected static ConsistentHash createNewConsistentHash(AddressCollection servers) {
       try {
          Configuration c = new Configuration();
          c.setConsistentHashClass(DefaultConsistentHash.class.getName());
@@ -335,7 +336,7 @@ public abstract class BaseDistFunctionalTest extends MultipleCacheManagersTest {
       return nonOwners;
    }
 
-   protected List<Address> residentAddresses(Object key) {
+   protected AddressCollection residentAddresses(Object key) {
       DistributionManager dm = c1.getAdvancedCache().getComponentRegistry().getComponent(DistributionManager.class);
       return dm.locate(key);
    }

@@ -24,6 +24,7 @@ package org.infinispan.notifications.cachemanagerlistener.event;
 
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Util;
 
 import java.util.List;
@@ -39,16 +40,16 @@ public class EventImpl implements CacheStartedEvent, CacheStoppedEvent, ViewChan
    String cacheName;
    EmbeddedCacheManager cacheManager;
    Type type;
-   List<Address> newMembers, oldMembers;
+   AddressCollection newMembers, oldMembers;
    Address localAddress;
    int viewId;
-   private List<List<Address>> subgroupsMerged;
+   private List<AddressCollection> subgroupsMerged;
    private boolean mergeView;
 
    public EventImpl() {
    }
 
-   public EventImpl(String cacheName, EmbeddedCacheManager cacheManager, Type type, List<Address> newMemberList, List<Address> oldMemberList, Address localAddress, int viewId) {
+   public EventImpl(String cacheName, EmbeddedCacheManager cacheManager, Type type, AddressCollection newMemberList, AddressCollection oldMemberList, Address localAddress, int viewId) {
       this.cacheName = cacheName;
       this.cacheManager = cacheManager;
       this.type = type;
@@ -82,19 +83,19 @@ public class EventImpl implements CacheStartedEvent, CacheStoppedEvent, ViewChan
       this.type = type;
    }
 
-   public List<Address> getNewMembers() {
+   public AddressCollection getNewMembers() {
       return newMembers;
    }
 
-   public void setNewMembers(List<Address> newMembers) {
+   public void setNewMembers(AddressCollection newMembers) {
       this.newMembers = newMembers;
    }
 
-   public void setOldMembers(List<Address> oldMembers) {
+   public void setOldMembers(AddressCollection oldMembers) {
       this.oldMembers = oldMembers;
    }
 
-   public List<Address> getOldMembers() {
+   public AddressCollection getOldMembers() {
       return this.oldMembers;
    }
 
@@ -158,11 +159,11 @@ public class EventImpl implements CacheStartedEvent, CacheStoppedEvent, ViewChan
               '}';
    }
 
-   public void setSubgroupsMerged(List<List<Address>> subgroupsMerged) {
+   public void setSubgroupsMerged(List<AddressCollection> subgroupsMerged) {
       this.subgroupsMerged = subgroupsMerged;
    }
 
-   public List<List<Address>> getSubgroupsMerged() {
+   public List<AddressCollection> getSubgroupsMerged() {
       return this.subgroupsMerged;
    }
 

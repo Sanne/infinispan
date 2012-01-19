@@ -25,6 +25,7 @@ package org.infinispan.distribution.ch;
 import org.infinispan.marshall.AbstractExternalizer;
 import org.infinispan.marshall.Ids;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Util;
 
 import java.io.IOException;
@@ -32,9 +33,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +58,7 @@ public class ExperimentalDefaultConsistentHash extends AbstractConsistentHash {
    private static final int DEFAULT_WEIGHT = 1;
    private static final int DEFAULT_WEIGHTFACTOR = 1;
 
-   private List<Address> nodes;
+   private AddressCollection nodes;
    private List<Entry> pool;
    private int poolSize;
 
@@ -72,7 +71,7 @@ public class ExperimentalDefaultConsistentHash extends AbstractConsistentHash {
       @Override
       @SuppressWarnings("unchecked")
       public ExperimentalDefaultConsistentHash readObject(ObjectInput input) throws IOException, ClassNotFoundException {
-         List<Address> addresses = (List<Address>) input.readObject();
+         AddressCollection addresses = (AddressCollection) input.readObject();
          ExperimentalDefaultConsistentHash gch = new ExperimentalDefaultConsistentHash();
          gch.setCaches(addresses);
          return gch;
@@ -89,17 +88,13 @@ public class ExperimentalDefaultConsistentHash extends AbstractConsistentHash {
       }
    }
 
-   public Set<Address> getCaches() {
-      return new LinkedHashSet<Address>(nodes);
+   public AddressCollection getCaches() {
+      return nodes;
    }
 
    @Override
-   public void setCaches(Set<Address> caches) {
-      setCaches((Collection<Address>)caches);
-   }
-
-   public void setCaches(Collection<Address> caches) {
-      nodes = new ArrayList<Address>(caches);
+   public void setCaches(AddressCollection caches) {
+      nodes = caches;
       int numNodes = nodes.size();
 
       int poolSize = 0;
@@ -118,13 +113,13 @@ public class ExperimentalDefaultConsistentHash extends AbstractConsistentHash {
       nodes = getSortedCachesList();
    }
 
-   private List<Address> getSortedCachesList() {
+   private AddressCollection getSortedCachesList() {
       ArrayList<Address> caches = new ArrayList<Address>();
       for (Entry e : pool) {
          if (!caches.contains(e.address)) caches.add(e.address);
       }
       caches.trimToSize();
-      return caches;
+      return new AddressCollection(caches);
    }
 
    /**

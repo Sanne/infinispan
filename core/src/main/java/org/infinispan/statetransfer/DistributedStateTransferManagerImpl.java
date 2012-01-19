@@ -28,6 +28,7 @@ import org.infinispan.factories.annotations.Inject;
 import org.infinispan.jmx.annotations.MBean;
 import org.infinispan.loaders.CacheStore;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
@@ -65,12 +66,12 @@ public class DistributedStateTransferManagerImpl extends BaseStateTransferManage
    }
 
 
-   protected BaseStateTransferTask createStateTransferTask(int viewId, List<Address> members, boolean initialView) {
+   protected BaseStateTransferTask createStateTransferTask(int viewId, AddressCollection members, boolean initialView) {
       return new DistributedStateTransferTask(rpcManager, configuration, dataContainer,
             this, dm, stateTransferLock, cacheNotifier, viewId, members, chOld, chNew, initialView);
    }
 
-   protected ConsistentHash createConsistentHash(List<Address> members) {
+   protected ConsistentHash createConsistentHash(AddressCollection members) {
       return ConsistentHashHelper.createConsistentHash(configuration, members);
    }
 

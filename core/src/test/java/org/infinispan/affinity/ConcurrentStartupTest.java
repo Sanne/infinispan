@@ -27,6 +27,7 @@ import org.infinispan.AdvancedCache;
 import org.infinispan.config.Configuration;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.AbstractCacheTest;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
@@ -88,7 +89,7 @@ public class ConcurrentStartupTest extends AbstractCacheTest {
       System.out.println("Test keys for cache1.");
       for (int i = 0; i < KEY_QUEUE_SIZE; i++) {
          Object keyForAddress = keyAffinityService1.getKeyForAddress(manager1.getAddress());
-         List<Address> locate = cache1.getDistributionManager().locate(keyForAddress);
+         AddressCollection locate = cache1.getDistributionManager().locate(keyForAddress);
          assertTrue("For key " + keyForAddress + " Locate " + locate + " should contain " + manager1.getAddress(), locate.contains(manager1.getAddress()));
       }
    }

@@ -26,9 +26,9 @@ import org.infinispan.distribution.BaseDistFunctionalTest;
 import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.manager.CacheContainer;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.TestingUtil;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -49,16 +49,16 @@ public class BaseKeyAffinityServiceTest extends BaseDistFunctionalTest {
       assertEquals("Expected key " + o + " to map to address " + addr + ". List of addresses is" + addresses, true, addresses.contains(addr));
    }
 
-   protected List<Address> topology() {
+   protected AddressCollection topology() {
       return topology(caches.get(0).getCacheManager());
    }
 
-   protected List<Address> topology(CacheContainer cm) {
+   protected AddressCollection topology(CacheContainer cm) {
       return cm.getCache(cacheName).getAdvancedCache().getRpcManager().getTransport().getMembers();
    }
 
    protected void assertEventualFullCapacity() throws InterruptedException {
-      List<Address> addresses = topology();
+      AddressCollection addresses = topology();
       assertEventualFullCapacity(addresses);
    }
 
@@ -66,7 +66,7 @@ public class BaseKeyAffinityServiceTest extends BaseDistFunctionalTest {
       assertCorrectCapacity(topology());
    }
 
-   protected void assertEventualFullCapacity(List<Address> addresses) throws InterruptedException {
+   protected void assertEventualFullCapacity(AddressCollection addresses) throws InterruptedException {
       Map<Address, BlockingQueue> blockingQueueMap = keyAffinityService.getAddress2KeysMapping();
       long maxWaitTime = 20 * 60 * 1000; // No more than 20 minutes per address since any more is ridiculous!
       for (Address addr : addresses) {
@@ -81,7 +81,7 @@ public class BaseKeyAffinityServiceTest extends BaseDistFunctionalTest {
       assertEquals(false, keyAffinityService.isKeyGeneratorThreadActive());
    }
 
-   protected void assertCorrectCapacity(List<Address> addresses) throws InterruptedException {
+   protected void assertCorrectCapacity(AddressCollection addresses) throws InterruptedException {
       Map<Address, BlockingQueue> blockingQueueMap = keyAffinityService.getAddress2KeysMapping();
       long maxWaitTime = 5 * 60 * 1000;
       for (Address addr : addresses) {
@@ -93,11 +93,11 @@ public class BaseKeyAffinityServiceTest extends BaseDistFunctionalTest {
    }
 
    protected void assertKeyAffinityCorrectness() {
-      List<Address> addressList = topology();
+      AddressCollection addressList = topology();
       assertKeyAffinityCorrectness(addressList);
    }
 
-   protected void assertKeyAffinityCorrectness(Collection<Address> addressList) {
+   protected void assertKeyAffinityCorrectness(AddressCollection addressList) {
       Map<Address, BlockingQueue> blockingQueueMap = keyAffinityService.getAddress2KeysMapping();
       for (Address addr : addressList) {
          BlockingQueue queue = blockingQueueMap.get(addr);

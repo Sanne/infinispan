@@ -49,6 +49,7 @@ import org.infinispan.marshall.jboss.ExternalizerTable;
 import org.infinispan.remoting.ReplicationQueue;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 import org.infinispan.statetransfer.StateTransferManager;
@@ -240,7 +241,7 @@ public class TestingUtil {
    }
    private static void viewsTimedOut(CacheContainer[] cacheContainers) {
       int length = cacheContainers.length;
-      List<List<Address>> allViews = new ArrayList<List<Address>>(length);
+      List<AddressCollection> allViews = new ArrayList<AddressCollection>(length);
       for (int i = 0; i < length; i++) {
          EmbeddedCacheManager cm = (EmbeddedCacheManager) cacheContainers[i];
          allViews.add(cm.getMembers());
@@ -468,7 +469,7 @@ public class TestingUtil {
       return isCacheViewComplete(cacheManager.getMembers(), cacheManager.getAddress(), memberCount, true);
    }
 
-   public static boolean isCacheViewComplete(List members, Address address, int memberCount, boolean barfIfTooManyMembers) {
+   public static boolean isCacheViewComplete(AddressCollection members, Address address, int memberCount, boolean barfIfTooManyMembers) {
       if (members == null || memberCount > members.size()) {
          return false;
       } else if (memberCount < members.size()) {
@@ -520,7 +521,7 @@ public class TestingUtil {
          }
       }
 
-      List<List<Address>> allViews = new ArrayList<List<Address>>(caches.length);
+      List<AddressCollection> allViews = new ArrayList<AddressCollection>(caches.length);
       for (int i = 0; i < caches.length; i++) {
          allViews.add(caches[i].getCacheManager().getMembers());
       }
@@ -543,7 +544,7 @@ public class TestingUtil {
       return true;
    }
 
-   private static boolean isCacheViewChanged(List members, int finalViewSize) {
+   private static boolean isCacheViewChanged(AddressCollection members, int finalViewSize) {
       if (members == null || finalViewSize != members.size())
          return false;
       else

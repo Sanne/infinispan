@@ -23,11 +23,11 @@
 package org.infinispan.distribution.ch;
 
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A consistent hash algorithm implementation.  Implementations would typically be constructed via reflection so should
@@ -45,14 +45,14 @@ public interface ConsistentHash {
     *
     * @param caches A set of unique caches in cluster.
     */
-   void setCaches(Set<Address> caches);
+   void setCaches(AddressCollection caches);
 
    /**
     * Should return a collection of cache addresses in the cluster.
     *
     * @return set of unique of cache addresses
     */
-   Set<Address> getCaches();
+   AddressCollection getCaches();
 
    /**
     * Locates a key, given a replication count (number of copies).
@@ -63,7 +63,7 @@ public interface ConsistentHash {
     *         #setCaches(java.util.Set)}.  Should never be null, and should contain replCount elements or the max
     *         number of caches available, whichever is smaller.
     */
-   List<Address> locate(Object key, int replCount);
+   AddressCollection locate(Object key, int replCount);
 
    /**
     * The logical equivalent of calling {@link #locate(Object, int)} multiple times for each key in the collection of

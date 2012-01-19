@@ -29,6 +29,7 @@ import org.infinispan.notifications.cachelistener.CacheNotifier;
 import org.infinispan.remoting.MembershipArithmetic;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.ByRef;
 import org.infinispan.util.ReadOnlyDataContainerBackedKeySet;
 import org.infinispan.util.logging.Log;
@@ -37,7 +38,6 @@ import org.infinispan.util.logging.LogFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Task which pushes keys to new nodes during join.
@@ -64,7 +64,7 @@ public class ReplicatedStateTransferTask extends BaseStateTransferTask {
 
    public ReplicatedStateTransferTask(RpcManager rpcManager, Configuration configuration, DataContainer dataContainer,
                                       ReplicatedStateTransferManagerImpl stateTransferManager, StateTransferLock stateTransferLock,
-                                      CacheNotifier cacheNotifier, int newViewId, Collection<Address> members,
+                                      CacheNotifier cacheNotifier, int newViewId, AddressCollection members,
                                       ConsistentHash chOld, ConsistentHash chNew, boolean initialView) {
       super(stateTransferManager, rpcManager, stateTransferLock, cacheNotifier, configuration, dataContainer, members, newViewId, chNew, chOld, initialView);
       this.stateTransferManager = stateTransferManager;
@@ -84,7 +84,7 @@ public class ReplicatedStateTransferTask extends BaseStateTransferTask {
       //distributionManager.getTransactionLogger().enable();
       stateTransferLock.blockNewTransactions(newViewId);
 
-      Set<Address> joiners = chOld != null ? MembershipArithmetic.getMembersJoined(chOld.getCaches(), chNew.getCaches()) : chNew.getCaches();
+      AddressCollection joiners = chOld != null ? MembershipArithmetic.getMembersJoined(chOld.getCaches(), chNew.getCaches()) : chNew.getCaches();
       if (joiners.isEmpty()) {
          log.tracef("No joiners in view %s, skipping replication", newViewId);
       } else {
@@ -134,7 +134,7 @@ public class ReplicatedStateTransferTask extends BaseStateTransferTask {
     * @param cacheStore   If the value is <code>null</code>, try to load it from this cache store
     * @param stateRef        The result collection of entries to be pushed to the joiners
     */
-   private void replicate(Object key, InternalCacheEntry value, ConsistentHash chOld, Collection<Address> joiners,
+   private void replicate(Object key, InternalCacheEntry value, ConsistentHash chOld, AddressCollection joiners,
                           CacheStore cacheStore, ByRef<Collection<InternalCacheEntry>> stateRef) throws StateTransferCancelledException {
       // 1. Get the old primary owner for key K
       // That node will be the "pushing owner" for key K

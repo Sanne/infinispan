@@ -25,9 +25,9 @@ package org.infinispan.cacheviews;
 import org.infinispan.factories.scopes.Scope;
 import org.infinispan.factories.scopes.Scopes;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A component that manages a virtual view of the cluster for each defined cache.
@@ -51,7 +51,7 @@ public interface CacheViewsManager {
    /**
     * @return The members which will (should) handle commands for a given cache.
     */
-   Set<Address> getLeavers(String cacheName);
+   AddressCollection getLeavers(String cacheName);
 
    /**
     * Start the cache.

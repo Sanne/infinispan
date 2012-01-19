@@ -32,6 +32,7 @@ import org.infinispan.loaders.bucket.Bucket;
 import org.infinispan.loaders.decorators.SingletonStore;
 import org.infinispan.remoting.responses.Response;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.statetransfer.StateTransferException;
 import org.infinispan.transaction.LocalTransaction;
 import org.infinispan.transaction.RemoteTransaction;
@@ -132,7 +133,7 @@ public interface Log extends BasicLogger {
 
    @LogMessage(level = WARN)
    @Message(value = "Can not select %s random members for %s", id = 8)
-   void cannotSelectRandomMembers(int numNeeded, List<Address> members);
+   void cannotSelectRandomMembers(int numNeeded, AddressCollection members);
 
    @LogMessage(level = INFO)
    @Message(value = "Detected a view change. Member list changed from %s to %s", id = 9)

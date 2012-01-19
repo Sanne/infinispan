@@ -28,6 +28,7 @@ import org.infinispan.notifications.Listener;
 import org.infinispan.notifications.cachemanagerlistener.annotation.ViewChanged;
 import org.infinispan.notifications.cachemanagerlistener.event.ViewChangedEvent;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
@@ -76,12 +77,12 @@ public class ClusterIdGenerator {
       versionCounter.compareAndSet(versionCounter.get(), 0);
    }
 
-   private int findAddressRank(Address address, List<Address> members, int rank) {
+   private int findAddressRank(Address address, AddressCollection members, int rank) {
       if (address.equals(members.get(0))) return rank;
       else return findAddressRank(address, members.subList(1, members.size()), rank + 1);
    }
 
-   protected long calculateRank(Address address, List<Address> members, long viewId) {
+   protected long calculateRank(Address address, AddressCollection members, long viewId) {
       long rank = findAddressRank(address, members, 1);
       // Version is composed of: <view id (2 bytes)><rank (2 bytes)><version counter (4 bytes)>
       // View id and rank form the prefix which is updated on a view change.

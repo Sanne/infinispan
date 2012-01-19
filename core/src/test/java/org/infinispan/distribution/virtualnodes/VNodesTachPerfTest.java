@@ -28,6 +28,7 @@ import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.distribution.ch.ConsistentHashHelper;
 import org.infinispan.distribution.ch.TopologyAwareConsistentHash;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.jgroups.JGroupsTopologyAwareAddress;
 import org.infinispan.test.AbstractInfinispanTest;
 import org.infinispan.util.Util;
@@ -54,13 +55,13 @@ import static org.testng.Assert.assertEquals;
 @Test(testName = "topologyaware.VNodesTachPerfTest", groups = "manual")
 public class VNodesTachPerfTest extends AbstractInfinispanTest {
 
-   private Set<Address> createAddresses(int numNodes) {
+   private AddressCollection createAddresses(int numNodes) {
       Set<Address> addresses = new HashSet<Address>(numNodes);
       for (int i = 0; i < numNodes; i++) {
          String machineId = "m" + i;
          addresses.add(new JGroupsTopologyAwareAddress(org.jgroups.util.TopologyUUID.randomUUID(null, null, machineId)));
       }
-      return addresses;
+      return new AddressCollection(addresses);
    }
 
    public void testSpeed() {
@@ -97,7 +98,7 @@ public class VNodesTachPerfTest extends AbstractInfinispanTest {
       c.fluent().hash()
             .consistentHashClass(TopologyAwareConsistentHash.class)
             .numVirtualNodes(10);
-      Set<Address> addresses = createAddresses(numNodes);
+      AddressCollection addresses = createAddresses(numNodes);
       return ConsistentHashHelper.createConsistentHash(c, addresses);
    }
 

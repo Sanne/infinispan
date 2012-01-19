@@ -24,6 +24,7 @@
 package org.infinispan.util;
 
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public class ClusterIdGeneratorTest {
       TestAddress addr2 = new TestAddress(2);
       TestAddress addr3 = new TestAddress(1);
       List<Address> members = Arrays.asList((Address)addr1, addr2, addr3);
-      vg.calculateRank(addr2, members, 1);
+      vg.calculateRank(addr2, new AddressCollection(members), 1);
 
 
       assertEquals(vg.newVersion(true), (Object)0x1000200000001L);

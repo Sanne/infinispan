@@ -26,10 +26,10 @@ import junit.framework.Assert;
 import org.infinispan.Cache;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -55,7 +55,7 @@ public abstract class BaseFilterKeyAffinityServiceTest extends BaseKeyAffinitySe
 
    protected abstract void createService();
 
-   protected abstract List<Address> getAddresses() ;
+   protected abstract AddressCollection getAddresses() ;
 
 
    protected void testSingleKey() throws InterruptedException {

@@ -28,10 +28,9 @@ import org.infinispan.container.entries.ImmortalCacheEntry;
 import org.infinispan.container.entries.InternalCacheEntry;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
-
-import java.util.List;
 
 /**
  * Test helper class
@@ -89,13 +88,13 @@ public class DistributionTestHelper {
 
    public static boolean isOwner(Cache<?, ?> c, Object key) {
       DistributionManager dm = c.getAdvancedCache().getDistributionManager();
-      List<Address> ownerAddresses = dm.locate(key);
+      AddressCollection ownerAddresses = dm.locate(key);
       return ownerAddresses.contains(addressOf(c));
    }
 
    public static boolean isFirstOwner(Cache<?, ?> c, Object key) {
       DistributionManager dm = c.getAdvancedCache().getComponentRegistry().getComponent(DistributionManager.class);
-      List<Address> ownerAddresses = dm.locate(key);
+      AddressCollection ownerAddresses = dm.locate(key);
       return addressOf(c).equals(ownerAddresses.get(0));
    }
 

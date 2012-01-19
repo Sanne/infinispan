@@ -36,6 +36,7 @@ import org.infinispan.remoting.responses.Response;
 import org.infinispan.remoting.responses.SuccessfulResponse;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Util;
 import org.infinispan.util.concurrent.FutureListener;
 import org.infinispan.util.concurrent.NotifyingFuture;
@@ -333,7 +334,7 @@ public class DefaultExecutorService extends AbstractExecutorService implements D
          Address me = rpc.getAddress();
          DistributedExecuteCommand<T> c = factory.buildDistributedExecuteCommand(task, me, Arrays.asList(input));
          DistributedRunnableFuture<T> f = new DistributedRunnableFuture<T>(c);
-         ArrayList<Address> nodes = new ArrayList<Address>(nodesKeysMap.keySet());
+         AddressCollection nodes = new AddressCollection(nodesKeysMap.keySet());
          executeFuture(selectExecutionNode(nodes), f);
          return f;
       } else {
@@ -344,8 +345,8 @@ public class DefaultExecutorService extends AbstractExecutorService implements D
    @Override
    public <T> List<Future<T>> submitEverywhere(Callable<T> task) {
       if (task == null) throw new NullPointerException();
-      List<Address> members = rpc.getTransport().getMembers();
-      List<Future<T>> futures = new ArrayList<Future<T>>(members.size() - 1);      
+      AddressCollection members = rpc.getTransport().getMembers();
+      List<Future<T>> futures = new ArrayList<Future<T>>(members.size() - 1);
       Address me = rpc.getAddress();
       for (Address target : members) {
          DistributedExecuteCommand<T> c = null;
@@ -396,7 +397,7 @@ public class DefaultExecutorService extends AbstractExecutorService implements D
       } else {
          log.tracef("Sending %s to remote execution at node %s", f, address);
          try {
-            rpc.invokeRemotelyInFuture(Collections.singletonList(address), f.getCommand(),
+            rpc.invokeRemotelyInFuture(AddressCollection.singleton(address), f.getCommand(),
                      (DistributedRunnableFuture<Object>) f);
          } catch (Throwable e) {
             log.remoteExecutionFailed(address, e);
@@ -439,7 +440,7 @@ public class DefaultExecutorService extends AbstractExecutorService implements D
       DistributionManager dm = cache.getDistributionManager();
       Map<Address, List<K>> addressToKey = new HashMap<Address, List<K>>(input.length * 2);
       for (K key : input) {
-         List<Address> nodesForKey = dm.locate(key);
+         AddressCollection nodesForKey = dm.locate(key);
          Address ownerOfKey = nodesForKey.get(0);
          List<K> keysAtNode = addressToKey.get(ownerOfKey);
          if (keysAtNode == null) {
@@ -451,7 +452,7 @@ public class DefaultExecutorService extends AbstractExecutorService implements D
       return addressToKey;
    }
 
-   protected Address selectExecutionNode(List<Address> candidates) {
+   protected Address selectExecutionNode(AddressCollection candidates) {
       List<Address> list = randomClusterMembers(candidates,1);
       return list.get(0);
    }
@@ -460,7 +461,7 @@ public class DefaultExecutorService extends AbstractExecutorService implements D
      return selectExecutionNode(rpc.getTransport().getMembers());
    }
 
-   protected List<Address> randomClusterMembers(final List<Address> members, int numNeeded) {
+   protected List<Address> randomClusterMembers(final AddressCollection members, int numNeeded) {
       if(members == null || members.isEmpty())
          throw new IllegalArgumentException("Invalid member list " + members);
 
@@ -468,7 +469,7 @@ public class DefaultExecutorService extends AbstractExecutorService implements D
          log.cannotSelectRandomMembers(numNeeded, members);
          numNeeded = members.size();
       }
-      List<Address> membersCopy = new ArrayList<Address>(members);
+//      List<Address> membersCopy = new ArrayList<Address>(members);
       List<Address> chosen = new ArrayList<Address>(numNeeded);
       Random r = new Random();
       while (!membersCopy.isEmpty() && numNeeded >= chosen.size()) {

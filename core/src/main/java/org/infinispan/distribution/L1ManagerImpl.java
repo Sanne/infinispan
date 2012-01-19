@@ -28,6 +28,7 @@ import org.infinispan.config.Configuration;
 import org.infinispan.factories.annotations.Inject;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.concurrent.AggregatingNotifyingFutureImpl;
 import org.infinispan.util.concurrent.ConcurrentHashSet;
 import org.infinispan.util.concurrent.NotifyingNotifiableFuture;
@@ -84,7 +85,7 @@ public class L1ManagerImpl implements L1Manager {
       
       NotifyingNotifiableFuture<Object> future = new AggregatingNotifyingFutureImpl(retval, 2);
       
-      Collection<Address> invalidationAddresses = buildInvalidationAddressList(keys, origin);
+      AddressCollection invalidationAddresses = buildInvalidationAddressList(keys, origin);
       
       int nodes = invalidationAddresses.size();
 
@@ -111,7 +112,7 @@ public class L1ManagerImpl implements L1Manager {
       return future;
    }
    
-   private Collection<Address> buildInvalidationAddressList(Collection<Object> keys, Address origin) {
+   private AddressCollection buildInvalidationAddressList(Collection<Object> keys, Address origin) {
    	Collection<Address> addresses = new HashSet<Address>(2);
    	
    	for (Object key : keys) {
@@ -123,7 +124,7 @@ public class L1ManagerImpl implements L1Manager {
    	}
    	if (origin != null)
    		addresses.remove(origin);
-   	return addresses;
+   	return new AddressCollection(addresses);//optimize this ctor?
    }
    
    private boolean isUseMulticast(int nodes) {

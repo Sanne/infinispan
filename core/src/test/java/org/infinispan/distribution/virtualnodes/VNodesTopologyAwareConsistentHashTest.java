@@ -28,6 +28,7 @@ import org.infinispan.distribution.TestAddress;
 import org.infinispan.distribution.TestTopologyAwareAddress;
 import org.infinispan.distribution.ch.TopologyAwareConsistentHash;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.TopologyAwareAddress;
 import org.infinispan.test.AbstractInfinispanTest;
 import org.infinispan.util.logging.Log;
@@ -52,25 +53,26 @@ public class VNodesTopologyAwareConsistentHashTest extends AbstractInfinispanTes
    private static final Log log = LogFactory.getLog(VNodesTopologyAwareConsistentHashTest.class);
 
    protected TopologyAwareConsistentHash ch;
-   protected HashSet<Address> addresses;
+   protected AddressCollection addresses;
    TestTopologyAwareAddress[] testAddresses;
 
    @BeforeMethod
    public void setUp() {
       ch = new TopologyAwareConsistentHash(new MurmurHash3());
-      addresses = new HashSet<Address>();
+      HashSet<Address> addressesBuild = new HashSet<Address>();
       for (int i = 0; i < 10; i++) {
-          addresses.add(new TestTopologyAwareAddress(i * 100));
+         addressesBuild.add(new TestTopologyAwareAddress(i * 100));
       }
+      addresses = new AddressCollection(addressesBuild);
       ch.setCaches(addresses);
-      Set<Address> tmp = ch.getCaches();
+      AddressCollection tmp = ch.getCaches();
       int i = 0;
       testAddresses = new TestTopologyAwareAddress[tmp.size()];
       for (Address a: tmp) testAddresses[i++] = (TestTopologyAwareAddress) a;
 
       ch = new TopologyAwareConsistentHash(new MurmurHash3());
       ch.setNumVirtualNodes(10);
-      addresses.clear();
+      addresses = AddressCollection.emptyList();
    }
 
    public void testNumberOfOwners() {
@@ -216,8 +218,7 @@ public class VNodesTopologyAwareConsistentHashTest extends AbstractInfinispanTes
 
       for (Address addr: addresses) {
          System.out.println("addr = " + addr);
-         Set<Address> addressCopy = (Set<Address>) addresses.clone();
-         addressCopy.remove(addr);
+         AddressCollection addressCopy = addresses.without(addr);
          ch.setCaches(addressCopy);
          checkConsistency(testAddresses0List, testAddresses[0], addr, 3);
          checkConsistency(testAddresses1List, testAddresses[1], addr, 3);
@@ -263,7 +264,7 @@ public class VNodesTopologyAwareConsistentHashTest extends AbstractInfinispanTes
    }
 
    private void addNode(TestTopologyAwareAddress address, String machineId, String rackId, String siteId) {
-      addresses.add(address);
+      addresses = addresses.with(address);
       address.setSiteId(siteId);
       address.setRackId(rackId);
       address.setMachineId(machineId);

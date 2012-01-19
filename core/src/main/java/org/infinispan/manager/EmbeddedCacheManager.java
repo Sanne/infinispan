@@ -32,6 +32,7 @@ import org.infinispan.factories.scopes.Scopes;
 import org.infinispan.lifecycle.ComponentStatus;
 import org.infinispan.notifications.Listenable;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 
 import java.util.List;
@@ -139,7 +140,7 @@ public interface EmbeddedCacheManager extends CacheContainer, Listenable {
    /**
     * @return the addresses of all the members in the cluster.
     */
-   List<Address> getMembers();
+   AddressCollection getMembers();
 
    /**
     * @return the address of the local node

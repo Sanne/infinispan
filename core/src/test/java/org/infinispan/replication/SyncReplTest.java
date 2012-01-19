@@ -39,6 +39,7 @@ import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.rpc.RpcManagerImpl;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
@@ -183,7 +184,7 @@ public class SyncReplTest extends MultipleCacheManagersTest {
          addresses.add(mockAddressOne);
          addresses.add(mockAddressTwo);
          expect(mockTransport.getAddress()).andReturn(mockAddressOne).anyTimes();
-         expect(mockTransport.getMembers()).andReturn(addresses).anyTimes();
+         expect(mockTransport.getMembers()).andReturn(new AddressCollection(addresses)).anyTimes();
 
          // this is shared by all caches managed by the cache manager
          originalTransport = TestingUtil.extractGlobalComponent(cache1.getCacheManager(), Transport.class);
@@ -191,7 +192,7 @@ public class SyncReplTest extends MultipleCacheManagersTest {
          rpcManager.setTransport(mockTransport);
 
          expect(
-               mockTransport.invokeRemotely((List<Address>) anyObject(),
+               mockTransport.invokeRemotely((AddressCollection) anyObject(),
                      (CacheRpcCommand) anyObject(), eq(ResponseMode.SYNCHRONOUS), anyLong(),
                      anyBoolean(), (ResponseFilter) anyObject(), anyBoolean())).andReturn(
                   emptyResponses).once();
@@ -207,9 +208,9 @@ public class SyncReplTest extends MultipleCacheManagersTest {
 
          reset(mockTransport);
          expect(mockTransport.getAddress()).andReturn(mockAddressOne).anyTimes();
-         expect(mockTransport.getMembers()).andReturn(addresses).anyTimes();
+         expect(mockTransport.getMembers()).andReturn(new AddressCollection(addresses)).anyTimes();
          expect(
-                  mockTransport.invokeRemotely((List<Address>) anyObject(),
+                  mockTransport.invokeRemotely((AddressCollection) anyObject(),
                            (CacheRpcCommand) anyObject(), eq(ResponseMode.ASYNCHRONOUS), anyLong(),
                            anyBoolean(), (ResponseFilter) anyObject(), anyBoolean())).andReturn(
                   emptyResponses).once();

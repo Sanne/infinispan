@@ -27,6 +27,7 @@ import org.infinispan.factories.scopes.Scope;
 import org.infinispan.factories.scopes.Scopes;
 import org.infinispan.notifications.Listenable;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.List;
 
@@ -43,11 +44,11 @@ public interface CacheManagerNotifier extends Listenable {
     * Notifies all registered listeners of a viewChange event.  Note that viewChange notifications are ALWAYS sent
     * immediately.
     */
-   void notifyViewChange(List<Address> members, List<Address> oldMembers, Address myAddress, int viewId);
+   void notifyViewChange(AddressCollection members, AddressCollection oldMembers, Address myAddress, int viewId);
 
    void notifyCacheStarted(String cacheName);
 
    void notifyCacheStopped(String cacheName);
 
-   void notifyMerge(List<Address> members, List<Address> oldMembers, Address myAddress, int viewId, List<List<Address>> subgroupsMerged);
+   void notifyMerge(AddressCollection members, AddressCollection oldMembers, Address myAddress, int viewId, List<AddressCollection> subgroupsMerged);
 }

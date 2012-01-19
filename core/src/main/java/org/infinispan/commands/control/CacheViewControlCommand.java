@@ -30,6 +30,7 @@ import org.infinispan.config.Configuration;
 import org.infinispan.context.InvocationContext;
 import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
@@ -72,9 +73,9 @@ public class CacheViewControlCommand implements CacheRpcCommand {
    private Type type;
    private Address sender;
    private int newViewId;
-   private List<Address> newMembers;
+   private AddressCollection newMembers;
    private int oldViewId;
-   private List<Address> oldMembers;
+   private AddressCollection oldMembers;
 
    // For CommandIdUniquenessTest only
    public CacheViewControlCommand() {
@@ -85,7 +86,7 @@ public class CacheViewControlCommand implements CacheRpcCommand {
       this.cacheName = cacheName;
    }
 
-   public CacheViewControlCommand(String cacheName, Type type, Address sender, int newViewId, List<Address> newMembers, int oldViewId, List<Address> oldMembers) {
+   public CacheViewControlCommand(String cacheName, Type type, Address sender, int newViewId, AddressCollection newMembers, int oldViewId, AddressCollection oldMembers) {
       this.cacheName = cacheName;
       this.type = type;
       this.sender = sender;
@@ -194,9 +195,9 @@ public class CacheViewControlCommand implements CacheRpcCommand {
       type = Type.values()[(Byte) parameters[i++]];
       sender = (Address) parameters[i++];
       newViewId = (Integer) parameters[i++];
-      newMembers = (List<Address>) parameters[i++];
+      newMembers = (AddressCollection) parameters[i++];
       oldViewId = (Integer) parameters[i++];
-      oldMembers = (List<Address>) parameters[i++];
+      oldMembers = (AddressCollection) parameters[i++];
    }
 
    @Override

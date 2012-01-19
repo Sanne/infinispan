@@ -26,6 +26,7 @@ import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.notifications.cachelistener.CacheNotifier;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.util.Util;
 import org.infinispan.util.concurrent.AggregatingNotifyingFutureBuilder;
 import org.infinispan.util.logging.Log;
@@ -51,7 +52,7 @@ public abstract class BaseStateTransferTask {
    protected final DataContainer dataContainer;
    protected final Address self;
    protected final boolean trace = log.isTraceEnabled();
-   protected final Collection<Address> members;
+   protected final AddressCollection members;
    protected final ConsistentHash chOld;
    protected final ConsistentHash chNew;
    protected final boolean initialView;
@@ -65,7 +66,7 @@ public abstract class BaseStateTransferTask {
 
    public BaseStateTransferTask(BaseStateTransferManagerImpl stateTransferManager, RpcManager rpcManager,
                                 StateTransferLock stateTransferLock, CacheNotifier cacheNotifier,
-                                Configuration configuration, DataContainer dataContainer, Collection<Address> members,
+                                Configuration configuration, DataContainer dataContainer, AddressCollection members,
                                 int newViewId, ConsistentHash chNew, ConsistentHash chOld, boolean initialView) {
       this.stateTransferLock = stateTransferLock;
       this.initialView = initialView;
@@ -136,7 +137,7 @@ public abstract class BaseStateTransferTask {
       log.debugf("Node finished pushing data for cache views %d.", newViewId);
    }
 
-   protected void pushPartialState(Collection<Address> targets, Collection<InternalCacheEntry> state) throws StateTransferCancelledException {
+   protected void pushPartialState(AddressCollection targets, Collection<InternalCacheEntry> state) throws StateTransferCancelledException {
       checkIfCancelled();
       stateTransferManager.pushStateToNode(statePushFuture, newViewId, targets, state);
    }

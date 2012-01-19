@@ -26,20 +26,17 @@ package org.infinispan.transaction;
 import org.infinispan.CacheException;
 import org.infinispan.commands.write.WriteCommand;
 import org.infinispan.container.entries.CacheEntry;
-import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.transaction.xa.GlobalTransaction;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
 import javax.transaction.Transaction;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Object that holds transaction's state on the node where it originated; as opposed to {@link RemoteTransaction}.
@@ -52,7 +49,7 @@ public abstract class LocalTransaction extends AbstractCacheTransaction {
    private static final Log log = LogFactory.getLog(LocalTransaction.class);
    private static final boolean trace = log.isTraceEnabled();
 
-   private Set<Address> remoteLockedNodes;
+   private AddressCollection remoteLockedNodes;
 
    /** mark as volatile as this might be set from the tx thread code on view change*/
    private volatile boolean isMarkedForRollback;
@@ -75,21 +72,21 @@ public abstract class LocalTransaction extends AbstractCacheTransaction {
       modifications.add(mod);
    }
 
-   public void locksAcquired(Collection<Address> nodes) {
+   public void locksAcquired(AddressCollection nodes) {
       log.tracef("Adding remote locks on %s. Remote locks are %s", nodes, remoteLockedNodes);
       if (remoteLockedNodes == null)
-         remoteLockedNodes = new HashSet<Address>(nodes);
+         remoteLockedNodes = nodes;
       else
-         remoteLockedNodes.addAll(nodes);
+         remoteLockedNodes = remoteLockedNodes.withAll(nodes);
    }
 
-   public Collection<Address> getRemoteLocksAcquired(){
-	   if (remoteLockedNodes == null) return Collections.emptySet();
+   public AddressCollection getRemoteLocksAcquired(){
+	   if (remoteLockedNodes == null) return AddressCollection.emptyList();
 	   return remoteLockedNodes;
    }
 
    public void clearRemoteLocksAcquired() {
-      if (remoteLockedNodes != null) remoteLockedNodes.clear();
+      if (remoteLockedNodes != null) remoteLockedNodes = AddressCollection.emptyList();
    }
 
    public void markForRollback(boolean markForRollback) {

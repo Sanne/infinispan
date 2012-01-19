@@ -26,6 +26,7 @@ package org.infinispan.tx.recovery;
 import org.infinispan.config.Configuration;
 import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.transaction.TransactionTable;
 import org.infinispan.transaction.lookup.DummyTransactionManagerLookup;
@@ -109,7 +110,7 @@ public class PostCommitRecoveryStateTest extends MultipleCacheManagersTest {
       }
 
       @Override
-      public void removeRecoveryInformationFromCluster(Collection<Address> where, Xid xid, boolean sync, GlobalTransaction gtx) {
+      public void removeRecoveryInformationFromCluster(AddressCollection where, Xid xid, boolean sync, GlobalTransaction gtx) {
          if (swallowRemoveRecoveryInfoCalls){
             log.trace("PostCommitRecoveryStateTest$RecoveryManagerDelegate.removeRecoveryInformation");
          } else {
@@ -118,7 +119,7 @@ public class PostCommitRecoveryStateTest extends MultipleCacheManagersTest {
       }
 
       @Override
-      public void removeRecoveryInformationFromCluster(Collection<Address> where, long internalId, boolean sync) {
+      public void removeRecoveryInformationFromCluster(AddressCollection where, long internalId, boolean sync) {
          rm.removeRecoveryInformationFromCluster(where, internalId, sync);
       }
 

@@ -24,6 +24,7 @@ package org.infinispan.affinity;
 
 import org.infinispan.Cache;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -84,7 +85,7 @@ public class KeyAffinityServiceFactory {
     * Same as {@link #newKeyAffinityService(org.infinispan.Cache, java.util.Collection, KeyGenerator,
     * java.util.concurrent.Executor, int, boolean)} with start == true.
     */
-   public static <K, V> KeyAffinityService newKeyAffinityService(Cache<K, V> cache, Collection<Address> filter, KeyGenerator keyGenerator, Executor ex, int keyBufferSize) {
+   public static <K, V> KeyAffinityService newKeyAffinityService(Cache<K, V> cache, AddressCollection filter, KeyGenerator keyGenerator, Executor ex, int keyBufferSize) {
       return newKeyAffinityService(cache, filter, keyGenerator, ex, keyBufferSize, true);
    }
 

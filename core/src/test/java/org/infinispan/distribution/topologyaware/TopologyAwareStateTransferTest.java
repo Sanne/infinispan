@@ -22,6 +22,8 @@
  */
 package org.infinispan.distribution.topologyaware;
 
+import java.util.List;
+
 import org.infinispan.Cache;
 import org.infinispan.config.Configuration;
 import org.infinispan.config.GlobalConfiguration;
@@ -29,15 +31,13 @@ import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.distribution.ch.TopologyAwareConsistentHash;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.test.fwk.CleanupAfterTest;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Mircea.Markus@jboss.com
@@ -58,8 +58,8 @@ public class TopologyAwareStateTransferTest extends MultipleCacheManagersTest {
 
       TopologyAwareConsistentHash hash =
             (TopologyAwareConsistentHash) cache(0).getAdvancedCache().getDistributionManager().getConsistentHash();
-      Set<Address> addressSet = hash.getCaches();
-      addresses = addressSet.toArray(new Address[addressSet.size()]);
+      AddressCollection addressSet = hash.getCaches();
+      addresses = addressSet.toAddressList().toArray(new Address[addressSet.size()]);
    }
 
    @AfterMethod
@@ -102,7 +102,7 @@ public class TopologyAwareStateTransferTest extends MultipleCacheManagersTest {
       TestingUtil.blockUntilViewsReceived(60000, false, caches());
       TestingUtil.waitForRehashToComplete(caches());
       log.info("Here is where ST ends");
-      Set<Address> addressList = cache(addresses[0]).getAdvancedCache().getDistributionManager().getConsistentHash().getCaches();
+      AddressCollection addressList = cache(addresses[0]).getAdvancedCache().getDistributionManager().getConsistentHash().getCaches();
       log.debug("After shutting down " + addresses[4] + " caches are " +  addressList);
 
       log.debugf("Cache on node %s: %s", addresses[0], TestingUtil.printCache(cache(addresses[0])));
@@ -124,7 +124,7 @@ public class TopologyAwareStateTransferTest extends MultipleCacheManagersTest {
       cacheManagers.remove(cm);
       TestingUtil.blockUntilViewsReceived(60000, false, caches());
       TestingUtil.waitForRehashToComplete(caches());
-      Set<Address> addressList = cache(addresses[0]).getAdvancedCache().getDistributionManager().getConsistentHash().getCaches();
+      AddressCollection addressList = cache(addresses[0]).getAdvancedCache().getDistributionManager().getConsistentHash().getCaches();
       log.debug("After shutting down " + addresses[2] + " caches are " +  addressList);
 
       log.debugf("Cache on node %s: %s", addresses[0], TestingUtil.printCache(cache(addresses[0])));
@@ -145,7 +145,7 @@ public class TopologyAwareStateTransferTest extends MultipleCacheManagersTest {
       cacheManagers.remove(cm);
       TestingUtil.blockUntilViewsReceived(60000, false, caches());
       TestingUtil.waitForRehashToComplete(caches());
-      Set<Address> addressList = cache(addresses[0]).getAdvancedCache().getDistributionManager().getConsistentHash().getCaches();
+      AddressCollection addressList = cache(addresses[0]).getAdvancedCache().getDistributionManager().getConsistentHash().getCaches();
       log.debug("After shutting down " + addresses[1] + " caches are " +  addressList);
 
       log.debugf("Cache on node %s: %s", addresses[0], TestingUtil.printCache(cache(addresses[0])));

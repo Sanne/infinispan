@@ -28,13 +28,13 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.responses.Response;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.jgroups.SuspectException;
 import org.infinispan.test.AbstractInfinispanTest;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.testng.annotations.Test;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -67,7 +67,7 @@ public class MessageSentToLeaverTest extends AbstractInfinispanTest {
          c2.put("k", "v1");
 
          RpcManager rpcManager = TestingUtil.extractComponent(c1, RpcManager.class);
-         Collection<Address>  addresses = cm1.getMembers();
+         AddressCollection  addresses = cm1.getMembers();
 
          CommandsFactory cf = TestingUtil.extractCommandsFactory(c1);
          PutKeyValueCommand cmd = cf.buildPutKeyValueCommand("k", "v2", -1, -1, null);

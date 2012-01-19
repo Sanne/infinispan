@@ -41,12 +41,12 @@ import org.infinispan.factories.scopes.Scope;
 import org.infinispan.factories.scopes.Scopes;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.transaction.xa.CacheTransaction;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Abstractization for logic related to different clustering modes: replicated or distributed. This implements the <a
@@ -67,7 +67,7 @@ public interface ClusteringDependentLogic {
 
    void commitEntry(CacheEntry entry, EntryVersion newVersion, boolean skipOwnershipCheck);
 
-   Collection<Address> getOwners(Collection<Object> keys);
+   AddressCollection getOwners(Collection<Object> keys);
 
    EntryVersionsMap createNewVersionsAndCheckForWriteSkews(VersionGenerator versionGenerator, TxInvocationContext context, VersionedPrepareCommand prepareCommand);
    
@@ -106,7 +106,7 @@ public interface ClusteringDependentLogic {
       }
 
       @Override
-      public Collection<Address> getOwners(Collection<Object> keys) {
+      public AddressCollection getOwners(Collection<Object> keys) {
          return null;
       }
       
@@ -167,7 +167,7 @@ public interface ClusteringDependentLogic {
 
       @Override
       public boolean localNodeIsPrimaryOwner(Object key) {
-         final List<Address> locate = dm.locate(key);
+         final AddressCollection locate = dm.locate(key);
          final Address address = rpcManager.getAddress();
          final boolean result = locate.get(0).equals(address);
          log.tracef("Node owners are %s and my address is %s. Am I main owner? - %b", locate, address, result);
@@ -192,7 +192,7 @@ public interface ClusteringDependentLogic {
       }
 
       @Override
-      public Collection<Address> getOwners(Collection<Object> keys) {
+      public AddressCollection getOwners(Collection<Object> keys) {
          return dm.getAffectedNodes(keys);
       }
 

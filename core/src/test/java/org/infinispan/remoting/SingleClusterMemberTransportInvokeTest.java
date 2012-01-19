@@ -28,6 +28,7 @@ import org.infinispan.config.Configuration;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.rpc.RpcManagerImpl;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
@@ -57,7 +58,7 @@ public class SingleClusterMemberTransportInvokeTest extends MultipleCacheManager
          Address mockAddress1 = createNiceMock(Address.class);
          List<Address> memberList = new ArrayList<Address>(1);
          memberList.add(mockAddress1);
-         expect(mockTransport.getMembers()).andReturn(memberList).anyTimes();
+         expect(mockTransport.getMembers()).andReturn(new AddressCollection(memberList)).anyTimes();
          expect(mockTransport.getAddress()).andReturn(null).anyTimes();
          rpcManager.setTransport(mockTransport);
          // Transport invoke remote should not be called.

@@ -33,11 +33,11 @@ import org.infinispan.distribution.DistributionManager;
 import org.infinispan.factories.annotations.Inject;
 import org.infinispan.factories.annotations.Start;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -169,7 +169,7 @@ public class DistCacheStoreInterceptor extends CacheStoreInterceptor {
     */
    @Override
    protected boolean skipKey(Object key) {
-      List<Address> addresses = dm.locate(key);
+      AddressCollection addresses = dm.locate(key);
       if (loaderConfig.isShared()) {
          if (!isFirstOwner(addresses)) {
             log.trace("Skipping cache store since the cache loader is shared " +
@@ -185,12 +185,12 @@ public class DistCacheStoreInterceptor extends CacheStoreInterceptor {
       return false;
    }
 
-   private boolean isL1Put(List<Address> addresses) {
+   private boolean isL1Put(AddressCollection addresses) {
       if (address == null) throw new NullPointerException("Local address cannot be null!");
       return !addresses.contains(address);
    }
 
-   private boolean isFirstOwner(List<Address> addresses) {
+   private boolean isFirstOwner(AddressCollection addresses) {
       if (address == null) throw new NullPointerException("Local address cannot be null!");
       return addresses.get(0).equals(address);
    }

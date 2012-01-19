@@ -51,6 +51,7 @@ import org.infinispan.interceptors.base.BaseRpcInterceptor;
 import org.infinispan.remoting.responses.Response;
 import org.infinispan.remoting.responses.SuccessfulResponse;
 import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 import org.infinispan.remoting.transport.jgroups.SuspectException;
 import org.infinispan.statetransfer.StateTransferLock;
 import org.infinispan.transaction.LockingMode;
@@ -91,7 +92,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
    LockManager lockManager;
 
    static final RecipientGenerator CLEAR_COMMAND_GENERATOR = new RecipientGenerator() {
-      public List<Address> generateRecipients() {
+      public AddressCollection generateRecipients() {
          return null;
       }
 
@@ -309,7 +310,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
       if (ctx.isOriginLocal()) {
          int newCacheViewId = -1;
          stateTransferLock.waitForStateTransferToEnd(ctx, command, newCacheViewId);
-         final Collection<Address> affectedNodes = dm.getAffectedNodes(command.getKeys());
+         final AddressCollection affectedNodes = dm.getAffectedNodes(command.getKeys());
          ((LocalTxInvocationContext) ctx).remoteLocksAcquired(affectedNodes);
          rpcManager.invokeRemotely(affectedNodes, command, true, true);
       }
@@ -361,7 +362,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
    private void sendCommitCommand(TxInvocationContext ctx, CommitCommand command, Collection<Address> preparedOn)
          throws TimeoutException, InterruptedException {
       // we only send the commit command to the nodes that
-      Collection<Address> recipients = dm.getAffectedNodes(ctx.getAffectedKeys());
+      AddressCollection recipients = dm.getAffectedNodes(ctx.getAffectedKeys());
 
       // By default, use the configured commit sync settings
       boolean syncCommitPhase = configuration.isSyncCommitPhase();
@@ -384,7 +385,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
          if (!resendTo.isEmpty()) {
             log.debugf("Need to resend prepares for %s to %s", command.getGlobalTransaction(), resendTo);
             PrepareCommand pc = buildPrepareCommandForResend(ctx, command);
-            rpcManager.invokeRemotely(resendTo, pc, true, true);
+            rpcManager.invokeRemotely(new AddressCollection(resendTo), pc, true, true);
          }
       }
    }
@@ -406,7 +407,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
 
          if (command.isOnePhaseCommit()) flushL1Caches(ctx); // if we are one-phase, don't block on this future.
 
-         Collection<Address> recipients = dm.getAffectedNodes(ctx.getAffectedKeys());
+         AddressCollection recipients = dm.getAffectedNodes(ctx.getAffectedKeys());
          prepareOnAffectedNodes(ctx, command, recipients, sync);
 
          ((LocalTxInvocationContext) ctx).remoteLocksAcquired(recipients);
@@ -418,7 +419,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
       return retVal;
    }
 
-   protected void prepareOnAffectedNodes(TxInvocationContext ctx, PrepareCommand command, Collection<Address> recipients, boolean sync) {
+   protected void prepareOnAffectedNodes(TxInvocationContext ctx, PrepareCommand command, AddressCollection recipients, boolean sync) {
       // this method will return immediately if we're the only member (because exclude_self=true)
       rpcManager.invokeRemotely(recipients, command, sync);
    }
@@ -470,7 +471,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
             if (ctx.isOriginLocal()) {
                int newCacheViewId = -1;
                stateTransferLock.waitForStateTransferToEnd(ctx, command, newCacheViewId);
-               List<Address> rec = recipientGenerator.generateRecipients();
+               AddressCollection rec = recipientGenerator.generateRecipients();
                int numCallRecipients = rec == null ? 0 : rec.size();
                if (trace) log.tracef("Invoking command %s on hosts %s", command, rec);
 
@@ -521,7 +522,7 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
     * If a single owner has been configured and the target for the key is the local address, it returns true.
     */
    private boolean isSingleOwnerAndLocal(RecipientGenerator recipientGenerator) {
-      List<Address> recipients;
+      AddressCollection recipients;
       return configuration.getNumOwners() == 1 && (recipients = recipientGenerator.generateRecipients()) != null && recipients.size() == 1 && recipients.get(0).equals(rpcManager.getTransport().getAddress());
    }
 
@@ -530,20 +531,20 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
    }
 
    interface RecipientGenerator extends KeyGenerator {
-      List<Address> generateRecipients();
+      AddressCollection generateRecipients();
    }
 
    class SingleKeyRecipientGenerator implements RecipientGenerator {
       final Object key;
       final Set<Object> keys;
-      List<Address> recipients = null;
+      AddressCollection recipients = null;
 
       SingleKeyRecipientGenerator(Object key) {
          this.key = key;
          keys = Collections.singleton(key);
       }
 
-      public List<Address> generateRecipients() {
+      public AddressCollection generateRecipients() {
          if (recipients == null) recipients = dm.locate(key);
          return recipients;
       }
@@ -556,18 +557,18 @@ public class DistributionInterceptor extends BaseRpcInterceptor {
    class MultipleKeysRecipientGenerator implements RecipientGenerator {
 
       final Collection<Object> keys;
-      List<Address> recipients = null;
+      AddressCollection recipients = null;
 
       MultipleKeysRecipientGenerator(Collection<Object> keys) {
          this.keys = keys;
       }
 
-      public List<Address> generateRecipients() {
+      public AddressCollection generateRecipients() {
          if (recipients == null) {
             Set<Address> addresses = new HashSet<Address>();
             Map<Object, List<Address>> recipientsMap = dm.locateAll(keys);
             for (List<Address> a : recipientsMap.values()) addresses.addAll(a);
-            recipients = Immutables.immutableListConvert(addresses);
+            recipients = new AddressCollection(addresses);
          }
          return recipients;
       }

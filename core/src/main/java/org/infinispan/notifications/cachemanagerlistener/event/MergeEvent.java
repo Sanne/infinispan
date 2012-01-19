@@ -22,7 +22,7 @@
  */
 package org.infinispan.notifications.cachemanagerlistener.event;
 
-import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.AddressCollection;
 
 import java.util.List;
 
@@ -33,5 +33,5 @@ import java.util.List;
  * @version 4.2
  */
 public interface MergeEvent extends ViewChangedEvent {
-   List<List<Address>> getSubgroupsMerged();
+   List<AddressCollection> getSubgroupsMerged();
 }
