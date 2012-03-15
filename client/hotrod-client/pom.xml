@@ -96,6 +96,33 @@
                </instructions>
             </configuration>
          </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-javadoc-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>javadoc</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                           <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                           <quiet>true</quiet>
+                           
+                           <!-- In case you anyone needs to trace javadoc issues
+                           <additionalJOption>-J-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</additionalJOption>
+                           -->
+                           <stylesheetfile>${basedir}/src/javadoc/stylesheet.css</stylesheetfile>
+                           <javadocDirectory>${basedir}/src/javadoc</javadocDirectory>
+                           <docfilessubdirs>true</docfilessubdirs>
+                           <links>
+                              <link>http://java.sun.com/javase/6/docs/api/</link>
+                              <link>http://java.sun.com/javaee/5/docs/api/</link>
+                           </links>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
       </plugins>
    </build>
 </project>

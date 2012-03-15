@@ -57,6 +57,11 @@
          <groupId>org.hibernate</groupId>
          <artifactId>hibernate-search-infinispan</artifactId>
       </dependency>
+      
+      <dependency>
+         <groupId>org.codehaus.jackson</groupId>
+         <artifactId>jackson-mapper-asl</artifactId>
+      </dependency>
 
       <dependency>
          <groupId>${project.groupId}</groupId>

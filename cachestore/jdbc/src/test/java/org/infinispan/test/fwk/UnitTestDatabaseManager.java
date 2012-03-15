@@ -41,8 +41,6 @@ import org.infinispan.loaders.jdbc.connectionfactory.ConnectionFactoryConfig;
 import org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory;
 import org.infinispan.loaders.jdbc.connectionfactory.SimpleConnectionFactory;
 
-import com.mysql.jdbc.Driver;
-
 /**
  * Class that assures concurrent access to the in memory database.
  *
@@ -61,25 +59,14 @@ public class UnitTestDatabaseManager {
    private static final DatabaseType dt;
 
    static {
-      String driver = "";
       try {
-         if (DB_TYPE.equalsIgnoreCase("mysql")) {
-            driver = Driver.class.getName();
-            dt = DatabaseType.MYSQL;
-         } else {
-            driver = H2_DRIVER;
-            dt = DatabaseType.H2;
-         }
-         try {
-            Class.forName(driver);
-         } catch (ClassNotFoundException e) {
-            driver = H2_DRIVER;
-            Class.forName(H2_DRIVER);
-         }
+          String driver = H2_DRIVER;
+          dt = DatabaseType.H2;
+          Class.forName(driver);
+          configure(dt, driver, realConfig);
       } catch (ClassNotFoundException e) {
          throw new RuntimeException(e);
       }
-      configure(dt, driver, realConfig);
    }
 
    private static void configure(DatabaseType dt, String driver, ConnectionFactoryConfig cfg) {
