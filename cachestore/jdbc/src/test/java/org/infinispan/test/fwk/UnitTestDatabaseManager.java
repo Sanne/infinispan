@@ -36,10 +36,7 @@ import org.infinispan.loaders.jdbc.JdbcUtil;
 import org.infinispan.loaders.jdbc.TableManipulation;
 import org.infinispan.loaders.jdbc.connectionfactory.ConnectionFactory;
 import org.infinispan.loaders.jdbc.connectionfactory.ConnectionFactoryConfig;
-import org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory;
 import org.infinispan.loaders.jdbc.connectionfactory.SimpleConnectionFactory;
-
-import com.mysql.jdbc.Driver;
 
 /**
  * Class that assures concurrent access to the in memory database.
@@ -59,25 +56,14 @@ public class UnitTestDatabaseManager {
    private static final DatabaseType dt;
 
    static {
-      String driver = "";
       try {
-         if (DB_TYPE.equalsIgnoreCase("mysql")) {
-            driver = Driver.class.getName();
-            dt = DatabaseType.MYSQL;
-         } else {
-            driver = H2_DRIVER;
-            dt = DatabaseType.H2;
-         }
-         try {
-            Class.forName(driver);
-         } catch (ClassNotFoundException e) {
-            driver = H2_DRIVER;
-            Class.forName(H2_DRIVER);
-         }
+         String driver = H2_DRIVER;
+         dt = DatabaseType.H2;
+         Class.forName(driver);
+         configure(dt, driver, realConfig);
       } catch (ClassNotFoundException e) {
          throw new RuntimeException(e);
       }
-      configure(dt, driver, realConfig);
    }
 
    private static void configure(DatabaseType dt, String driver, ConnectionFactoryConfig cfg) {
@@ -85,7 +71,7 @@ public class UnitTestDatabaseManager {
       switch (dt) {
          case H2:
             cfg.setConnectionUrl("jdbc:h2:mem:infinispan;DB_CLOSE_DELAY=-1");
-            cfg.setConnectionFactoryClass(PooledConnectionFactory.class.getName());
+            cfg.setConnectionFactoryClass(SimpleConnectionFactory.class.getName());
             cfg.setUserName("sa");
             break;
          case MYSQL:
@@ -141,11 +127,15 @@ public class UnitTestDatabaseManager {
 
    private static String extractTestName() {
       StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-      if (stack.length == 0) return null;
+      if (stack.length == 0) {
+         return null;
+      }
       for (int i = stack.length - 1; i > 0; i--) {
          StackTraceElement e = stack[i];
          String className = e.getClassName();
-         if (className.indexOf("org.infinispan") != -1) return className.replace('.', '_') + "_" + e.getMethodName();
+         if (className.indexOf("org.infinispan") != -1) {
+            return className.replace('.', '_') + "_" + e.getMethodName();
+         }
       }
       return null;
    }
