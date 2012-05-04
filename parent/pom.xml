@@ -1416,6 +1416,7 @@
                   <version>2.4.3-JBOSS</version>
                   <configuration>
                      <parallel>tests</parallel>
+                     <runOrder>balanced</runOrder>
                      <threadCount>${infinispan.test.parallel.threads}</threadCount>
                      <forkMode>none</forkMode>
                      <groups>${defaultTestGroup}</groups>
