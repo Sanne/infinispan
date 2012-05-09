@@ -392,7 +392,7 @@ public class CacheImpl<K, V> extends CacheSupport<K, V> implements AdvancedCache
    public Configuration getConfiguration() {
       return config;
    }
-   
+
    @Override
    public org.infinispan.configuration.cache.Configuration getCacheConfiguration() {
       // TODO Once we switch to the new configuration as the canonical configuration, we can remove the adaptor
@@ -503,7 +503,7 @@ public class CacheImpl<K, V> extends CacheSupport<K, V> implements AdvancedCache
       LockControlCommand command = commandsFactory.buildLockControlCommand((Collection<Object>) keys, ctx.getFlags());
       return (Boolean) invoker.invoke(ctx, command);
    }
-   
+
    @Override
    public void applyDelta(K deltaAwareValueKey, Delta delta, Object... locksToAcquire) {
       if (locksToAcquire == null || locksToAcquire.length == 0) {
@@ -515,7 +515,7 @@ public class CacheImpl<K, V> extends CacheSupport<K, V> implements AdvancedCache
    }
 
    @Override
-   @ManagedOperation(description = "Starts the cache.")
+   //@ManagedOperation(description = "Starts the cache.")
    @Operation(displayName = "Starts cache.")
    public void start() {
       componentRegistry.start();
@@ -525,7 +525,7 @@ public class CacheImpl<K, V> extends CacheSupport<K, V> implements AdvancedCache
    }
 
    @Override
-   @ManagedOperation(description = "Stops the cache.")
+   //@ManagedOperation(description = "Stops the cache.")
    @Operation(displayName = "Stops cache.")
    public void stop() {
       stop(null, null);

@@ -52,6 +52,7 @@ public class CacheMBeanTest extends SingleCacheManagerTest {
       return cacheManager;
    }
    
+   @Test(enabled=false)
    public void testStartStopManagedOperations() throws Exception {
       ObjectName defaultOn = getCacheObjectName(JMX_DOMAIN);
       ObjectName managerON = getCacheManagerObjectName(JMX_DOMAIN);
@@ -81,6 +82,7 @@ public class CacheMBeanTest extends SingleCacheManagerTest {
       assert ComponentStatus.TERMINATED.toString().equals(server.getAttribute(defaultOn, "CacheStatus"));
    }
    
+   @Test(enabled=false)
    public void testManagerStopRemovesCacheMBean(Method m) throws Exception {
       final String otherJmxDomain = getMethodSpecificJmxDomain(m, JMX_DOMAIN);
       ObjectName defaultOn = getCacheObjectName(otherJmxDomain);
