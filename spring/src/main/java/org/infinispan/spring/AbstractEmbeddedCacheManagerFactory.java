@@ -630,14 +630,6 @@ public class AbstractEmbeddedCacheManagerFactory {
    }
 
    /**
-    * @param stateRetrievalLogFlushTimeout
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalLogFlushTimeout(java.lang.Long)
-    */
-   public void setStateRetrievalLogFlushTimeout(final Long stateRetrievalLogFlushTimeout) {
-      this.configurationOverrides.setStateRetrievalLogFlushTimeout(stateRetrievalLogFlushTimeout);
-   }
-
-   /**
     * @param stateRetrievalMaxNonProgressingLogWrites
     * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalMaxNonProgressingLogWrites(java.lang.Integer)
     */

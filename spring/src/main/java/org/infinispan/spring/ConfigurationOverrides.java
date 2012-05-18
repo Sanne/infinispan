@@ -117,11 +117,7 @@ public final class ConfigurationOverrides {
 
    private Long stateRetrievalTimeout;
 
-   private Integer stateRetrievalMaxNonProgressingLogWrites;
-
    private Integer stateRetrievalChunkSize;
-
-   private Long stateRetrievalInitialRetryWaitTime;
 
    private String isolationLevelClass;
 
@@ -430,29 +426,12 @@ public final class ConfigurationOverrides {
    }
 
    /**
-    * @param stateRetrievalMaxNonProgressingLogWrites
-    *           the stateRetrievalMaxNonProgressingLogWrites to set
-    */
-   public void setStateRetrievalMaxNonProgressingLogWrites(
-            final Integer stateRetrievalMaxNonProgressingLogWrites) {
-      this.stateRetrievalMaxNonProgressingLogWrites = stateRetrievalMaxNonProgressingLogWrites;
-   }
-
-   /**
     * @param stateRetrievalChunkSize
     *           the stateRetrievalChunkSize to set
     */
    public void setStateRetrievalChunkSize(
          final Integer stateRetrievalChunkSize) {
       this.stateRetrievalChunkSize = stateRetrievalChunkSize;
-   }
-
-   /**
-    * @param stateRetrievalInitialRetryWaitTime
-    *           the stateRetrievalInitialRetryWaitTime to set
-    */
-   public void setStateRetrievalInitialRetryWaitTime(final Long stateRetrievalInitialRetryWaitTime) {
-      this.stateRetrievalInitialRetryWaitTime = stateRetrievalInitialRetryWaitTime;
    }
 
    /**
@@ -713,18 +692,9 @@ public final class ConfigurationOverrides {
          this.logger.debug("Overriding property [stateRetrievalTimeout] with value [" + this.stateRetrievalTimeout + "]");
          configurationToOverride.clustering().stateTransfer().timeout(this.stateRetrievalTimeout);
       }
-      if (this.stateRetrievalMaxNonProgressingLogWrites != null) {
-         this.logger.debug("Overriding property [stateRetrievalMaxNonProgressingLogWrites] with value [" + this.stateRetrievalMaxNonProgressingLogWrites + "]");
-//         configurationToOverride
-//               .setStateRetrievalMaxNonProgressingLogWrites(this.stateRetrievalMaxNonProgressingLogWrites);
-      }
       if (this.stateRetrievalChunkSize != null) {
          this.logger.debug("Overriding property [stateRetrievalChunkSize] with value [" + this.stateRetrievalChunkSize + "]");
          configurationToOverride.clustering().stateTransfer().chunkSize(this.stateRetrievalChunkSize);
-      }
-      if (this.stateRetrievalInitialRetryWaitTime != null) {
-         this.logger.debug("Overriding property [stateRetrievalInitialRetryWaitTime] with value [" + this.stateRetrievalInitialRetryWaitTime + "]");
-         //FIXME
       }
       if (this.isolationLevelClass != null) {
          this.logger.debug("Overriding property [isolationLevelClass] with value [" + this.isolationLevelClass + "]");

@@ -45,7 +45,6 @@ import org.testng.annotations.Test;
  * </p>
  * 
  * @author <a href="mailto:olaf DOT bergner AT gmx DOT de">Olaf Bergner</a>
- * 
  */
 public class ConfigurationOverridesTest {
 
@@ -77,8 +76,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEnableDeadlockDetectionPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEnableDeadlockDetectionPropIfExplicitlySet() throws Exception {
       final boolean expectedEnableDeadlockDetection = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -100,8 +98,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideUseLockStripingPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideUseLockStripingPropIfExplicitlySet() throws Exception {
       final boolean expectedUseLockStriping = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -123,8 +120,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideUnsafeUnreliableReturnValuesPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideUnsafeUnreliableReturnValuesPropIfExplicitlySet() throws Exception {
       final boolean expectedUnsafeUnreliableReturnValues = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -147,8 +143,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideRehashRpcTimeoutPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideRehashRpcTimeoutPropIfExplicitlySet() throws Exception {
       final long expectedRehashRpcTimeout = 100000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -170,8 +165,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideWriteSkewCheckPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideWriteSkewCheckPropIfExplicitlySet() throws Exception {
       final boolean expectedWriteSkewCheck = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -193,8 +187,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideConcurrencyLevelPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideConcurrencyLevelPropIfExplicitlySet() throws Exception {
       final int expectedConcurrencyLevel = 10000;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -216,8 +209,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideReplQueueMaxElementsPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideReplQueueMaxElementsPropIfExplicitlySet() throws Exception {
       final int expectedReplQueueMaxElements = 10000;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -239,8 +231,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideReplQueueIntervalPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideReplQueueIntervalPropIfExplicitlySet() throws Exception {
       final long expectedReplQueueInterval = 10000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -262,8 +253,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideReplQueueClassPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideReplQueueClassPropIfExplicitlySet() throws Exception {
       final String expectedReplQueueClass = "repl.queue.Class";//FIXME create one
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -307,8 +297,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideInvocationBatchingEnabledPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideInvocationBatchingEnabledPropIfExplicitlySet() throws Exception {
       final boolean expectedInvocationBatchingEnabled = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -330,8 +319,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideFetchInMemoryStatePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideFetchInMemoryStatePropIfExplicitlySet() throws Exception {
       final boolean expectedFetchInMemoryState = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -353,8 +341,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideAlwaysProvideInMemoryStatePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideAlwaysProvideInMemoryStatePropIfExplicitlySet() throws Exception {
       final boolean expectedAlwaysProvideInMemoryState = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -376,8 +363,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideLockAcquisitionTimeoutPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideLockAcquisitionTimeoutPropIfExplicitlySet() throws Exception {
       final long expectedLockAcquisitionTimeout = 1000000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -399,8 +385,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideSyncReplTimeoutPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideSyncReplTimeoutPropIfExplicitlySet() throws Exception {
       final long expectedSyncReplTimeout = 100000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -422,8 +407,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideCacheModeStringPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideCacheModeStringPropIfExplicitlySet() throws Exception {
       final String expectedCacheModeString = CacheMode.LOCAL.name();
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -445,8 +429,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEvictionWakeUpIntervalPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEvictionWakeUpIntervalPropIfExplicitlySet() throws Exception {
       final long expectedExpirationWakeUpInterval = 100000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -468,8 +451,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEvictionStrategyPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEvictionStrategyPropIfExplicitlySet() throws Exception {
       final EvictionStrategy expectedEvictionStrategy = EvictionStrategy.LIRS;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -491,8 +473,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEvictionStrategyClassPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEvictionStrategyClassPropIfExplicitlySet() throws Exception {
       final String expectedEvictionStrategyClass = "LRU";
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -514,8 +495,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEvictionThreadPolicyPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEvictionThreadPolicyPropIfExplicitlySet() throws Exception {
       final EvictionThreadPolicy expectedEvictionThreadPolicy = EvictionThreadPolicy.PIGGYBACK;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -537,8 +517,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEvictionThreadPolicyClassPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEvictionThreadPolicyClassPropIfExplicitlySet() throws Exception {
       final String expectedEvictionThreadPolicyClass = "PIGGYBACK";
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -560,8 +539,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEvictionMaxEntriesPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEvictionMaxEntriesPropIfExplicitlySet() throws Exception {
       final int expectedEvictionMaxEntries = 1000000;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -583,8 +561,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideExpirationLifespanPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideExpirationLifespanPropIfExplicitlySet() throws Exception {
       final long expectedExpirationLifespan = 1000000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -606,8 +583,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideExpirationMaxIdlePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideExpirationMaxIdlePropIfExplicitlySet() throws Exception {
       final long expectedExpirationMaxIdle = 100000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -629,8 +605,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideTransactionManagerLookupClassPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideTransactionManagerLookupClassPropIfExplicitlySet() throws Exception {
       final String expectedTransactionManagerLookupClass = "expected.transaction.manager.lookup.Class";
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -652,8 +627,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideTransactionManagerLookupPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideTransactionManagerLookupPropIfExplicitlySet() throws Exception {
       final TransactionManagerLookup expectedTransactionManagerLookup = new JBossTransactionManagerLookup();
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -675,8 +649,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideCacheLoaderManagerConfigPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideCacheLoaderManagerConfigPropIfExplicitlySet() throws Exception {
       final CacheLoaderManagerConfig expectedCacheLoaderManagerConfig = new CacheLoaderManagerConfig();
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -698,8 +671,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideSyncCommitPhasePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideSyncCommitPhasePropIfExplicitlySet() throws Exception {
       final boolean expectedSyncCommitPhase = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -721,8 +693,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideSyncRollbackPhasePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideSyncRollbackPhasePropIfExplicitlySet() throws Exception {
       final boolean expectedSyncRollbackPhase = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -744,8 +715,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideUseEagerLockingPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideUseEagerLockingPropIfExplicitlySet() throws Exception {
       final boolean expectedUseEagerLocking = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -767,8 +737,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEagerLockSingleNodePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideEagerLockSingleNodePropIfExplicitlySet() throws Exception {
       final boolean expectedEagerLockSingleNode = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -790,8 +759,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideUseReplQueuePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideUseReplQueuePropIfExplicitlySet() throws Exception {
       final boolean expectedUseReplQueue = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -813,8 +781,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideIsolationLevelPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideIsolationLevelPropIfExplicitlySet() throws Exception {
       final IsolationLevel expectedIsolationLevel = IsolationLevel.SERIALIZABLE;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -836,8 +803,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideStateRetrievalTimeoutPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideStateRetrievalTimeoutPropIfExplicitlySet() throws Exception {
       final long expectedStateRetrievalTimeout = 1000000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -859,32 +825,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideStateRetrievalMaxNonProgressingLogWritesPropIfExplicitlySet()
-         throws Exception {
-      final int expectedStateRetrievalMaxNonProgressingLogWrites = 123456;
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest
-            .setStateRetrievalMaxNonProgressingLogWrites(expectedStateRetrievalMaxNonProgressingLogWrites);
-      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-      Configuration configuration = defaultConfiguration.build();
-
-      AssertJUnit
-            .assertEquals(
-                  "ConfigurationOverrides should have overridden default value with explicitly set StateRetrievalMaxNonProgressingLogWrites property. However, it didn't.",
-                  expectedStateRetrievalMaxNonProgressingLogWrites,
-                  defaultConfiguration.getStateRetrievalMaxNonProgressingLogWrites());
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.ConfigurationOverrides#applyOverridesTo(org.infinispan.config.Configuration)}
-    * .
-    */
-   @Test
-   public final void configurationOverridesShouldOverrideStateRetrievalChunkSizePropIfExplicitlySet()
-         throws Exception {
+   public final void configurationOverridesShouldOverrideStateRetrievalChunkSizePropIfExplicitlySet() throws Exception {
       final int expectedStateRetrievalChunkSize = 123456;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -898,78 +839,7 @@ public class ConfigurationOverridesTest {
             .assertEquals(
                   "ConfigurationOverrides should have overridden default value with explicitly set StateRetrievalChunkSize property. However, it didn't.",
                   expectedStateRetrievalChunkSize,
-                  defaultConfiguration.getStateRetrievalChunkSize());
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.ConfigurationOverrides#applyOverridesTo(org.infinispan.config.Configuration)}
-    * .
-    */
-   @Test
-   public final void configurationOverridesShouldOverrideStateRetrievalInitialRetryWaitTimePropIfExplicitlySet()
-            throws Exception {
-      final long expectedStateRetrievalInitialRetryWaitTime = 987665L;
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest
-               .setStateRetrievalInitialRetryWaitTime(expectedStateRetrievalInitialRetryWaitTime);
-      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-      Configuration configuration = defaultConfiguration.build();
-
-      AssertJUnit
-               .assertEquals(
-                        "ConfigurationOverrides should have overridden default value with explicitly set StateRetrievalInitialRetryWaitTime property. However, it didn't.",
-                        expectedStateRetrievalInitialRetryWaitTime,
-                        defaultConfiguration.getStateRetrievalInitialRetryWaitTime());
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.ConfigurationOverrides#applyOverridesTo(org.infinispan.config.Configuration)}
-    * .
-    */
-   @Test
-   public final void configurationOverridesShouldOverrideStateRetrievalRetryWaitTimeIncreaseFactorPropIfExplicitlySet()
-            throws Exception {
-      final int expectedStateRetrievalRetryWaitTimeIncreaseFactor = 987432;
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest
-               .setStateRetrievalRetryWaitTimeIncreaseFactor(expectedStateRetrievalRetryWaitTimeIncreaseFactor);
-      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-      Configuration configuration = defaultConfiguration.build();
-
-      AssertJUnit
-               .assertEquals(
-                        "ConfigurationOverrides should have overridden default value with explicitly set StateRetrievalRetryWaitTimeIncreaseFactor property. However, it didn't.",
-                        expectedStateRetrievalRetryWaitTimeIncreaseFactor,
-                        defaultConfiguration.getStateRetrievalRetryWaitTimeIncreaseFactor());
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.ConfigurationOverrides#applyOverridesTo(org.infinispan.config.Configuration)}
-    * .
-    */
-   @Test
-   public final void configurationOverridesShouldOverrideStateRetrievalNumRetriesPropIfExplicitlySet()
-            throws Exception {
-      final int expectedStateRetrievalNumRetries = 765123;
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest.setStateRetrievalNumRetries(expectedStateRetrievalNumRetries);
-      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-      Configuration configuration = defaultConfiguration.build();
-
-      AssertJUnit
-               .assertEquals(
-                        "ConfigurationOverrides should have overridden default value with explicitly set StateRetrievalNumRetries property. However, it didn't.",
-                        expectedStateRetrievalNumRetries,
-                        defaultConfiguration.getStateRetrievalNumRetries());
+                  configuration.clustering().stateTransfer().chunkSize());
    }
 
    /**
@@ -978,8 +848,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideIsolationLevelClassPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideIsolationLevelClassPropIfExplicitlySet() throws Exception {
       final String expectedIsolationLevelClass = "REPEATABLE_READ";
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -991,7 +860,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set IsolationLevelClass property. However, it didn't.",
-                        IsolationLevel.REPEATABLE_READ, defaultConfiguration.getIsolationLevel());
+                        IsolationLevel.REPEATABLE_READ,
+                        configuration.locking().isolationLevel());
    }
 
    /**
@@ -1000,8 +870,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideUseLazyDeserializationPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideUseLazyDeserializationPropIfExplicitlySet() throws Exception {
       final boolean expectedUseLazyDeserialization = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1013,7 +882,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set UseLazyDeserialization property. However, it didn't.",
-                        expectedUseLazyDeserialization, defaultConfiguration.isStoreAsBinary());
+                        expectedUseLazyDeserialization,
+                        configuration.storeAsBinary().enabled());
    }
 
    /**
@@ -1022,8 +892,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideL1CacheEnabledPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideL1CacheEnabledPropIfExplicitlySet() throws Exception {
       final boolean expectedL1CacheEnabled = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1035,7 +904,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set L1CacheEnabled property. However, it didn't.",
-                        expectedL1CacheEnabled, defaultConfiguration.isL1CacheEnabled());
+                        expectedL1CacheEnabled,
+                        configuration.clustering().l1().enabled());
    }
 
    /**
@@ -1044,8 +914,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideL1LifespanPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideL1LifespanPropIfExplicitlySet() throws Exception {
       final long expectedL1Lifespan = 2300446L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1057,7 +926,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set L1Lifespan property. However, it didn't.",
-                        expectedL1Lifespan, defaultConfiguration.getL1Lifespan());
+                        expectedL1Lifespan,
+                        configuration.clustering().l1().lifespan());
    }
 
    /**
@@ -1066,8 +936,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideL1OnRehashPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideL1OnRehashPropIfExplicitlySet() throws Exception {
       final boolean expectedL1OnRehash = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1079,29 +948,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set L1OnRehash property. However, it didn't.",
-                        expectedL1OnRehash, defaultConfiguration.isL1OnRehash());
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.embedded.InfinispanConfigurationFactoryBean#setConsistentHashClass(java.lang.String)}
-    * .
-    */
-   @Test
-   public final void configurationOverridesShouldOverrideConsistentHashClassPropIfExplicitlySet()
-            throws Exception {
-      final String expectedConsistentHashClass = "expected.consistent.hash.Class";
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest.setConsistentHashClass(expectedConsistentHashClass);
-      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-      Configuration configuration = defaultConfiguration.build();
-
-      AssertJUnit
-               .assertEquals(
-                        "ConfigurationOverrides should have overridden default value with explicitly set ConsistentHashClass property. However, it didn't.",
-                        expectedConsistentHashClass, defaultConfiguration.getConsistentHashClass());
+                        expectedL1OnRehash,
+                        configuration.clustering().l1().onRehash());
    }
 
    /**
@@ -1110,8 +958,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideNumOwnersPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideNumOwnersPropIfExplicitlySet() throws Exception {
       final int expectedNumOwners = 675443;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1123,7 +970,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set NumOwners property. However, it didn't.",
-                        expectedNumOwners, defaultConfiguration.getNumOwners());
+                        expectedNumOwners,
+                        configuration.clustering().hash().numOwners());
    }
 
    /**
@@ -1132,8 +980,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideRehashEnabledPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideRehashEnabledPropIfExplicitlySet() throws Exception {
       final boolean expectedRehashEnabled = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1145,7 +992,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set RehashEnabled property. However, it didn't.",
-                        expectedRehashEnabled, defaultConfiguration.isRehashEnabled());
+                        expectedRehashEnabled,
+                        configuration.clustering().stateTransfer().fetchInMemoryState());
    }
 
    /**
@@ -1154,8 +1002,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideRehashWaitTimePropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideRehashWaitTimePropIfExplicitlySet() throws Exception {
       final long expectedRehashWaitTime = 1232778L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1167,7 +1014,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set RehashWaitTime property. However, it didn't.",
-                        expectedRehashWaitTime, defaultConfiguration.getRehashWaitTime());
+                        expectedRehashWaitTime,
+                        configuration.clustering().stateTransfer().timeout());
    }
 
    /**
@@ -1176,8 +1024,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideUseAsyncMarshallingPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideUseAsyncMarshallingPropIfExplicitlySet() throws Exception {
       final boolean expectedUseAsyncMarshalling = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1189,7 +1036,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set UseAsyncMarshalling property. However, it didn't.",
-                        expectedUseAsyncMarshalling, defaultConfiguration.isUseAsyncMarshalling());
+                        expectedUseAsyncMarshalling,
+                        configuration.clustering().async().asyncMarshalling());
    }
 
    /**
@@ -1198,8 +1046,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideIndexingEnabledPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideIndexingEnabledPropIfExplicitlySet() throws Exception {
       final boolean expectedIndexingEnabled = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1211,7 +1058,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set IndexingEnabled property. However, it didn't.",
-                        expectedIndexingEnabled, defaultConfiguration.isIndexingEnabled());
+                        expectedIndexingEnabled,
+                        configuration.indexing().enabled());
    }
 
    /**
@@ -1220,8 +1068,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideIndexLocalOnlyPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideIndexLocalOnlyPropIfExplicitlySet() throws Exception {
       final boolean expectedIndexLocalOnly = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
@@ -1233,7 +1080,8 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set IndexLocalOnly property. However, it didn't.",
-                        expectedIndexLocalOnly, defaultConfiguration.isIndexLocalOnly());
+                        expectedIndexLocalOnly,
+                        configuration.indexing().indexLocalOnly());
    }
 
    /**
@@ -1242,8 +1090,7 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideCustomInterceptorsPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideCustomInterceptorsPropIfExplicitlySet() throws Exception {
       final CustomInterceptorConfig customInterceptor = new CustomInterceptorConfig();
       final List<CustomInterceptorConfig> expectedCustomInterceptors = Arrays
                .asList(customInterceptor);
@@ -1257,6 +1104,7 @@ public class ConfigurationOverridesTest {
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set CustomInterceptors property. However, it didn't.",
-                        expectedCustomInterceptors, defaultConfiguration.getCustomInterceptors());
+                        expectedCustomInterceptors,
+                        configuration.customInterceptors().interceptors());
    }
 }
