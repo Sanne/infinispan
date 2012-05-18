@@ -27,9 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.infinispan.config.CacheLoaderManagerConfig;
-import org.infinispan.config.Configuration;
+import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.config.Configuration.CacheMode;
 import org.infinispan.config.CustomInterceptorConfig;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.eviction.EvictionThreadPolicy;
 import org.infinispan.transaction.lookup.JBossTransactionManagerLookup;
@@ -54,20 +55,20 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideDeadlockSpinDetectionDurationPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideDeadlockSpinDetectionDurationPropIfExplicitlySet() throws Exception {
       final long expectedDeadlockSpinDetectionDuration = 100000L;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setDeadlockDetectionSpinDuration(expectedDeadlockSpinDetectionDuration);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set deadlockDetectionSpinDuration. However, it didn't.",
                         expectedDeadlockSpinDetectionDuration,
-                        defaultConfiguration.getDeadlockDetectionSpinDuration());
+                        configuration.deadlockDetection().spinDuration());
    }
 
    /**
@@ -82,14 +83,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setEnableDeadlockDetection(expectedEnableDeadlockDetection);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set enableDeadlockDetection property. However, it didn't.",
                         expectedEnableDeadlockDetection,
-                        defaultConfiguration.isDeadlockDetectionEnabled());
+                        configuration.deadlockDetection().enabled());
    }
 
    /**
@@ -104,14 +106,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setUseLockStriping(expectedUseLockStriping);
-      final Configuration defaultConfiguration = new Configuration();
-
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set useLockStriping property. However, it didn't.",
-                        expectedUseLockStriping, defaultConfiguration.isUseLockStriping());
+                        expectedUseLockStriping,
+                        configuration.locking().useLockStriping());
    }
 
    /**
@@ -126,15 +129,16 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setUnsafeUnreliableReturnValues(expectedUnsafeUnreliableReturnValues);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
 
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set unsafeUnreliableReturnValues property. However, it didn't.",
                         expectedUnsafeUnreliableReturnValues,
-                        defaultConfiguration.isUnsafeUnreliableReturnValues());
+                        configuration.unsafe().unreliableReturnValues());
    }
 
    /**
@@ -149,13 +153,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setRehashRpcTimeout(expectedRehashRpcTimeout);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set rehashRpcTimeout property. However, it didn't.",
-                        expectedRehashRpcTimeout, defaultConfiguration.getRehashRpcTimeout());
+                        expectedRehashRpcTimeout,
+                        configuration.clustering().stateTransfer().timeout());
    }
 
    /**
@@ -170,13 +176,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setWriteSkewCheck(expectedWriteSkewCheck);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set writeSkewCheck property. However, it didn't.",
-                        expectedWriteSkewCheck, defaultConfiguration.isWriteSkewCheck());
+                        expectedWriteSkewCheck,
+                        configuration.locking().writeSkewCheck());
    }
 
    /**
@@ -191,13 +199,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setConcurrencyLevel(expectedConcurrencyLevel);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set ConcurrencyLevel property. However, it didn't.",
-                        expectedConcurrencyLevel, defaultConfiguration.getConcurrencyLevel());
+                        expectedConcurrencyLevel,
+                        configuration.locking().concurrencyLevel());
    }
 
    /**
@@ -212,14 +222,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setReplQueueMaxElements(expectedReplQueueMaxElements);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set ReplQueueMaxElements property. However, it didn't.",
                         expectedReplQueueMaxElements,
-                        defaultConfiguration.getReplQueueMaxElements());
+                        configuration.clustering().async().replQueueMaxElements());
    }
 
    /**
@@ -234,13 +245,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setReplQueueInterval(expectedReplQueueInterval);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set ReplQueueInterval property. However, it didn't.",
-                        expectedReplQueueInterval, defaultConfiguration.getReplQueueInterval());
+                        expectedReplQueueInterval,
+                        configuration.clustering().async().replQueueInterval());
    }
 
    /**
@@ -251,17 +264,19 @@ public class ConfigurationOverridesTest {
    @Test
    public final void configurationOverridesShouldOverrideReplQueueClassPropIfExplicitlySet()
             throws Exception {
-      final String expectedReplQueueClass = "repl.queue.Class";
+      final String expectedReplQueueClass = "repl.queue.Class";//FIXME create one
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setReplQueueClass(expectedReplQueueClass);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set ReplQueueClass property. However, it didn't.",
-                        expectedReplQueueClass, defaultConfiguration.getReplQueueClass());
+                        expectedReplQueueClass,
+                        configuration.clustering().async().replQueue().getClass());
    }
 
    /**
@@ -270,19 +285,20 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideExposeJmxStatisticsPropIfExplicitlySet()
-            throws Exception {
+   public final void configurationOverridesShouldOverrideExposeJmxStatisticsPropIfExplicitlySet() throws Exception {
       final boolean expectedExposeJmxStatistics = true;
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setExposeJmxStatistics(expectedExposeJmxStatistics);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set ExposeJmxStatistics property. However, it didn't.",
-                        expectedExposeJmxStatistics, defaultConfiguration.isExposeJmxStatistics());
+                        expectedExposeJmxStatistics,
+                        configuration.jmxStatistics().enabled());
    }
 
    /**
@@ -297,14 +313,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setInvocationBatchingEnabled(expectedInvocationBatchingEnabled);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set InvocationBatchingEnabled property. However, it didn't.",
                         expectedInvocationBatchingEnabled,
-                        defaultConfiguration.isInvocationBatchingEnabled());
+                        configuration.invocationBatching().enabled());
    }
 
    /**
@@ -319,13 +336,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setFetchInMemoryState(expectedFetchInMemoryState);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set FetchInMemoryState property. However, it didn't.",
-                        expectedFetchInMemoryState, defaultConfiguration.isFetchInMemoryState());
+                        expectedFetchInMemoryState,
+                        configuration.clustering().stateTransfer().fetchInMemoryState());
    }
 
    /**
@@ -340,14 +359,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setAlwaysProvideInMemoryState(expectedAlwaysProvideInMemoryState);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set AlwaysProvideInMemoryState property. However, it didn't.",
                         expectedAlwaysProvideInMemoryState,
-                        defaultConfiguration.isAlwaysProvideInMemoryState());
+                        configuration.clustering().stateTransfer().fetchInMemoryState());//FIXME
    }
 
    /**
@@ -362,14 +382,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setLockAcquisitionTimeout(expectedLockAcquisitionTimeout);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set LockAcquisitionTimeout property. However, it didn't.",
                         expectedLockAcquisitionTimeout,
-                        defaultConfiguration.getLockAcquisitionTimeout());
+                        configuration.locking().lockAcquisitionTimeout());
    }
 
    /**
@@ -384,13 +405,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setSyncReplTimeout(expectedSyncReplTimeout);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set SyncReplTimeout property. However, it didn't.",
-                        expectedSyncReplTimeout, defaultConfiguration.getSyncReplTimeout());
+                        expectedSyncReplTimeout,
+                        configuration.clustering().stateTransfer().timeout());
    }
 
    /**
@@ -405,13 +428,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setCacheModeString(expectedCacheModeString);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set CacheModeString property. However, it didn't.",
-                        expectedCacheModeString, defaultConfiguration.getCacheModeString());
+                        expectedCacheModeString,
+                        configuration.clustering().cacheModeString());
    }
 
    /**
@@ -426,14 +451,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setExpirationWakeUpInterval(expectedExpirationWakeUpInterval);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set EvictionWakeUpInterval property. However, it didn't.",
                         expectedExpirationWakeUpInterval,
-                        defaultConfiguration.getExpirationWakeUpInterval());
+                        configuration.expiration().wakeUpInterval());
    }
 
    /**
@@ -448,13 +474,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setEvictionStrategy(expectedEvictionStrategy);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set EvictionStrategy property. However, it didn't.",
-                        expectedEvictionStrategy, defaultConfiguration.getEvictionStrategy());
+                        expectedEvictionStrategy,
+                        configuration.eviction().strategy());
    }
 
    /**
@@ -469,13 +497,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setEvictionStrategyClass(expectedEvictionStrategyClass);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set EvictionStrategyClass property. However, it didn't.",
-                        EvictionStrategy.LRU, defaultConfiguration.getEvictionStrategy());
+                        EvictionStrategy.LRU,
+                        configuration.eviction().strategy());
    }
 
    /**
@@ -490,14 +520,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setEvictionThreadPolicy(expectedEvictionThreadPolicy);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set EvictionThreadPolicy property. However, it didn't.",
                         expectedEvictionThreadPolicy,
-                        defaultConfiguration.getEvictionThreadPolicy());
+                        configuration.eviction().threadPolicy());
    }
 
    /**
@@ -512,14 +543,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setEvictionThreadPolicyClass(expectedEvictionThreadPolicyClass);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set EvictionThreadPolicyClass property. However, it didn't.",
                         EvictionThreadPolicy.PIGGYBACK,
-                        defaultConfiguration.getEvictionThreadPolicy());
+                        configuration.eviction().threadPolicy());
    }
 
    /**
@@ -534,13 +566,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setEvictionMaxEntries(expectedEvictionMaxEntries);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set EvictionMaxEntries property. However, it didn't.",
-                        expectedEvictionMaxEntries, defaultConfiguration.getEvictionMaxEntries());
+                        expectedEvictionMaxEntries,
+                        configuration.eviction().maxEntries());
    }
 
    /**
@@ -555,13 +589,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setExpirationLifespan(expectedExpirationLifespan);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set ExpirationLifespan property. However, it didn't.",
-                        expectedExpirationLifespan, defaultConfiguration.getExpirationLifespan());
+                        expectedExpirationLifespan,
+                        configuration.expiration().lifespan());
    }
 
    /**
@@ -576,13 +612,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setExpirationMaxIdle(expectedExpirationMaxIdle);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set ExpirationMaxIdle property. However, it didn't.",
-                        expectedExpirationMaxIdle, defaultConfiguration.getExpirationMaxIdle());
+                        expectedExpirationMaxIdle,
+                        configuration.expiration().maxIdle());
    }
 
    /**
@@ -597,14 +635,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setTransactionManagerLookupClass(expectedTransactionManagerLookupClass);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set TransactionManagerLookupClass property. However, it didn't.",
                         expectedTransactionManagerLookupClass,
-                        defaultConfiguration.getTransactionManagerLookupClass());
+                        configuration.transaction().transactionManagerLookup());
    }
 
    /**
@@ -619,14 +658,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setTransactionManagerLookup(expectedTransactionManagerLookup);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set TransactionManagerLookup property. However, it didn't.",
                         expectedTransactionManagerLookup,
-                        defaultConfiguration.getTransactionManagerLookup());
+                        configuration.transaction().transactionManagerLookup());
    }
 
    /**
@@ -641,14 +681,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setCacheLoaderManagerConfig(expectedCacheLoaderManagerConfig);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertSame(
                         "ConfigurationOverrides should have overridden default value with explicitly set CacheLoaderManagerConfig property. However, it didn't.",
                         expectedCacheLoaderManagerConfig,
-                        defaultConfiguration.getCacheLoaderManagerConfig());
+                        configuration.loaders().cacheLoaders());//FIXME
    }
 
    /**
@@ -663,13 +704,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setSyncCommitPhase(expectedSyncCommitPhase);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set SyncCommitPhase property. However, it didn't.",
-                        expectedSyncCommitPhase, defaultConfiguration.isSyncCommitPhase());
+                        expectedSyncCommitPhase,
+                        configuration.transaction().syncCommitPhase());
    }
 
    /**
@@ -684,13 +727,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setSyncRollbackPhase(expectedSyncRollbackPhase);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set SyncRollbackPhase property. However, it didn't.",
-                        expectedSyncRollbackPhase, defaultConfiguration.isSyncRollbackPhase());
+                        expectedSyncRollbackPhase,
+                        configuration.transaction().syncRollbackPhase());
    }
 
    /**
@@ -705,13 +750,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setUseEagerLocking(expectedUseEagerLocking);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set UseEagerLocking property. However, it didn't.",
-                        expectedUseEagerLocking, defaultConfiguration.isUseEagerLocking());
+                        expectedUseEagerLocking,
+                        configuration.transaction().useEagerLocking());
    }
 
    /**
@@ -726,13 +773,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setEagerLockSingleNode(expectedEagerLockSingleNode);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set EagerLockSingleNode property. However, it didn't.",
-                        expectedEagerLockSingleNode, defaultConfiguration.isEagerLockSingleNode());
+                        expectedEagerLockSingleNode,
+                        configuration);//FIXME
    }
 
    /**
@@ -747,13 +796,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setUseReplQueue(expectedUseReplQueue);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set UseReplQueue property. However, it didn't.",
-                        expectedUseReplQueue, defaultConfiguration.isUseReplQueue());
+                        expectedUseReplQueue,
+                        configuration.clustering().async().useReplQueue());
    }
 
    /**
@@ -768,13 +819,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setIsolationLevel(expectedIsolationLevel);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set IsolationLevel property. However, it didn't.",
-                        expectedIsolationLevel, defaultConfiguration.getIsolationLevel());
+                        expectedIsolationLevel,
+                        configuration.locking().isolationLevel());
    }
 
    /**
@@ -789,36 +842,15 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setStateRetrievalTimeout(expectedStateRetrievalTimeout);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
                         "ConfigurationOverrides should have overridden default value with explicitly set StateRetrievalTimeout property. However, it didn't.",
                         expectedStateRetrievalTimeout,
-                        defaultConfiguration.getStateRetrievalTimeout());
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.ConfigurationOverrides#applyOverridesTo(org.infinispan.config.Configuration)}
-    * .
-    */
-   @Test
-   public final void configurationOverridesShouldOverrideStateRetrievalLogFlushTimeoutPropIfExplicitlySet()
-            throws Exception {
-      final long expectedStateRetrievalLogFlushTimeout = 1000000L;
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest.setStateRetrievalLogFlushTimeout(expectedStateRetrievalLogFlushTimeout);
-      final Configuration defaultConfiguration = new Configuration();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-
-      AssertJUnit
-               .assertEquals(
-                        "ConfigurationOverrides should have overridden default value with explicitly set StateRetrievalLogFlushTimeout property. However, it didn't.",
-                        expectedStateRetrievalLogFlushTimeout,
-                        defaultConfiguration.getStateRetrievalLogFlushTimeout());
+                        configuration.clustering().stateTransfer().timeout());
    }
 
    /**
@@ -834,8 +866,9 @@ public class ConfigurationOverridesTest {
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest
             .setStateRetrievalMaxNonProgressingLogWrites(expectedStateRetrievalMaxNonProgressingLogWrites);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
             .assertEquals(
@@ -857,8 +890,9 @@ public class ConfigurationOverridesTest {
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest
             .setStateRetrievalChunkSize(expectedStateRetrievalChunkSize);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
             .assertEquals(
@@ -880,8 +914,9 @@ public class ConfigurationOverridesTest {
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest
                .setStateRetrievalInitialRetryWaitTime(expectedStateRetrievalInitialRetryWaitTime);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -903,8 +938,9 @@ public class ConfigurationOverridesTest {
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest
                .setStateRetrievalRetryWaitTimeIncreaseFactor(expectedStateRetrievalRetryWaitTimeIncreaseFactor);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -925,8 +961,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setStateRetrievalNumRetries(expectedStateRetrievalNumRetries);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -947,8 +984,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setIsolationLevelClass(expectedIsolationLevelClass);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -968,8 +1006,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setUseLazyDeserialization(expectedUseLazyDeserialization);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -989,8 +1028,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setL1CacheEnabled(expectedL1CacheEnabled);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1010,8 +1050,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setL1Lifespan(expectedL1Lifespan);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1031,8 +1072,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setL1OnRehash(expectedL1OnRehash);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1052,8 +1094,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setConsistentHashClass(expectedConsistentHashClass);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1073,8 +1116,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setNumOwners(expectedNumOwners);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1094,8 +1138,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setRehashEnabled(expectedRehashEnabled);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1115,8 +1160,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setRehashWaitTime(expectedRehashWaitTime);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1136,8 +1182,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setUseAsyncMarshalling(expectedUseAsyncMarshalling);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1157,8 +1204,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setIndexingEnabled(expectedIndexingEnabled);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1178,8 +1226,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setIndexLocalOnly(expectedIndexLocalOnly);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(
@@ -1201,8 +1250,9 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setCustomInterceptors(expectedCustomInterceptors);
-      final Configuration defaultConfiguration = new Configuration();
+      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
+      Configuration configuration = defaultConfiguration.build();
 
       AssertJUnit
                .assertEquals(

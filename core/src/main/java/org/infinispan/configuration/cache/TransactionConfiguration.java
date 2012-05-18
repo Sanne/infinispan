@@ -128,7 +128,9 @@ public class TransactionConfiguration {
     * If the cache is not transactional then the locking mode is ignored.
     *
     * @see TransactionConfiguration#transactionMode()
+    * @deprecated all Configuration files are meant to be read-only
     */
+   @Deprecated
     public TransactionConfiguration lockingMode(LockingMode lockingMode) {
       this.lockingMode = lockingMode;
       return this;
@@ -146,18 +148,6 @@ public class TransactionConfiguration {
    }
 
    /**
-    * If true, the cluster-wide commit phase in two-phase commit (2PC) transactions will be
-    * synchronous, so Infinispan will wait for responses from all nodes to which the commit was
-    * sent. Otherwise, the commit phase will be asynchronous. Keeping it as false improves
-    * performance of 2PC transactions, since any remote failures are trapped during the prepare
-    * phase anyway and appropriate rollbacks are issued.
-    */
-   public TransactionConfiguration syncCommitPhase(boolean b) {
-      this.syncCommitPhase = b;
-      return this;
-   }
-
-   /**
     * If true, the cluster-wide rollback phase in two-phase commit (2PC) transactions will be
     * synchronous, so Infinispan will wait for responses from all nodes to which the rollback was
     * sent. Otherwise, the rollback phase will be asynchronous. Keeping it as false improves
@@ -170,30 +160,11 @@ public class TransactionConfiguration {
    }
 
    /**
-    * If true, the cluster-wide rollback phase in two-phase commit (2PC) transactions will be
-    * synchronous, so Infinispan will wait for responses from all nodes to which the rollback was
-    * sent. Otherwise, the rollback phase will be asynchronous. Keeping it as false improves
-    * performance of 2PC transactions.
-    *
-    * @param b
-    * @return
-    */
-   public TransactionConfiguration syncRollbackPhase(boolean b) {
-      this.syncRollbackPhase = b;
-      return this;
-   }
-
-   /**
     * Configure Transaction manager lookup directly using an instance of TransactionManagerLookup.
     * Calling this method marks the cache as transactional.
     */
    public TransactionManagerLookup transactionManagerLookup() {
       return transactionManagerLookup;
-   }
-
-   public TransactionConfiguration transactionManagerLookup(TransactionManagerLookup transactionManagerLookup) {
-      this.transactionManagerLookup = transactionManagerLookup;
-      return this;
    }
 
    /**
