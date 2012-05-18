@@ -23,15 +23,23 @@
 package org.infinispan.stress;
 
 import org.infinispan.Cache;
-import org.infinispan.config.Configuration;
-import org.infinispan.config.GlobalConfiguration;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.infinispan.util.concurrent.BoundedConcurrentHashMap;
-import org.testng.annotations.*;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -89,12 +97,17 @@ public class MapStressTest {
    }
 
    private Cache<String, Integer> configureAndBuildCache(int capacity) {
-      Configuration config = new Configuration().fluent()
-         .eviction().maxEntries(capacity).strategy(EvictionStrategy.LRU)
-         .expiration().wakeUpInterval(5000L).maxIdle(120000L)
-         .build();
+      ConfigurationBuilder builder = TestCacheManagerFactory.getDefaultCacheConfiguration(false);
+      builder
+         .eviction()
+            .maxEntries(capacity)
+            .strategy(EvictionStrategy.LRU)
+         .expiration()
+            .wakeUpInterval(5000L)
+            .maxIdle(120000L)
+         ;
 
-      DefaultCacheManager cm = new DefaultCacheManager(GlobalConfiguration.getNonClusteredDefault(), config);
+      DefaultCacheManager cm = new DefaultCacheManager(builder.build());
       cm.start();
       return cm.getCache();
    }
