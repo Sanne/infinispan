@@ -636,35 +636,6 @@ public class InfinispanNamedEmbeddedCacheFactoryBean<K, V> implements FactoryBea
    }
 
    /**
-    * @param stateRetrievalMaxNonProgressingLogWrites
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalMaxNonProgressingLogWrites(java.lang.Integer)
-    */
-   public void setStateRetrievalMaxNonProgressingLogWrites(
-         final Integer stateRetrievalMaxNonProgressingLogWrites) {
-      this.configurationOverrides
-            .setStateRetrievalMaxNonProgressingLogWrites(stateRetrievalMaxNonProgressingLogWrites);
-   }
-
-   /**
-    * @param stateRetrievalChunkSize
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalMaxNonProgressingLogWrites(java.lang.Integer)
-    */
-   public void setStateRetrievalChunkSize(
-         final Integer stateRetrievalChunkSize) {
-      this.configurationOverrides
-            .setStateRetrievalMaxNonProgressingLogWrites(stateRetrievalChunkSize);
-   }
-
-   /**
-    * @param stateRetrievalInitialRetryWaitTime
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalInitialRetryWaitTime(java.lang.Long)
-    */
-   public void setStateRetrievalInitialRetryWaitTime(final Long stateRetrievalInitialRetryWaitTime) {
-      this.configurationOverrides
-               .setStateRetrievalInitialRetryWaitTime(stateRetrievalInitialRetryWaitTime);
-   }
-
-   /**
     * @param isolationLevelClass
     * @see org.infinispan.spring.ConfigurationOverrides#setIsolationLevelClass(java.lang.String)
     */
