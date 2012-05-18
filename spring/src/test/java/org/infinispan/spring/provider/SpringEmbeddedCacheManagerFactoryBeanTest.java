@@ -44,7 +44,7 @@ import org.infinispan.jmx.PlatformMBeanServerLookup;
 import org.infinispan.lifecycle.ComponentStatus;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.spring.AbstractEmbeddedCacheManagerFactory;
-import org.infinispan.spring.mock.MockExecutorFatory;
+import org.infinispan.spring.mock.MockExecutorFactory;
 import org.infinispan.spring.mock.MockMarshaller;
 import org.infinispan.spring.mock.MockScheduleExecutorFactory;
 import org.infinispan.spring.mock.MockTransport;
@@ -389,7 +389,7 @@ public class SpringEmbeddedCacheManagerFactoryBeanTest {
    @Test
    public final void springEmbeddedCacheManagerFactoryBeanShouldUseAsyncListenerExecutorFactoryClassPropIfExplicitlySet()
             throws Exception {
-      final String expectedAsyncListenerExecutorFactoryClass = MockExecutorFatory.class.getName();
+      final String expectedAsyncListenerExecutorFactoryClass = MockExecutorFactory.class.getName();
 
       final SpringEmbeddedCacheManagerFactoryBean objectUnderTest = new SpringEmbeddedCacheManagerFactoryBean();
       objectUnderTest
@@ -413,7 +413,7 @@ public class SpringEmbeddedCacheManagerFactoryBeanTest {
    @Test
    public final void springEmbeddedCacheManagerFactoryBeanShouldUseAsyncTransportExecutorFactoryClassPropIfExplicitlySet()
             throws Exception {
-      final String expectedAsyncTransportExecutorFactoryClass = MockExecutorFatory.class.getName();
+      final String expectedAsyncTransportExecutorFactoryClass = MockExecutorFactory.class.getName();
 
       final SpringEmbeddedCacheManagerFactoryBean objectUnderTest = new SpringEmbeddedCacheManagerFactoryBean();
       objectUnderTest
@@ -462,7 +462,7 @@ public class SpringEmbeddedCacheManagerFactoryBeanTest {
    @Test
    public final void springEmbeddedCacheManagerFactoryBeanShouldUseReplicationQueueScheduledExecutorFactoryClassPropIfExplicitlySet()
             throws Exception {
-      final String expectedReplicationQueueScheduledExecutorFactoryClass = MockExecutorFatory.class
+      final String expectedReplicationQueueScheduledExecutorFactoryClass = MockExecutorFactory.class
                .getName();
 
       final SpringEmbeddedCacheManagerFactoryBean objectUnderTest = new SpringEmbeddedCacheManagerFactoryBean();

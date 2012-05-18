@@ -42,7 +42,7 @@ import org.infinispan.jmx.MBeanServerLookup;
 import org.infinispan.jmx.PlatformMBeanServerLookup;
 import org.infinispan.lifecycle.ComponentStatus;
 import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.spring.mock.MockExecutorFatory;
+import org.infinispan.spring.mock.MockExecutorFactory;
 import org.infinispan.spring.mock.MockTransport;
 import org.infinispan.spring.provider.SpringEmbeddedCacheManagerFactoryBean;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
@@ -382,7 +382,7 @@ public class InfinispanEmbeddedCacheManagerFactoryBeanTest {
    @Test
    public final void infinispanEmbeddedCacheManagerFactoryBeanShouldUseAsyncListenerExecutorFactoryClassPropIfExplicitlySet()
             throws Exception {
-      final String expectedAsyncListenerExecutorFactoryClass = MockExecutorFatory.class.getName();
+      final String expectedAsyncListenerExecutorFactoryClass = MockExecutorFactory.class.getName();
 
       final InfinispanEmbeddedCacheManagerFactoryBean objectUnderTest = new InfinispanEmbeddedCacheManagerFactoryBean();
       objectUnderTest

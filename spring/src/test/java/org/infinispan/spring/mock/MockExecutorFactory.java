@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.infinispan.executors.ExecutorFactory;
 
-public final class MockExecutorFatory implements ExecutorFactory {
+public final class MockExecutorFactory implements ExecutorFactory {
 
    @Override
    public ExecutorService getExecutor(final Properties p) {

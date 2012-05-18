@@ -636,61 +636,6 @@ public class InfinispanNamedEmbeddedCacheFactoryBean<K, V> implements FactoryBea
    }
 
    /**
-    * @param stateRetrievalLogFlushTimeout
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalLogFlushTimeout(java.lang.Long)
-    */
-   public void setStateRetrievalLogFlushTimeout(final Long stateRetrievalLogFlushTimeout) {
-      this.configurationOverrides.setStateRetrievalLogFlushTimeout(stateRetrievalLogFlushTimeout);
-   }
-
-   /**
-    * @param stateRetrievalMaxNonProgressingLogWrites
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalMaxNonProgressingLogWrites(java.lang.Integer)
-    */
-   public void setStateRetrievalMaxNonProgressingLogWrites(
-         final Integer stateRetrievalMaxNonProgressingLogWrites) {
-      this.configurationOverrides
-            .setStateRetrievalMaxNonProgressingLogWrites(stateRetrievalMaxNonProgressingLogWrites);
-   }
-
-   /**
-    * @param stateRetrievalChunkSize
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalMaxNonProgressingLogWrites(java.lang.Integer)
-    */
-   public void setStateRetrievalChunkSize(
-         final Integer stateRetrievalChunkSize) {
-      this.configurationOverrides
-            .setStateRetrievalMaxNonProgressingLogWrites(stateRetrievalChunkSize);
-   }
-
-   /**
-    * @param stateRetrievalInitialRetryWaitTime
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalInitialRetryWaitTime(java.lang.Long)
-    */
-   public void setStateRetrievalInitialRetryWaitTime(final Long stateRetrievalInitialRetryWaitTime) {
-      this.configurationOverrides
-               .setStateRetrievalInitialRetryWaitTime(stateRetrievalInitialRetryWaitTime);
-   }
-
-   /**
-    * @param stateRetrievalRetryWaitTimeIncreaseFactor
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalRetryWaitTimeIncreaseFactor(java.lang.Integer)
-    */
-   public void setStateRetrievalRetryWaitTimeIncreaseFactor(
-            final Integer stateRetrievalRetryWaitTimeIncreaseFactor) {
-      this.configurationOverrides
-               .setStateRetrievalRetryWaitTimeIncreaseFactor(stateRetrievalRetryWaitTimeIncreaseFactor);
-   }
-
-   /**
-    * @param stateRetrievalNumRetries
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalNumRetries(java.lang.Integer)
-    */
-   public void setStateRetrievalNumRetries(final Integer stateRetrievalNumRetries) {
-      this.configurationOverrides.setStateRetrievalNumRetries(stateRetrievalNumRetries);
-   }
-
-   /**
     * @param isolationLevelClass
     * @see org.infinispan.spring.ConfigurationOverrides#setIsolationLevelClass(java.lang.String)
     */
