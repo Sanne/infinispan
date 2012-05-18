@@ -23,9 +23,13 @@
 
 package org.infinispan.spring;
 
-import org.infinispan.config.*;
+import org.infinispan.config.CacheLoaderManagerConfig;
+import org.infinispan.config.ConfigurationException;
+import org.infinispan.config.CustomInterceptorConfig;
+import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.LegacyConfigurationAdaptor;
+import org.infinispan.configuration.global.GlobalConfiguration;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.configuration.global.LegacyGlobalConfigurationAdaptor;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
@@ -53,11 +57,11 @@ import java.util.*;
  * 
  * @author <a href="mailto:olaf DOT bergner AT gmx DOT de">Olaf Bergner</a>
  * @author Marius Bogoevici
- * 
+ * @author Sanne Grinovero
  */
 public class AbstractEmbeddedCacheManagerFactory {
 
-   protected final Log logger = LogFactory.getLog(getClass());
+   protected static final Log logger = LogFactory.getLog(AbstractEmbeddedCacheManagerFactory.class);
 
    private Resource configurationFileLocation;
 
@@ -69,60 +73,20 @@ public class AbstractEmbeddedCacheManagerFactory {
    // Create fully configured EmbeddedCacheManager instance
    // ------------------------------------------------------------------------
 
-   protected EmbeddedCacheManager createBackingEmbeddedCacheManager()
-            throws ConfigurationException, IOException {
-      final ConfigurationContainer templateConfiguration = createTemplateConfiguration();
+   protected EmbeddedCacheManager createBackingEmbeddedCacheManager() throws ConfigurationException, IOException {
+      final GlobalConfigurationBuilder globalCfgBuilder = new GlobalConfigurationBuilder();
+      final ConfigurationBuilder cacheCfgBuilder = new ConfigurationBuilder();
 
-      this.globalConfigurationOverrides.applyOverridesTo(templateConfiguration.globalConfiguration);
-      this.configurationOverrides.applyOverridesTo(templateConfiguration.defaultConfiguration);
+      this.globalConfigurationOverrides.applyOverridesTo(globalCfgBuilder);
+      this.configurationOverrides.applyOverridesTo(cacheCfgBuilder);
 
-      final EmbeddedCacheManager nativeEmbeddedCacheManager = createCacheManager(templateConfiguration);
-      for (final Map.Entry<String, Configuration> namedCacheConfig : templateConfiguration.namedCaches
-               .entrySet()) {
-         nativeEmbeddedCacheManager.defineConfiguration(namedCacheConfig.getKey(),
-                  namedCacheConfig.getValue());
-      }
+      final EmbeddedCacheManager nativeEmbeddedCacheManager = createCacheManager(globalCfgBuilder, cacheCfgBuilder);
 
       return nativeEmbeddedCacheManager;
    }
 
-   protected EmbeddedCacheManager createCacheManager(ConfigurationContainer templateConfiguration) {
-      return new DefaultCacheManager(
-               templateConfiguration.globalConfiguration,
-               templateConfiguration.defaultConfiguration);
-   }
-
-   // ------------------------------------------------------------------------
-   // Create ConfigurationContainer
-   // ------------------------------------------------------------------------
-
-   protected ConfigurationContainer createTemplateConfiguration() throws ConfigurationException,
-            IOException {
-      final ConfigurationContainer templateConfiguration;
-      if (this.configurationFileLocation == null) {
-         this.logger
-                  .info("No configuration file has been given. Using Infinispan's default settings.");
-         final GlobalConfiguration standardGlobalConfiguration = new GlobalConfiguration();
-         final Configuration standardDefaultConfiguration = new Configuration();
-         templateConfiguration = new ConfigurationContainer(standardGlobalConfiguration,
-                  standardDefaultConfiguration, new HashMap<String, Configuration>());
-      } else {
-         this.logger.info("Using Infinispan configuration file located at ["
-                  + this.configurationFileLocation + "]");
-         templateConfiguration = loadConfigurationFromFile(this.configurationFileLocation);
-      }
-      return templateConfiguration;
-   }
-
-   private ConfigurationContainer loadConfigurationFromFile(final Resource configFileLocation) throws ConfigurationException, IOException {
-      ParserRegistry parserRegistry = new ParserRegistry(Thread.currentThread().getContextClassLoader());
-      final InputStream configFileInputStream = configFileLocation.getInputStream();
-      try {
-         ConfigurationBuilderHolder parsed = parserRegistry.parse(configFileInputStream);
-         return new ConfigurationContainer(parsed);
-      } finally {
-         configFileInputStream.close();
-      }
+   protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
+      return new DefaultCacheManager( globalBuilder.build(), builder.build() );
    }
 
    // ------------------------------------------------------------------------
@@ -828,37 +792,6 @@ public class AbstractEmbeddedCacheManagerFactory {
    // Helper classes
    // ------------------------------------------------------------------------
 
-   protected static final class ConfigurationContainer {
-
-      public final GlobalConfiguration globalConfiguration;
-
-      public final Configuration defaultConfiguration;
-
-      public final Map<String, Configuration> namedCaches;
-
-      ConfigurationContainer(final GlobalConfiguration globalConfiguration,
-               final Configuration defaultConfiguration,
-               final Map<String, Configuration> namedCaches) {
-         this.globalConfiguration = globalConfiguration.clone();
-         this.defaultConfiguration = defaultConfiguration.clone();
-         this.namedCaches = Collections.unmodifiableMap(namedCaches);
-      }
-
-      ConfigurationContainer(ConfigurationBuilderHolder parsed) {
-         this(LegacyGlobalConfigurationAdaptor.adapt(parsed.getGlobalConfigurationBuilder().build()),
-               LegacyConfigurationAdaptor.adapt(parsed.getDefaultConfigurationBuilder().build()),
-               extractNamedCfgs(parsed));
-      }
-
-      private static Map<String, Configuration> extractNamedCfgs(ConfigurationBuilderHolder parsed) {
-         Map<String, ConfigurationBuilder> ncbs = parsed.getNamedConfigurationBuilders();
-         Map<String, Configuration> namedCfgs = new HashMap(ncbs.size());
-         for (Map.Entry<String, ConfigurationBuilder> entry : ncbs.entrySet())
-            namedCfgs.put(entry.getKey(), LegacyConfigurationAdaptor.adapt(entry.getValue().build()));
-         return namedCfgs;
-      }
-   }
-
    protected static final class GlobalConfigurationOverrides {
 
       private final Log logger = LogFactory.getLog(getClass());
@@ -917,7 +850,7 @@ public class AbstractEmbeddedCacheManagerFactory {
 
       private Short marshallVersion;
 
-      public void applyOverridesTo(final GlobalConfiguration globalConfigurationToOverride) {
+      public void applyOverridesTo(final GlobalConfigurationBuilder globalConfigurationToOverride) {
          this.logger.debug("Applying configuration overrides to GlobalConfiguration ["
                   + globalConfigurationToOverride + "] ...");
 

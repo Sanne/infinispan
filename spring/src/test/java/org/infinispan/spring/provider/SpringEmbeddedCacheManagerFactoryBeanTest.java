@@ -37,6 +37,8 @@ import org.infinispan.Version;
 import org.infinispan.config.Configuration;
 import org.infinispan.config.Configuration.CacheMode;
 import org.infinispan.config.GlobalConfiguration.ShutdownHookBehavior;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.jmx.MBeanServerLookup;
 import org.infinispan.jmx.PlatformMBeanServerLookup;
 import org.infinispan.lifecycle.ComponentStatus;
@@ -104,9 +106,8 @@ public class SpringEmbeddedCacheManagerFactoryBeanTest {
 
       final SpringEmbeddedCacheManagerFactoryBean objectUnderTest = new SpringEmbeddedCacheManagerFactoryBean() {
          @Override
-         protected EmbeddedCacheManager createCacheManager(ConfigurationContainer template) {
-            return TestCacheManagerFactory.createCacheManager(
-                  template.globalConfiguration, template.defaultConfiguration);
+         protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
+            return TestCacheManagerFactory.createCacheManager(globalBuilder, builder);
          }
       };
       objectUnderTest.setConfigurationFileLocation(infinispanConfig);
