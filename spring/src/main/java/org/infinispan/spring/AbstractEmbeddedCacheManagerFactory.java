@@ -86,7 +86,7 @@ public class AbstractEmbeddedCacheManagerFactory {
    }
 
    protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
-      return new DefaultCacheManager( globalBuilder.build(), builder.build() );
+      return new DefaultCacheManager(globalBuilder.build(), builder.build());
    }
 
    // ------------------------------------------------------------------------
