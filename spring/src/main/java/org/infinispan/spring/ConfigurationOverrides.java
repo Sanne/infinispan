@@ -117,8 +117,6 @@ public final class ConfigurationOverrides {
 
    private Long stateRetrievalTimeout;
 
-   private Long stateRetrievalLogFlushTimeout;
-
    private Integer stateRetrievalMaxNonProgressingLogWrites;
 
    private Integer stateRetrievalChunkSize;
@@ -432,14 +430,6 @@ public final class ConfigurationOverrides {
    }
 
    /**
-    * @param stateRetrievalLogFlushTimeout
-    *           the stateRetrievalLogFlushTimeout to set
-    */
-   public void setStateRetrievalLogFlushTimeout(final Long stateRetrievalLogFlushTimeout) {
-      this.stateRetrievalLogFlushTimeout = stateRetrievalLogFlushTimeout;
-   }
-
-   /**
     * @param stateRetrievalMaxNonProgressingLogWrites
     *           the stateRetrievalMaxNonProgressingLogWrites to set
     */
@@ -722,11 +712,6 @@ public final class ConfigurationOverrides {
       if (this.stateRetrievalTimeout != null) {
          this.logger.debug("Overriding property [stateRetrievalTimeout] with value [" + this.stateRetrievalTimeout + "]");
          configurationToOverride.clustering().stateTransfer().timeout(this.stateRetrievalTimeout);
-      }
-      if (this.stateRetrievalLogFlushTimeout != null) {
-         this.logger.debug("Overriding property [stateRetrievalLogFlushTimeout] with value [" + this.stateRetrievalLogFlushTimeout + "]");
-//         configurationToOverride.clustering().stateTransfer().
-//                  .setStateRetrievalLogFlushTimeout(this.stateRetrievalLogFlushTimeout);
       }
       if (this.stateRetrievalMaxNonProgressingLogWrites != null) {
          this.logger.debug("Overriding property [stateRetrievalMaxNonProgressingLogWrites] with value [" + this.stateRetrievalMaxNonProgressingLogWrites + "]");

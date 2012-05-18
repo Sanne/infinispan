@@ -84,8 +84,8 @@ public class AbstractEmbeddedCacheManagerFactory {
       return nativeEmbeddedCacheManager;
    }
 
-   protected EmbeddedCacheManager createCacheManager(ConfigurationContainer templateConfiguration) {
-      return new DefaultCacheManager( globalBuilder.build(), builder.build() );
+   protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
+      return new DefaultCacheManager(globalBuilder.build(), builder.build());
    }
 
    // ------------------------------------------------------------------------
@@ -689,16 +689,6 @@ public class AbstractEmbeddedCacheManagerFactory {
    }
 
    /**
-    * @param stateRetrievalRetryWaitTimeIncreaseFactor
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalRetryWaitTimeIncreaseFactor(java.lang.Integer)
-    */
-   public void setStateRetrievalRetryWaitTimeIncreaseFactor(
-            final Integer stateRetrievalRetryWaitTimeIncreaseFactor) {
-      this.configurationOverrides
-               .setStateRetrievalRetryWaitTimeIncreaseFactor(stateRetrievalRetryWaitTimeIncreaseFactor);
-   }
-
-   /**
     * @param stateRetrievalChunkSize
     * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalRetryWaitTimeIncreaseFactor(java.lang.Integer)
     */
@@ -706,14 +696,6 @@ public class AbstractEmbeddedCacheManagerFactory {
          final Integer stateRetrievalChunkSize) {
       this.configurationOverrides
             .setStateRetrievalChunkSize(stateRetrievalChunkSize);
-   }
-
-   /**
-    * @param stateRetrievalNumRetries
-    * @see org.infinispan.spring.ConfigurationOverrides#setStateRetrievalNumRetries(java.lang.Integer)
-    */
-   public void setStateRetrievalNumRetries(final Integer stateRetrievalNumRetries) {
-      this.configurationOverrides.setStateRetrievalNumRetries(stateRetrievalNumRetries);
    }
 
    /**

@@ -205,9 +205,8 @@ public class SpringEmbeddedCacheManagerFactoryBeanTest {
 
       final SpringEmbeddedCacheManagerFactoryBean objectUnderTest = new SpringEmbeddedCacheManagerFactoryBean() {
          @Override
-         protected EmbeddedCacheManager createCacheManager(ConfigurationContainer template) {
-            return TestCacheManagerFactory.createCacheManager(
-                  template.globalConfiguration, template.defaultConfiguration);
+         protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
+            return TestCacheManagerFactory.createCacheManager(globalBuilder, builder);
          }
       };
       objectUnderTest.setExposeGlobalJmxStatistics(expectedExposeGlobalJmxStatistics);

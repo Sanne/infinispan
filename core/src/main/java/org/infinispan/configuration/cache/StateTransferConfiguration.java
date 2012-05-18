@@ -66,15 +66,6 @@ public class StateTransferConfiguration {
    }
 
    /**
-    * This is the maximum amount of time - in milliseconds - to wait for state from neighboring
-    * caches, before throwing an exception and aborting startup.
-    */
-   public StateTransferConfiguration timeout(long l) {
-      timeout = l;
-      return this;
-   }
-
-   /**
     * If &gt; 0, the state will be transferred in batches of {@code chunkSize} cache entries.
     * If &lt;= 0, the state will be transferred in all at once. Not recommended.
     */
