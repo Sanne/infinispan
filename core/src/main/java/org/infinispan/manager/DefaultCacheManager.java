@@ -154,18 +154,6 @@ public class DefaultCacheManager implements EmbeddedCacheManager, CacheManager {
    }
 
    /**
-    * Constructs and starts a new instance of the CacheManager, using the default configuration passed in. Uses defaults
-    * for a {@link GlobalConfiguration}.  See {@link GlobalConfiguration} for details of these defaults.
-    *
-    * @param defaultConfiguration configuration to use as a template for all caches created
-    * @deprecated Use {@link #DefaultCacheManager(org.infinispan.configuration.cache.Configuration)} instead
-    */
-   @Deprecated
-   public DefaultCacheManager(org.infinispan.config.Configuration defaultConfiguration) {
-      this(null, defaultConfiguration, true);
-   }
-
-   /**
     * Constructs and starts a new instance of the CacheManager, using the default configuration passed in.  See {@link org.infinispan.configuration.cache.Configuration Configuration}
     * and {@link org.infinispan.configuration.global.GlobalConfiguration GlobalConfiguration} for details of these defaults.
     *
@@ -173,20 +161,6 @@ public class DefaultCacheManager implements EmbeddedCacheManager, CacheManager {
     */
    public DefaultCacheManager(org.infinispan.configuration.cache.Configuration defaultConfiguration) {
       this(null, defaultConfiguration, true);
-   }
-
-   /**
-    * Constructs a new instance of the CacheManager, using the default configuration passed in. Uses defaults for a
-    * {@link org.infinispan.config.GlobalConfiguration}.  See {@link GlobalConfiguration} for details of these
-    * defaults.
-    *
-    * @param defaultConfiguration configuration file to use as a template for all caches created
-    * @param start                if true, the cache manager is started
-    * @deprecated Use {@link #DefaultCacheManager(org.infinispan.configuration.cache.Configuration, boolean)} instead
-    */
-   @Deprecated
-   public DefaultCacheManager(org.infinispan.config.Configuration defaultConfiguration, boolean start) {
-      this(null, defaultConfiguration, start);
    }
 
    /**
@@ -202,18 +176,6 @@ public class DefaultCacheManager implements EmbeddedCacheManager, CacheManager {
 
    /**
     * Constructs and starts a new instance of the CacheManager, using the global configuration passed in, and system
-    * defaults for the default named cache configuration.  See {@link Configuration} for details of these defaults.
-    *
-    * @param globalConfiguration GlobalConfiguration to use for all caches created
-    * @deprecated Use {@link #DefaultCacheManager(org.infinispan.configuration.global.GlobalConfiguration)} instead
-    */
-   @Deprecated
-   public DefaultCacheManager(org.infinispan.config.GlobalConfiguration globalConfiguration) {
-      this(globalConfiguration, null, true);
-   }
-
-   /**
-    * Constructs and starts a new instance of the CacheManager, using the global configuration passed in, and system
     * defaults for the default named cache configuration.  See {@link org.infinispan.configuration.cache.Configuration Configuration}
     * for details of these defaults.
     *
@@ -221,19 +183,6 @@ public class DefaultCacheManager implements EmbeddedCacheManager, CacheManager {
     */
    public DefaultCacheManager(GlobalConfiguration globalConfiguration) {
       this(LegacyGlobalConfigurationAdaptor.adapt(globalConfiguration), null, true);
-   }
-
-   /**
-    * Constructs a new instance of the CacheManager, using the global configuration passed in, and system defaults for
-    * the default named cache configuration.  See {@link Configuration} for details of these defaults.
-    *
-    * @param globalConfiguration GlobalConfiguration to use for all caches created
-    * @param start               if true, the cache manager is started.
-    * @deprecated Use {@link #DefaultCacheManager(org.infinispan.configuration.global.GlobalConfiguration, boolean)} instead
-    */
-   @Deprecated
-   public DefaultCacheManager(org.infinispan.config.GlobalConfiguration globalConfiguration, boolean start) {
-      this(globalConfiguration, null, start);
    }
 
    /**
@@ -246,19 +195,6 @@ public class DefaultCacheManager implements EmbeddedCacheManager, CacheManager {
     */
    public DefaultCacheManager(GlobalConfiguration globalConfiguration, boolean start) {
       this(LegacyGlobalConfigurationAdaptor.adapt(globalConfiguration), null, start);
-   }
-
-   /**
-    * Constructs and starts a new instance of the CacheManager, using the global and default configurations passed in.
-    * If either of these are null, system defaults are used.
-    *
-    * @param globalConfiguration  global configuration to use. If null, a default instance is created.
-    * @param defaultConfiguration default configuration to use. If null, a default instance is created.
-    * Use {@link #DefaultCacheManager(org.infinispan.configuration.global.GlobalConfiguration, org.infinispan.configuration.cache.Configuration)} instead
-    */
-   @Deprecated
-   public DefaultCacheManager(org.infinispan.config.GlobalConfiguration globalConfiguration, org.infinispan.config.Configuration defaultConfiguration) {
-      this(globalConfiguration, defaultConfiguration, true);
    }
 
    /**
