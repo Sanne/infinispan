@@ -824,163 +824,121 @@ public class AbstractEmbeddedCacheManagerFactory {
 
       private Short marshallVersion;
 
-      public void applyOverridesTo(final GlobalConfigurationBuilder globalConfigurationToOverride) {
-         this.logger.debug("Applying configuration overrides to GlobalConfiguration ["
-                  + globalConfigurationToOverride + "] ...");
+      public void applyOverridesTo(final GlobalConfigurationBuilder cfg) {
+         logger.debug("Applying configuration overrides to GlobalConfiguration [" + cfg + "] ...");
 
          if (this.exposeGlobalJmxStatistics != null) {
-            this.logger.debug("Overriding property [exposeGlobalJmxStatistics] with new value ["
-                     + this.exposeGlobalJmxStatistics + "]");
-            globalConfigurationToOverride
-                     .setExposeGlobalJmxStatistics(this.exposeGlobalJmxStatistics);
+            logger.debug("Overriding property [exposeGlobalJmxStatistics] with new value [" + this.exposeGlobalJmxStatistics + "]");
+            cfg.setExposeGlobalJmxStatistics(this.exposeGlobalJmxStatistics);
          }
          if (this.mBeanServerProperties != null) {
-            this.logger.debug("Overriding property [mBeanServerProperties] with new value ["
-                     + this.mBeanServerProperties + "]");
-            globalConfigurationToOverride.setMBeanServerProperties(this.mBeanServerProperties);
+            logger.debug("Overriding property [mBeanServerProperties] with new value [" + this.mBeanServerProperties + "]");
+            cfg.setMBeanServerProperties(this.mBeanServerProperties);
          }
          if (this.jmxDomain != null) {
-            this.logger.debug("Overriding property [jmxDomain] with new value [" + this.jmxDomain
-                     + "]");
-            globalConfigurationToOverride.setJmxDomain(this.jmxDomain);
+            logger.debug("Overriding property [jmxDomain] with new value [" + this.jmxDomain + "]");
+            cfg.setJmxDomain(this.jmxDomain);
          }
          if (this.mBeanServerLookupClass != null) {
-            this.logger.debug("Overriding property [mBeanServerLookupClass] with new value ["
-                     + this.mBeanServerLookupClass + "]");
-            globalConfigurationToOverride.setMBeanServerLookup(this.mBeanServerLookupClass);
+            logger.debug("Overriding property [mBeanServerLookupClass] with new value [" + this.mBeanServerLookupClass + "]");
+            cfg.setMBeanServerLookup(this.mBeanServerLookupClass);
          }
          if (this.mBeanServerLookup != null) {
-            this.logger.debug("Overriding property [mBeanServerLookup] with new value ["
-                     + this.mBeanServerLookup + "]");
-            globalConfigurationToOverride.setMBeanServerLookup(this.mBeanServerLookup);
+            logger.debug("Overriding property [mBeanServerLookup] with new value [" + this.mBeanServerLookup + "]");
+            cfg.setMBeanServerLookup(this.mBeanServerLookup);
          }
          if (this.allowDuplicateDomains != null) {
-            this.logger.debug("Overriding property [allowDuplicateDomains] with new value ["
-                     + this.allowDuplicateDomains + "]");
-            globalConfigurationToOverride.setAllowDuplicateDomains(this.allowDuplicateDomains);
+            logger.debug("Overriding property [allowDuplicateDomains] with new value [" + this.allowDuplicateDomains + "]");
+            cfg.setAllowDuplicateDomains(this.allowDuplicateDomains);
          }
          if (this.cacheManagerName != null) {
-            this.logger.debug("Overriding property [cacheManagerName] with new value ["
-                     + this.cacheManagerName + "]");
-            globalConfigurationToOverride.setCacheManagerName(this.cacheManagerName);
+            logger.debug("Overriding property [cacheManagerName] with new value [" + this.cacheManagerName + "]");
+            cfg.setCacheManagerName(this.cacheManagerName);
          }
          if (this.clusterName != null) {
-            this.logger.debug("Overriding property [clusterName] with new value ["
-                     + this.clusterName + "]");
-            globalConfigurationToOverride.setClusterName(this.clusterName);
+            logger.debug("Overriding property [clusterName] with new value [" + this.clusterName + "]");
+            cfg.setClusterName(this.clusterName);
          }
          if (this.machineId != null) {
-            this.logger.debug("Overriding property [machineId] with new value [" + this.machineId
-                     + "]");
-            globalConfigurationToOverride.setMachineId(this.machineId);
+            logger.debug("Overriding property [machineId] with new value [" + this.machineId + "]");
+            cfg.setMachineId(this.machineId);
          }
          if (this.rackId != null) {
-            this.logger.debug("Overriding property [rackId] with new value [" + this.rackId + "]");
-            globalConfigurationToOverride.setRackId(this.rackId);
+            logger.debug("Overriding property [rackId] with new value [" + this.rackId + "]");
+            cfg.setRackId(this.rackId);
          }
          if (this.siteId != null) {
-            this.logger.debug("Overriding property [siteId] with new value [" + this.siteId + "]");
-            globalConfigurationToOverride.setSiteId(this.siteId);
+            logger.debug("Overriding property [siteId] with new value [" + this.siteId + "]");
+            cfg.setSiteId(this.siteId);
          }
          if (this.strictPeerToPeer != null) {
-            this.logger.debug("Overriding property [strictPeerToPeer] with new value ["
-                     + this.strictPeerToPeer + "]");
-            globalConfigurationToOverride.setStrictPeerToPeer(this.strictPeerToPeer);
+            logger.debug("Overriding property [strictPeerToPeer] with new value [" + this.strictPeerToPeer + "]");
+            cfg.setStrictPeerToPeer(this.strictPeerToPeer);
          }
          if (this.distributedSyncTimeout != null) {
-            this.logger.debug("Overriding property [distributedSyncTimeout] with new value ["
-                     + this.distributedSyncTimeout + "]");
-            globalConfigurationToOverride.setDistributedSyncTimeout(this.distributedSyncTimeout);
+            logger.debug("Overriding property [distributedSyncTimeout] with new value [" + this.distributedSyncTimeout + "]");
+            cfg.setDistributedSyncTimeout(this.distributedSyncTimeout);
          }
          if (this.transportClass != null) {
-            this.logger.debug("Overriding property [transportClass] with new value ["
-                     + this.transportClass + "]");
-            globalConfigurationToOverride.setTransportClass(this.transportClass);
+            logger.debug("Overriding property [transportClass] with new value [" + this.transportClass + "]");
+            cfg.setTransportClass(this.transportClass);
          }
          if (this.transportNodeName != null) {
-            this.logger.debug("Overriding property [transportNodeName] with new value ["
-                     + this.transportNodeName + "]");
-            globalConfigurationToOverride.setTransportNodeName(this.transportNodeName);
+            logger.debug("Overriding property [transportNodeName] with new value [" + this.transportNodeName + "]");
+            cfg.setTransportNodeName(this.transportNodeName);
          }
          if (this.asyncListenerExecutorFactoryClass != null) {
-            this.logger
-                     .debug("Overriding property [asyncListenerExecutorFactoryClass] with new value ["
-                              + this.asyncListenerExecutorFactoryClass + "]");
-            globalConfigurationToOverride
-                     .setAsyncListenerExecutorFactoryClass(this.asyncListenerExecutorFactoryClass);
+            logger.debug("Overriding property [asyncListenerExecutorFactoryClass] with new value [" + this.asyncListenerExecutorFactoryClass + "]");
+            cfg.setAsyncListenerExecutorFactoryClass(this.asyncListenerExecutorFactoryClass);
          }
          if (this.asyncTransportExecutorFactoryClass != null) {
-            this.logger
-                     .debug("Overriding property [asyncTransportExecutorFactoryClass] with new value ["
-                              + this.asyncTransportExecutorFactoryClass + "]");
-            globalConfigurationToOverride
-                     .setAsyncTransportExecutorFactoryClass(this.asyncTransportExecutorFactoryClass);
+            logger.debug("Overriding property [asyncTransportExecutorFactoryClass] with new value [" + this.asyncTransportExecutorFactoryClass + "]");
+            cfg.setAsyncTransportExecutorFactoryClass(this.asyncTransportExecutorFactoryClass);
          }
          if (this.evictionScheduledExecutorFactoryClass != null) {
-            this.logger
-                     .debug("Overriding property [evictionScheduledExecutorFactoryClass] with new value ["
-                              + this.evictionScheduledExecutorFactoryClass + "]");
-            globalConfigurationToOverride
-                     .setEvictionScheduledExecutorFactoryClass(this.evictionScheduledExecutorFactoryClass);
+            logger.debug("Overriding property [evictionScheduledExecutorFactoryClass] with new value [" + this.evictionScheduledExecutorFactoryClass + "]");
+            cfg.setEvictionScheduledExecutorFactoryClass(this.evictionScheduledExecutorFactoryClass);
          }
          if (this.replicationQueueScheduledExecutorFactoryClass != null) {
-            this.logger
-                     .debug("Overriding property [replicationQueueScheduledExecutorFactoryClass] with new value ["
-                              + this.replicationQueueScheduledExecutorFactoryClass + "]");
-            globalConfigurationToOverride
-                     .setReplicationQueueScheduledExecutorFactoryClass(this.replicationQueueScheduledExecutorFactoryClass);
+            logger.debug("Overriding property [replicationQueueScheduledExecutorFactoryClass] with new value ["
+                  + this.replicationQueueScheduledExecutorFactoryClass + "]");
+            cfg.setReplicationQueueScheduledExecutorFactoryClass(this.replicationQueueScheduledExecutorFactoryClass);
          }
          if (this.marshallerClass != null) {
-            this.logger.debug("Overriding property [marshallerClass] with new value ["
-                     + this.marshallerClass + "]");
-            globalConfigurationToOverride.setMarshallerClass(this.marshallerClass);
+            logger.debug("Overriding property [marshallerClass] with new value [" + this.marshallerClass + "]");
+            cfg.setMarshallerClass(this.marshallerClass);
          }
          if (this.transportProperties != null) {
-            this.logger.debug("Overriding property [transportProperties] with new value ["
-                     + this.transportProperties + "]");
-            globalConfigurationToOverride.setTransportProperties(this.transportProperties);
+            logger.debug("Overriding property [transportProperties] with new value [" + this.transportProperties + "]");
+            cfg.setTransportProperties(this.transportProperties);
          }
          if (this.shutdownHookBehavior != null) {
-            this.logger.debug("Overriding property [shutdownHookBehavior] with new value ["
-                     + this.shutdownHookBehavior + "]");
-            globalConfigurationToOverride.setShutdownHookBehavior(this.shutdownHookBehavior);
+            logger.debug("Overriding property [shutdownHookBehavior] with new value [" + this.shutdownHookBehavior + "]");
+            cfg.setShutdownHookBehavior(this.shutdownHookBehavior);
          }
          if (this.asyncListenerExecutorProperties != null) {
-            this.logger
-                     .debug("Overriding property [asyncListenerExecutorProperties] with new value ["
-                              + this.asyncListenerExecutorProperties + "]");
-            globalConfigurationToOverride
-                     .setAsyncListenerExecutorProperties(this.asyncListenerExecutorProperties);
+            logger.debug("Overriding property [asyncListenerExecutorProperties] with new value [" + this.asyncListenerExecutorProperties + "]");
+            cfg.setAsyncListenerExecutorProperties(this.asyncListenerExecutorProperties);
          }
          if (this.asyncTransportExecutorProperties != null) {
-            this.logger
-                     .debug("Overriding property [asyncTransportExecutorProperties] with new value ["
-                              + this.asyncTransportExecutorProperties + "]");
-            globalConfigurationToOverride
-                     .setAsyncTransportExecutorProperties(this.asyncTransportExecutorProperties);
+            logger.debug("Overriding property [asyncTransportExecutorProperties] with new value [" + this.asyncTransportExecutorProperties + "]");
+            cfg.setAsyncTransportExecutorProperties(this.asyncTransportExecutorProperties);
          }
          if (this.evictionScheduledExecutorProperties != null) {
-            this.logger
-                     .debug("Overriding property [evictionScheduledExecutorProperties] with new value ["
-                              + this.evictionScheduledExecutorProperties + "]");
-            globalConfigurationToOverride
-                     .setEvictionScheduledExecutorProperties(this.evictionScheduledExecutorProperties);
+            logger.debug("Overriding property [evictionScheduledExecutorProperties] with new value [" + this.evictionScheduledExecutorProperties + "]");
+            cfg.setEvictionScheduledExecutorProperties(this.evictionScheduledExecutorProperties);
          }
          if (this.replicationQueueScheduledExecutorProperties != null) {
-            this.logger
-                     .debug("Overriding property [replicationQueueScheduledExecutorProperties] with new value ["
-                              + this.replicationQueueScheduledExecutorProperties + "]");
-            globalConfigurationToOverride
-                     .setReplicationQueueScheduledExecutorProperties(this.replicationQueueScheduledExecutorProperties);
+            logger.debug("Overriding property [replicationQueueScheduledExecutorProperties] with new value ["
+                  + this.replicationQueueScheduledExecutorProperties + "]");
+            cfg.setReplicationQueueScheduledExecutorProperties(this.replicationQueueScheduledExecutorProperties);
          }
          if (this.marshallVersion != null) {
-            this.logger.debug("Overriding property [marshallVersion] with new value ["
-                     + this.marshallVersion + "]");
-            globalConfigurationToOverride.fluent().serialization().version(this.marshallVersion);
+            logger.debug("Overriding property [marshallVersion] with new value [" + this.marshallVersion + "]");
+            cfg.fluent().serialization().version(this.marshallVersion);
          }
 
-         this.logger.debug("Finished applying configuration overrides to GlobalConfiguration ["
-                  + globalConfigurationToOverride + "]");
+         logger.debug("Finished applying configuration overrides to GlobalConfiguration [" + cfg + "]");
       }
    }
 }

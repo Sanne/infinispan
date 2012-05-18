@@ -46,7 +46,7 @@ import java.util.Properties;
 
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.spring.AbstractRemoteCacheManagerFactory;
-import org.infinispan.spring.mock.MockExecutorFatory;
+import org.infinispan.spring.mock.MockExecutorFactory;
 import org.infinispan.spring.mock.MockMarshaller;
 import org.infinispan.spring.mock.MockRequestBalancingStrategy;
 import org.infinispan.spring.mock.MockTransportFactory;
@@ -348,7 +348,7 @@ public class InfinispanRemoteCacheManagerFactoryBeanTest {
    @Test
    public final void setAsyncExecutorFactoryShouldOverrideDefaultAsyncExecutorFactory()
             throws Exception {
-      final String expectedAsyncExecutorFactory = MockExecutorFatory.class.getName();
+      final String expectedAsyncExecutorFactory = MockExecutorFactory.class.getName();
       final InfinispanRemoteCacheManagerFactoryBean objectUnderTest = new InfinispanRemoteCacheManagerFactoryBean();
       objectUnderTest.setAsyncExecutorFactory(expectedAsyncExecutorFactory);
       objectUnderTest.setStartAutomatically(false);
