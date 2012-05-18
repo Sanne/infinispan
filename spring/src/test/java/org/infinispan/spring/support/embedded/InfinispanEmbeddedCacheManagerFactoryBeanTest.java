@@ -36,11 +36,12 @@ import org.infinispan.Cache;
 import org.infinispan.config.Configuration;
 import org.infinispan.config.Configuration.CacheMode;
 import org.infinispan.config.GlobalConfiguration.ShutdownHookBehavior;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.jmx.MBeanServerLookup;
 import org.infinispan.jmx.PlatformMBeanServerLookup;
 import org.infinispan.lifecycle.ComponentStatus;
 import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.spring.AbstractEmbeddedCacheManagerFactory;
 import org.infinispan.spring.mock.MockExecutorFatory;
 import org.infinispan.spring.mock.MockTransport;
 import org.infinispan.spring.provider.SpringEmbeddedCacheManagerFactoryBean;
@@ -100,9 +101,8 @@ public class InfinispanEmbeddedCacheManagerFactoryBeanTest {
 
       final InfinispanEmbeddedCacheManagerFactoryBean objectUnderTest = new InfinispanEmbeddedCacheManagerFactoryBean() {
          @Override
-         protected EmbeddedCacheManager createCacheManager(ConfigurationContainer template) {
-            return TestCacheManagerFactory.createCacheManager(
-                  template.globalConfiguration, template.defaultConfiguration);
+         protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
+            return TestCacheManagerFactory.createCacheManager(globalBuilder, builder);
          }
       };
       objectUnderTest.setConfigurationFileLocation(infinispanConfig);
@@ -200,9 +200,8 @@ public class InfinispanEmbeddedCacheManagerFactoryBeanTest {
 
       final InfinispanEmbeddedCacheManagerFactoryBean objectUnderTest = new InfinispanEmbeddedCacheManagerFactoryBean() {
          @Override
-         protected EmbeddedCacheManager createCacheManager(ConfigurationContainer template) {
-            return TestCacheManagerFactory.createCacheManager(
-                  template.globalConfiguration, template.defaultConfiguration);
+         protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
+            return TestCacheManagerFactory.createCacheManager(globalBuilder, builder);
          }
       };
       objectUnderTest.setExposeGlobalJmxStatistics(expectedExposeGlobalJmxStatistics);
