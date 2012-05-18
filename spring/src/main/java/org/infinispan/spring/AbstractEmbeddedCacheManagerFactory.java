@@ -23,17 +23,15 @@
 
 package org.infinispan.spring;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+
 import org.infinispan.config.CacheLoaderManagerConfig;
 import org.infinispan.config.ConfigurationException;
 import org.infinispan.config.CustomInterceptorConfig;
-import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
-import org.infinispan.configuration.cache.LegacyConfigurationAdaptor;
-import org.infinispan.configuration.global.GlobalConfiguration;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
-import org.infinispan.configuration.global.LegacyGlobalConfigurationAdaptor;
-import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
-import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.eviction.EvictionThreadPolicy;
 import org.infinispan.jmx.MBeanServerLookup;
@@ -44,10 +42,6 @@ import org.infinispan.util.concurrent.IsolationLevel;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 import org.springframework.core.io.Resource;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 
 /**
  * <p>
@@ -86,39 +80,6 @@ public class AbstractEmbeddedCacheManagerFactory {
 
    protected EmbeddedCacheManager createCacheManager(GlobalConfigurationBuilder globalBuilder, ConfigurationBuilder builder) {
       return new DefaultCacheManager(globalBuilder.build(), builder.build());
-   }
-
-   // ------------------------------------------------------------------------
-   // Create ConfigurationContainer
-   // ------------------------------------------------------------------------
-
-   protected ConfigurationContainer createTemplateConfiguration() throws ConfigurationException,
-            IOException {
-      final ConfigurationContainer templateConfiguration;
-      if (this.configurationFileLocation == null) {
-         this.logger
-                  .info("No configuration file has been given. Using Infinispan's default settings.");
-         final GlobalConfiguration standardGlobalConfiguration = new GlobalConfiguration();
-         final Configuration standardDefaultConfiguration = new Configuration();
-         templateConfiguration = new ConfigurationContainer(standardGlobalConfiguration,
-                  standardDefaultConfiguration, new HashMap<String, Configuration>());
-      } else {
-         this.logger.info("Using Infinispan configuration file located at ["
-                  + this.configurationFileLocation + "]");
-         templateConfiguration = loadConfigurationFromFile(this.configurationFileLocation);
-      }
-      return templateConfiguration;
-   }
-
-   private ConfigurationContainer loadConfigurationFromFile(final Resource configFileLocation) throws ConfigurationException, IOException {
-      ParserRegistry parserRegistry = new ParserRegistry(Thread.currentThread().getContextClassLoader());
-      final InputStream configFileInputStream = configFileLocation.getInputStream();
-      try {
-         ConfigurationBuilderHolder parsed = parserRegistry.parse(configFileInputStream);
-         return new ConfigurationContainer(parsed);
-      } finally {
-         configFileInputStream.close();
-      }
    }
 
    // ------------------------------------------------------------------------

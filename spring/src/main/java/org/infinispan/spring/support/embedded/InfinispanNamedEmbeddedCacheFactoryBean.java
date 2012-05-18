@@ -25,6 +25,7 @@ package org.infinispan.spring.support.embedded;
 
 import org.infinispan.Cache;
 import org.infinispan.config.*;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.eviction.EvictionThreadPolicy;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -184,45 +185,32 @@ public class InfinispanNamedEmbeddedCacheFactoryBean<K, V> implements FactoryBea
 
    private Cache<K, V> configureAndCreateNamedCache(final String cacheName) {
       switch (this.configurationTemplateMode) {
-         case NONE:
-            this.logger
-                     .debug("ConfigurationTemplateMode is NONE: starting with a fresh Configuration");
-            if (this.infinispanEmbeddedCacheManager.getCacheNames().contains(cacheName)) {
-               throw new IllegalStateException(
-                        "Cannot use ConfigurationTemplateMode NONE: a cache named [" + cacheName
-                                 + "] has already been defined.");
-            }
-            final Configuration newConfiguration = new Configuration();
-            final Configuration customizedNewConfiguration = this.infinispanEmbeddedCacheManager
-                     .defineConfiguration(cacheName, newConfiguration);
-            this.configurationOverrides.applyOverridesTo(customizedNewConfiguration);
-            break;
-         case NAMED:
-            this.logger
-                     .debug("ConfigurationTemplateMode is NAMED: starting with a named Configuration ["
-                              + cacheName + "]");
-            final Configuration namedConfiguration = new Configuration();
-            final Configuration customizedNamedConfiguration = this.infinispanEmbeddedCacheManager
-                     .defineConfiguration(cacheName, cacheName, namedConfiguration);
-            this.configurationOverrides.applyOverridesTo(customizedNamedConfiguration);
-            break;
-         case DEFAULT:
-            this.logger
-                     .debug("ConfigurationTemplateMode is DEFAULT: starting with default Configuration");
-            if (this.infinispanEmbeddedCacheManager.getCacheNames().contains(cacheName)) {
-               throw new IllegalStateException(
-                        "Cannot use ConfigurationTemplateMode DEFAULT: a cache named [" + cacheName
-                                 + "] has already been defined.");
-            }
-            final Configuration defaultConfiguration = this.infinispanEmbeddedCacheManager
-                     .getDefaultConfiguration().clone();
-            final Configuration customizedDefaultConfiguration = this.infinispanEmbeddedCacheManager
-                     .defineConfiguration(cacheName, defaultConfiguration);
-            this.configurationOverrides.applyOverridesTo(customizedDefaultConfiguration);
-            break;
-         default:
-            throw new IllegalStateException("Unknown ConfigurationTemplateMode: "
-                     + this.configurationTemplateMode);
+      case NONE:
+         this.logger.debug("ConfigurationTemplateMode is NONE: starting with a fresh Configuration");
+         if (this.infinispanEmbeddedCacheManager.getCacheNames().contains(cacheName)) {
+            throw new IllegalStateException("Cannot use ConfigurationTemplateMode NONE: a cache named [" + cacheName + "] has already been defined.");
+         }
+         final ConfigurationBuilder newConfiguration = new ConfigurationBuilder();
+         this.configurationOverrides.applyOverridesTo(newConfiguration);
+         final org.infinispan.configuration.cache.Configuration customizedNewConfiguration = this.infinispanEmbeddedCacheManager.defineConfiguration(cacheName, newConfiguration.build());
+         break;
+      case NAMED:
+         this.logger.debug("ConfigurationTemplateMode is NAMED: starting with a named Configuration [" + cacheName + "]");
+         org.infinispan.configuration.cache.Configuration cacheConfiguration = infinispanEmbeddedCacheManager.getCacheConfiguration(cacheName);
+//         this.configurationOverrides.applyOverridesTo(customizedNamedConfiguration);
+//         final Configuration customizedNamedConfiguration = this.infinispanEmbeddedCacheManager.defineConfiguration(cacheName, cacheName, namedConfiguration);
+         break;
+      case DEFAULT:
+         this.logger.debug("ConfigurationTemplateMode is DEFAULT: starting with default Configuration");
+         if (this.infinispanEmbeddedCacheManager.getCacheNames().contains(cacheName)) {
+            throw new IllegalStateException("Cannot use ConfigurationTemplateMode DEFAULT: a cache named [" + cacheName + "] has already been defined.");
+         }
+         final Configuration defaultConfiguration = this.infinispanEmbeddedCacheManager.getDefaultConfiguration().clone();
+         final Configuration customizedDefaultConfiguration = this.infinispanEmbeddedCacheManager.defineConfiguration(cacheName, defaultConfiguration);
+//         this.configurationOverrides.applyOverridesTo(customizedDefaultConfiguration);
+         break;
+      default:
+         throw new IllegalStateException("Unknown ConfigurationTemplateMode: " + this.configurationTemplateMode);
       }
 
       return this.infinispanEmbeddedCacheManager.getCache(cacheName);
