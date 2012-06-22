@@ -1007,6 +1007,8 @@ public class ConfigurationOverridesTest {
 
       final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
       objectUnderTest.setUseAsyncMarshalling(expectedUseAsyncMarshalling);
+      objectUnderTest.setCacheModeString( "REPL_ASYNC" ); // Needed as AsyncMarshalling is otherwise illegal
+
       final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
       objectUnderTest.applyOverridesTo(defaultConfiguration);
       Configuration configuration = defaultConfiguration.build();
