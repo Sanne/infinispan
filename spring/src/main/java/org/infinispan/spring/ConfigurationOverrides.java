@@ -674,10 +674,6 @@ public final class ConfigurationOverrides {
          //FIXME
          //.setUseEagerLocking(this.useEagerLocking);
       }
-      if (this.eagerLockSingleNode != null) {
-         this.logger.debug("Overriding property [eagerLockSingleNode] with value [" + this.eagerLockSingleNode + "]");
-         configurationToOverride.transaction().eagerLockingSingleNode(this.eagerLockSingleNode);
-      }
       if (this.useReplQueue != null) {
          this.logger.debug("Overriding property [useReplQueue] with value [" + this.useReplQueue + "]");
          configurationToOverride.clustering().async().useReplQueue(this.useReplQueue);
