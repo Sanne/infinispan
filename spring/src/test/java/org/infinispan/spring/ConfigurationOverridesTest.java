@@ -737,28 +737,6 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideEagerLockSingleNodePropIfExplicitlySet() throws Exception {
-      final boolean expectedEagerLockSingleNode = true;
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest.setEagerLockSingleNode(expectedEagerLockSingleNode);
-      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-      Configuration configuration = defaultConfiguration.build();
-
-      AssertJUnit
-               .assertEquals(
-                        "ConfigurationOverrides should have overridden default value with explicitly set EagerLockSingleNode property. However, it didn't.",
-                        expectedEagerLockSingleNode,
-                        configuration);//FIXME
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.ConfigurationOverrides#applyOverridesTo(org.infinispan.config.Configuration)}
-    * .
-    */
-   @Test
    public final void configurationOverridesShouldOverrideUseReplQueuePropIfExplicitlySet() throws Exception {
       final boolean expectedUseReplQueue = true;
 

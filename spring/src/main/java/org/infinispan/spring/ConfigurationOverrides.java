@@ -109,8 +109,6 @@ public final class ConfigurationOverrides {
 
    private Boolean useEagerLocking;
 
-   private Boolean eagerLockSingleNode;
-
    private Boolean useReplQueue;
 
    private IsolationLevel isolationLevel;
@@ -397,8 +395,8 @@ public final class ConfigurationOverrides {
     * @param eagerLockSingleNode
     *           the eagerLockSingleNode to set
     */
+   @Deprecated
    public void setEagerLockSingleNode(final Boolean eagerLockSingleNode) {
-      this.eagerLockSingleNode = eagerLockSingleNode;
    }
 
    /**

@@ -595,8 +595,8 @@ public class InfinispanNamedEmbeddedCacheFactoryBean<K, V> implements FactoryBea
     * @param eagerLockSingleNode
     * @see org.infinispan.spring.ConfigurationOverrides#setEagerLockSingleNode(java.lang.Boolean)
     */
+   @Deprecated
    public void setEagerLockSingleNode(final Boolean eagerLockSingleNode) {
-      this.configurationOverrides.setEagerLockSingleNode(eagerLockSingleNode);
    }
 
    /**
