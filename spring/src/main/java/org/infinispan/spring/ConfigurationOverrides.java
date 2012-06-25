@@ -73,8 +73,6 @@ public final class ConfigurationOverrides {
 
    private Boolean fetchInMemoryState;
 
-   private Boolean alwaysProvideInMemoryState;
-
    private Long lockAcquisitionTimeout;
 
    private Long syncReplTimeout;
@@ -245,14 +243,6 @@ public final class ConfigurationOverrides {
     */
    public void setFetchInMemoryState(final Boolean fetchInMemoryState) {
       this.fetchInMemoryState = fetchInMemoryState;
-   }
-
-   /**
-    * @param alwaysProvideInMemoryState
-    *           the alwaysProvideInMemoryState to set
-    */
-   public void setAlwaysProvideInMemoryState(final Boolean alwaysProvideInMemoryState) {
-      this.alwaysProvideInMemoryState = alwaysProvideInMemoryState;
    }
 
    /**
@@ -591,11 +581,6 @@ public final class ConfigurationOverrides {
       if (this.fetchInMemoryState != null) {
          this.logger.debug("Overriding property [fetchInMemoryState] with value [" + this.fetchInMemoryState + "]");
          configurationToOverride.clustering().stateTransfer().fetchInMemoryState(this.fetchInMemoryState);
-      }
-      if (this.alwaysProvideInMemoryState != null) {
-         this.logger.debug("Overriding property [alwaysProvideInMemoryState] with value [" + this.alwaysProvideInMemoryState + "]");
-         //FIXME BROKEN
-         //configurationToOverride.clustering().stateTransfer()..setAlwaysProvideInMemoryState(this.alwaysProvideInMemoryState);
       }
       if (this.lockAcquisitionTimeout != null) {
          this.logger.debug("Overriding property [lockAcquisitionTimeout] with value [" + this.lockAcquisitionTimeout + "]");

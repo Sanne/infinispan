@@ -447,14 +447,6 @@ public class AbstractEmbeddedCacheManagerFactory {
    }
 
    /**
-    * @param alwaysProvideInMemoryState
-    * @see org.infinispan.spring.ConfigurationOverrides#setAlwaysProvideInMemoryState(java.lang.Boolean)
-    */
-   public void setAlwaysProvideInMemoryState(final Boolean alwaysProvideInMemoryState) {
-      this.configurationOverrides.setAlwaysProvideInMemoryState(alwaysProvideInMemoryState);
-   }
-
-   /**
     * @param lockAcquisitionTimeout
     * @see org.infinispan.spring.ConfigurationOverrides#setLockAcquisitionTimeout(java.lang.Long)
     */

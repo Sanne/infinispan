@@ -341,28 +341,6 @@ public class ConfigurationOverridesTest {
     * .
     */
    @Test
-   public final void configurationOverridesShouldOverrideAlwaysProvideInMemoryStatePropIfExplicitlySet() throws Exception {
-      final boolean expectedAlwaysProvideInMemoryState = true;
-
-      final ConfigurationOverrides objectUnderTest = new ConfigurationOverrides();
-      objectUnderTest.setAlwaysProvideInMemoryState(expectedAlwaysProvideInMemoryState);
-      final ConfigurationBuilder defaultConfiguration = new ConfigurationBuilder();
-      objectUnderTest.applyOverridesTo(defaultConfiguration);
-      Configuration configuration = defaultConfiguration.build();
-
-      AssertJUnit
-               .assertEquals(
-                        "ConfigurationOverrides should have overridden default value with explicitly set AlwaysProvideInMemoryState property. However, it didn't.",
-                        expectedAlwaysProvideInMemoryState,
-                        configuration.clustering().stateTransfer().fetchInMemoryState());//FIXME
-   }
-
-   /**
-    * Test method for
-    * {@link org.infinispan.spring.ConfigurationOverrides#applyOverridesTo(org.infinispan.config.Configuration)}
-    * .
-    */
-   @Test
    public final void configurationOverridesShouldOverrideLockAcquisitionTimeoutPropIfExplicitlySet() throws Exception {
       final long expectedLockAcquisitionTimeout = 1000000L;
 
