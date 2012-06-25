@@ -25,6 +25,7 @@ package org.infinispan.spring;
 
 import org.infinispan.config.*;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.cache.LoaderConfiguration;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.eviction.EvictionThreadPolicy;
 import org.infinispan.transaction.lookup.TransactionManagerLookup;
@@ -99,7 +100,7 @@ public final class ConfigurationOverrides {
 
    private TransactionManagerLookup transactionManagerLookup;
 
-   private CacheLoaderManagerConfig cacheLoaderManagerConfig;
+   private LoaderConfiguration cacheLoaderManagerConfig;
 
    private Boolean syncCommitPhase;
 
@@ -353,7 +354,7 @@ public final class ConfigurationOverrides {
     * @param cacheLoaderManagerConfig
     *           the cacheLoaderManagerConfig to set
     */
-   public void setCacheLoaderManagerConfig(final CacheLoaderManagerConfig cacheLoaderManagerConfig) {
+   public void setCacheLoaderManagerConfig(final LoaderConfiguration cacheLoaderManagerConfig) {
       this.cacheLoaderManagerConfig = cacheLoaderManagerConfig;
    }
 
@@ -642,9 +643,7 @@ public final class ConfigurationOverrides {
       }
       if (this.cacheLoaderManagerConfig != null) {
          this.logger.debug("Overriding property [cacheLoaderManagerConfig] with value [" + this.cacheLoaderManagerConfig + "]");
-         //FIXME
-         //TOTALLY BROKEN
-         //configurationToOverride.loaders().setCacheLoaderManagerConfig(this.cacheLoaderManagerConfig);
+         configurationToOverride.loaders().addCacheLoader().read(cacheLoaderManagerConfig);
       }
       if (this.syncCommitPhase != null) {
          this.logger.debug("Overriding property [syncCommitPhase] with value [" + this.syncCommitPhase + "]");

@@ -31,6 +31,7 @@ import org.infinispan.config.CacheLoaderManagerConfig;
 import org.infinispan.config.ConfigurationException;
 import org.infinispan.config.CustomInterceptorConfig;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.cache.LoaderConfiguration;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.eviction.EvictionThreadPolicy;
@@ -554,7 +555,7 @@ public class AbstractEmbeddedCacheManagerFactory {
     * @param cacheLoaderManagerConfig
     * @see org.infinispan.spring.ConfigurationOverrides#setCacheLoaderManagerConfig(org.infinispan.config.CacheLoaderManagerConfig)
     */
-   public void setCacheLoaderManagerConfig(final CacheLoaderManagerConfig cacheLoaderManagerConfig) {
+   public void setCacheLoaderManagerConfig(final LoaderConfiguration cacheLoaderManagerConfig) {
       this.configurationOverrides.setCacheLoaderManagerConfig(cacheLoaderManagerConfig);
    }
 

@@ -26,6 +26,7 @@ package org.infinispan.spring.support.embedded;
 import org.infinispan.Cache;
 import org.infinispan.config.*;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.cache.LoaderConfiguration;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.eviction.EvictionThreadPolicy;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -555,7 +556,7 @@ public class InfinispanNamedEmbeddedCacheFactoryBean<K, V> implements FactoryBea
     * @param cacheLoaderManagerConfig
     * @see org.infinispan.spring.ConfigurationOverrides#setCacheLoaderManagerConfig(org.infinispan.config.CacheLoaderManagerConfig)
     */
-   public void setCacheLoaderManagerConfig(final CacheLoaderManagerConfig cacheLoaderManagerConfig) {
+   public void setCacheLoaderManagerConfig(final LoaderConfiguration cacheLoaderManagerConfig) {
       this.configurationOverrides.setCacheLoaderManagerConfig(cacheLoaderManagerConfig);
    }
 
