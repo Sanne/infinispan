@@ -22,6 +22,7 @@
  */
 package org.infinispan.util.logging;
 
+import org.hibernate.search.backend.LuceneWork;
 import org.infinispan.CacheException;
 import org.infinispan.cacheviews.CacheView;
 import org.infinispan.commands.remote.CacheRpcCommand;
