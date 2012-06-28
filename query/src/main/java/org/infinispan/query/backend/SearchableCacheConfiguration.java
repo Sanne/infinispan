@@ -29,6 +29,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.spi.ServiceProvider;
+import org.infinispan.manager.EmbeddedCacheManager;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class that implements {@link org.hibernate.search.cfg.SearchConfiguration} so that within Infinispan-Query, there is
@@ -49,8 +51,10 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
    private final Map<String, Class<?>> classes;
    private final Properties properties;
    private final SearchMapping searchMapping;
+   private final Map<Class<? extends ServiceProvider<?>>, Object> providedServices;
 
-   public SearchableCacheConfiguration(Class<?>[] classArray, Properties properties) {
+   public SearchableCacheConfiguration(Class<?>[] classArray, Properties properties, EmbeddedCacheManager uninitializedCacheManager) {
+      this.providedServices = initializeProvidedServices(uninitializedCacheManager);
       if (properties == null) {
          this.properties = new Properties();
       }
@@ -76,6 +80,14 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
             classes.put(entity.getName(), entity);
          }
       }
+   }
+
+   private static Map<Class<? extends ServiceProvider<?>>, Object> initializeProvidedServices(EmbeddedCacheManager uninitializedCacheManager) {
+      //Register the SelfLoopedCacheManagerServiceProvider to allow custom IndexManagers to access the CacheManager
+      ConcurrentHashMap<Class<? extends ServiceProvider<?>>, Object> map = new ConcurrentHashMap<Class<? extends ServiceProvider<?>>, Object>(1);
+      SelfLoopedCacheManagerServiceProvider cacheProvider = new SelfLoopedCacheManagerServiceProvider(uninitializedCacheManager);
+      map.put(SelfLoopedCacheManagerServiceProvider.class, cacheProvider);
+      return Collections.unmodifiableMap(map);
    }
 
    @Override
@@ -110,7 +122,7 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
 
    @Override
    public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
-      return Collections.emptyMap();
+      return providedServices;
    }
 
    @Override
