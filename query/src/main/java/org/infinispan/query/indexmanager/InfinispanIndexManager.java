@@ -35,11 +35,14 @@ import org.hibernate.search.store.impl.DirectoryProviderFactory;
 public class InfinispanIndexManager extends DirectoryBasedIndexManager {
 
    protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-      return BackendFactory.createBackend( this, buildContext, cfg );
+      BackendQueueProcessor localMaster = BackendFactory.createBackend(this, buildContext, cfg);
+      InfinispanCommandsBackend remoteMaster = new InfinispanCommandsBackend();
+      MasterSwitchDelegatingQueueProcessor joinedMaster = new MasterSwitchDelegatingQueueProcessor(localMaster, remoteMaster);
+      return joinedMaster;
    }
 
    protected DirectoryProvider createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-      return  DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
+      return DirectoryProviderFactory.createDirectoryProvider(indexName, cfg, buildContext);
    }
 
 }
