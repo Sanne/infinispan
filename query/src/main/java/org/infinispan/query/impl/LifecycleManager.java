@@ -153,7 +153,7 @@ public class LifecycleManager extends AbstractModuleLifecycle {
           GlobalComponentRegistry globalComponentRegistry = cr.getGlobalComponentRegistry();
           EmbeddedCacheManager uninitializedCacheManager = globalComponentRegistry.getComponent(EmbeddedCacheManager.class);
           // Set up the search factory for Hibernate Search first.
-          SearchConfiguration config = new SearchableCacheConfiguration(new Class[0], indexingProperties, uninitializedCacheManager);
+          SearchConfiguration config = new SearchableCacheConfiguration(new Class[0], indexingProperties, uninitializedCacheManager, cr);
           searchFactory = new SearchFactoryBuilder().configuration(config).buildSearchFactory();
           cr.registerComponent(searchFactory, SearchFactoryIntegrator.class);
        }

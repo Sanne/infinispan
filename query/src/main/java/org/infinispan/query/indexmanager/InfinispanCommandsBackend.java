@@ -27,6 +27,14 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.infinispan.distribution.DistributionManager;
+import org.infinispan.distribution.ch.ConsistentHash;
+import org.infinispan.factories.ComponentRegistry;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.query.backend.ComponentRegistryServiceProvider;
+import org.infinispan.query.backend.SelfLoopedCacheManagerServiceProvider;
+import org.infinispan.remoting.transport.Address;
+import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
@@ -37,15 +45,30 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
 
    private static final Log log = LogFactory.getLog(InfinispanCommandsBackend.class);
 
+   private EmbeddedCacheManager cacheManager;
+   private WorkerBuildContext context;
+   private String indexName;
+   private ComponentRegistry componentsRegistry;
+   private ConsistentHash hashService;
+
    @Override
-   public void initialize(Properties props, WorkerBuildContext context,
-         DirectoryBasedIndexManager indexManager) {
-      //FIXME implement me
+   public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+      this.context = context;
+      this.cacheManager = context.requestService(SelfLoopedCacheManagerServiceProvider.class);
+      this.componentsRegistry = context.requestService(ComponentRegistryServiceProvider.class);
+      this.indexName = indexManager.getIndexName();
+      DistributionManager distributionManager = componentsRegistry.getComponent(DistributionManager.class);
+      if (distributionManager != null) {
+         hashService = distributionManager.getConsistentHash();
+      }
    }
 
    @Override
    public void close() {
-      //FIXME implement me
+      context.releaseService(SelfLoopedCacheManagerServiceProvider.class);
+      context.releaseService(ComponentRegistryServiceProvider.class);
+      context = null;
+      cacheManager = null;
    }
 
    @Override
@@ -69,7 +92,24 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
    }
 
    public boolean isMasterLocal() {
-      return true;
+      Transport transport = cacheManager.getTransport();
+      if (transport == null) {
+         return true;
+      }
+      else {
+         final Address primaryLocation;
+         if (hashService == null) { // REPL
+            //TODO think about splitting this implementation, or use this same approach for both configurations?
+            List<Address> members = transport.getMembers();
+            int elementIndex = (indexName.hashCode() % members.size());
+            primaryLocation = members.get(elementIndex);
+         }
+         else { //DIST
+            primaryLocation = hashService.primaryLocation(indexName);
+         }
+         Address localAddress = transport.getAddress();
+         return localAddress.equals(primaryLocation);
+      }
    }
 
 }

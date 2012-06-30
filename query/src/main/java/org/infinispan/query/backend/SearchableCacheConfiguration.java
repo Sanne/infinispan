@@ -29,6 +29,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.spi.ServiceProvider;
+import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.manager.EmbeddedCacheManager;
 
 import java.util.Collections;
@@ -53,8 +54,8 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
    private final SearchMapping searchMapping;
    private final Map<Class<? extends ServiceProvider<?>>, Object> providedServices;
 
-   public SearchableCacheConfiguration(Class<?>[] classArray, Properties properties, EmbeddedCacheManager uninitializedCacheManager) {
-      this.providedServices = initializeProvidedServices(uninitializedCacheManager);
+   public SearchableCacheConfiguration(Class<?>[] classArray, Properties properties, EmbeddedCacheManager uninitializedCacheManager, ComponentRegistry cr) {
+      this.providedServices = initializeProvidedServices(uninitializedCacheManager, cr);
       if (properties == null) {
          this.properties = new Properties();
       }
@@ -82,11 +83,13 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
       }
    }
 
-   private static Map<Class<? extends ServiceProvider<?>>, Object> initializeProvidedServices(EmbeddedCacheManager uninitializedCacheManager) {
+   private static Map<Class<? extends ServiceProvider<?>>, Object> initializeProvidedServices(EmbeddedCacheManager uninitializedCacheManager, ComponentRegistry cr) {
       //Register the SelfLoopedCacheManagerServiceProvider to allow custom IndexManagers to access the CacheManager
       ConcurrentHashMap<Class<? extends ServiceProvider<?>>, Object> map = new ConcurrentHashMap<Class<? extends ServiceProvider<?>>, Object>(1);
       SelfLoopedCacheManagerServiceProvider cacheProvider = new SelfLoopedCacheManagerServiceProvider(uninitializedCacheManager);
       map.put(SelfLoopedCacheManagerServiceProvider.class, cacheProvider);
+      ComponentRegistryServiceProvider registryProvider = new ComponentRegistryServiceProvider(cr);
+      map.put(ComponentRegistryServiceProvider.class, registryProvider);
       return Collections.unmodifiableMap(map);
    }
 

@@ -22,27 +22,20 @@ import java.util.Properties;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
-import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.factories.ComponentRegistry;
 
 /**
- * To be registered as a provided ServiceProvider to the SearchFactory to allow it to extract
- * the CacheManager where needed by Search services, as the custom DirectoryProvider using
- * Infinispan itself.
- * This allows for a given indexed Cache of an EmbeddableCacheManager to use othe caches defined
- * on the same CacheManager to store it's indexes.
+ * ComponentRegistryServiceProvider.
  * 
- * @author Sanne Grinovero
+ * @author sanne
  * @since 5.2
  */
-public final class SelfLoopedCacheManagerServiceProvider implements ServiceProvider<EmbeddedCacheManager> {
+public final class ComponentRegistryServiceProvider implements ServiceProvider<ComponentRegistry> {
 
-   private final EmbeddedCacheManager uninitializedCacheManager;
+   private final ComponentRegistry cr;
 
-   public SelfLoopedCacheManagerServiceProvider(EmbeddedCacheManager uninitializedCacheManager) {
-      if (uninitializedCacheManager == null) {
-         throw new IllegalArgumentException( "null parameter unacceptable" );
-      }
-      this.uninitializedCacheManager = uninitializedCacheManager;
+   public ComponentRegistryServiceProvider(ComponentRegistry cr) {
+      this.cr = cr;
    }
 
    @Override
@@ -51,8 +44,8 @@ public final class SelfLoopedCacheManagerServiceProvider implements ServiceProvi
    }
 
    @Override
-   public EmbeddedCacheManager getService() {
-      return uninitializedCacheManager;
+   public ComponentRegistry getService() {
+      return cr;
    }
 
    @Override
