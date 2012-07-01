@@ -26,13 +26,13 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.infinispan.CacheManagerServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.infinispan.distribution.DistributionManager;
 import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.backend.ComponentRegistryServiceProvider;
-import org.infinispan.query.backend.SelfLoopedCacheManagerServiceProvider;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.logging.Log;
@@ -54,7 +54,7 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
    @Override
    public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
       this.context = context;
-      this.cacheManager = context.requestService(SelfLoopedCacheManagerServiceProvider.class);
+      this.cacheManager = context.requestService(CacheManagerServiceProvider.class);
       this.componentsRegistry = context.requestService(ComponentRegistryServiceProvider.class);
       this.indexName = indexManager.getIndexName();
       DistributionManager distributionManager = componentsRegistry.getComponent(DistributionManager.class);
@@ -65,7 +65,7 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
 
    @Override
    public void close() {
-      context.releaseService(SelfLoopedCacheManagerServiceProvider.class);
+      context.releaseService(CacheManagerServiceProvider.class);
       context.releaseService(ComponentRegistryServiceProvider.class);
       context = null;
       cacheManager = null;

@@ -28,6 +28,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.impl.SearchMappingBuilder;
+import org.hibernate.search.infinispan.CacheManagerServiceProvider;
 import org.hibernate.search.spi.ServiceProvider;
 import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -85,11 +86,9 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
 
    private static Map<Class<? extends ServiceProvider<?>>, Object> initializeProvidedServices(EmbeddedCacheManager uninitializedCacheManager, ComponentRegistry cr) {
       //Register the SelfLoopedCacheManagerServiceProvider to allow custom IndexManagers to access the CacheManager
-      ConcurrentHashMap<Class<? extends ServiceProvider<?>>, Object> map = new ConcurrentHashMap<Class<? extends ServiceProvider<?>>, Object>(1);
-      SelfLoopedCacheManagerServiceProvider cacheProvider = new SelfLoopedCacheManagerServiceProvider(uninitializedCacheManager);
-      map.put(SelfLoopedCacheManagerServiceProvider.class, cacheProvider);
-      ComponentRegistryServiceProvider registryProvider = new ComponentRegistryServiceProvider(cr);
-      map.put(ComponentRegistryServiceProvider.class, registryProvider);
+      ConcurrentHashMap map = new ConcurrentHashMap(2);
+      map.put(CacheManagerServiceProvider.class, uninitializedCacheManager);
+      map.put(ComponentRegistryServiceProvider.class, cr);
       return Collections.unmodifiableMap(map);
    }
 
