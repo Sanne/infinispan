@@ -46,7 +46,7 @@ public class MultiNodeDistributedTest extends MultipleCacheManagersTest {
       ConfigurationBuilder cacheCfg = getDefaultClusteredCacheConfig(CacheMode.DIST_SYNC, transactionsEnabled());
       cacheCfg.indexing()
          .enable()
-         .indexLocalOnly(false)
+         .indexLocalOnly(true)
          .addProperty("hibernate.search.default.indexmanager", org.infinispan.query.indexmanager.InfinispanIndexManager.class.getName())
          .addProperty("hibernate.search.lucene_version", "LUCENE_CURRENT");
       List<Cache<String, Person>> caches = createClusteredCaches(2, cacheCfg);
@@ -59,13 +59,16 @@ public class MultiNodeDistributedTest extends MultipleCacheManagersTest {
    }
 
    private void prepareTestData() throws Exception {
-      TransactionManager transactionManager = null;
-      transactionManager = cache1.getAdvancedCache().getTransactionManager();
+      storeOn(cache1, "k1", new Person("K. Firt", "Is not a characted from the matrix", 1));
+      storeOn(cache2, "k2", new Person("K. Seycond", "Is a pilot", 1));
+      storeOn(cache2, "k3", new Person("K. Theerd", "Forgot the fundamental laws", 1));
+   }
 
+   private void storeOn(Cache<String, Person> cache, String key, Person person) throws Exception {
+      TransactionManager transactionManager = null;
+      transactionManager = cache.getAdvancedCache().getTransactionManager();
       if (transactionsEnabled()) transactionManager.begin();
-      cache1.put("k1", new Person("K. Firt", "Is not a characted from the matrix", 1));
-      cache1.put("k2", new Person("K. Seycond", "Is a pilot", 1));
-      cache1.put("k3", new Person("K. Theerd", "Forgot the fundamental laws", 1));
+      cache.put(key, person);
       if (transactionsEnabled()) transactionManager.commit();
    }
 

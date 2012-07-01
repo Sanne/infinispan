@@ -73,12 +73,12 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
 
    @Override
    public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
-      //FIXME implement me
+      System.out.println(workList);
    }
 
    @Override
    public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-      //FIXME implement me
+      System.out.println(singleOperation);
    }
 
    @Override
