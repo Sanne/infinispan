@@ -59,9 +59,11 @@ public class MasterSwitchDelegatingQueueProcessor implements BackendQueueProcess
    @Override
    public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
       if (remoteMaster.isMasterLocal()) {
+         System.out.println("Local: " + workList);
          localMaster.applyWork(workList, monitor);
       }
       else {
+         System.out.println("To remote: " + workList);
          remoteMaster.applyWork(workList, monitor);
       }
    }

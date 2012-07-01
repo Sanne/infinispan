@@ -55,6 +55,8 @@ public class MultiNodeDistributedTest extends MultipleCacheManagersTest {
          .addProperty("hibernate.search.default.indexmanager", org.infinispan.query.indexmanager.InfinispanIndexManager.class.getName())
          //specify the managed index is to be shared across the nodes
          .addProperty("hibernate.search.default.directory_provider", "infinispan")
+         .addProperty("hibernate.search.​default.​exclusive_index_use", "false")
+         .addProperty("hibernate.search.default.reader.strategy", "not-shared")
          .addProperty("hibernate.search.lucene_version", "LUCENE_CURRENT");
       List<Cache<String, Person>> caches = createClusteredCaches(2, cacheCfg);
       cache1 = caches.get(0);

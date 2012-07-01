@@ -20,15 +20,16 @@ package org.infinispan.query.indexmanager;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.infinispan.CacheManagerServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.infinispan.commands.ReplicableCommand;
@@ -57,6 +58,7 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
    private RpcManager rpcManager;
    private String cacheName;
    private DirectoryBasedIndexManager indexManager;
+   private HashSet<Class> knownTypes = new HashSet<Class>(10);
 
    @Override
    public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
@@ -87,8 +89,19 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
       //Use Searche's custom Avro based serializer as it includes support for back/future compatibility
       byte[] serializedModel = indexManager.getSerializer().toSerializedModel(workList);
       command.setSerializedWorkList(serializedModel);
+      command.setKnownIndexedTypes(extractTypesUnique(workList));
       command.setIndexName(this.indexName);
       sendCommand(command);
+   }
+
+   private Set<Class> extractTypesUnique(List<LuceneWork> workList) {
+      for (LuceneWork work : workList) {
+         Class<?> entityClass = work.getEntityClass();
+         if (entityClass != null) {
+            knownTypes.add(work.getEntityClass());
+         }
+      }
+      return knownTypes;
    }
 
    private void sendCommand(ReplicableCommand command) {

@@ -21,9 +21,12 @@
  */
 package org.infinispan.query;
 
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.infinispan.Cache;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.commands.module.ModuleCommandInitializer;
+import org.infinispan.query.backend.QueryInterceptor;
 import org.infinispan.query.clustered.ClusteredQueryCommand;
 import org.infinispan.query.indexmanager.IndexUpdateCommand;
 
@@ -36,11 +39,15 @@ import org.infinispan.query.indexmanager.IndexUpdateCommand;
 public class CommandInitializer implements ModuleCommandInitializer {
 
    private Cache<?, ?> cache;
-   private SearchManager searchManager;
+   private SearchFactoryImplementor searchFactoryImplementor;
+   private QueryInterceptor queryInterceptor;
    
    public void setCache(Cache<?, ?> cache){
       this.cache = cache;
-      this.searchManager = Search.getSearchManager(cache);
+      SearchManager searchManager = Search.getSearchManager(cache);
+      SearchFactory searchFactory = searchManager.getSearchFactory();
+      searchFactoryImplementor = (SearchFactoryImplementor) searchFactory;
+      queryInterceptor = cache.getAdvancedCache().getComponentRegistry().getComponent(QueryInterceptor.class);
    }
    
    @Override
@@ -49,7 +56,7 @@ public class CommandInitializer implements ModuleCommandInitializer {
           ((ClusteredQueryCommand) c).injectComponents(cache);
       }
       else if (c instanceof IndexUpdateCommand) {
-         ((IndexUpdateCommand) c).injectComponents(searchManager);
+         ((IndexUpdateCommand) c).injectComponents(searchFactoryImplementor, queryInterceptor);
       }
    }
 

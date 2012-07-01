@@ -311,4 +311,9 @@ public class QueryInterceptor extends CommandInterceptor {
    public KeyTransformationHandler getKeyTransformationHandler() {
       return keyTransformationHandler;
    }
+
+   public void enableClasses(Set<Class> knownIndexedTypes) {
+      Class[] classes = knownIndexedTypes.toArray(new Class[knownIndexedTypes.size()]);
+      enableClasses(classes);
+   }
 }

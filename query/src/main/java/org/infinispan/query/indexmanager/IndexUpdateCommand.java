@@ -18,12 +18,19 @@
  */
 package org.infinispan.query.indexmanager;
 
+import java.util.List;
+import java.util.Set;
+
+import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.infinispan.CacheException;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.commands.remote.BaseRpcCommand;
 import org.infinispan.context.InvocationContext;
 import org.infinispan.query.ModuleCommandIds;
-import org.infinispan.query.SearchManager;
+import org.infinispan.query.backend.QueryInterceptor;
 
 /**
 * @author Sanne Grinovero
@@ -31,17 +38,21 @@ import org.infinispan.query.SearchManager;
 public class IndexUpdateCommand extends BaseRpcCommand implements ReplicableCommand {
 
    /**
-    * Being the first version, we only support version 1.
+    * First version: we only support version 1.
     */
    private static final Byte PROTOCOL_VERSION = Byte.valueOf((byte) 1);
 
    public static final byte COMMAND_ID = ModuleCommandIds.UPDATE_INDEX;
 
-   private SearchManager searchManager;
+   private SearchFactoryImplementor searchFactory;
 
    private byte[] serializedModel;
 
    private String indexName;
+
+   private QueryInterceptor queryInterceptor;
+
+   private Set<Class> knownIndexedTypes;
 
    public IndexUpdateCommand(String cacheName) {
       super(cacheName);
@@ -49,7 +60,13 @@ public class IndexUpdateCommand extends BaseRpcCommand implements ReplicableComm
 
    @Override
    public Object perform(InvocationContext ctx) throws Throwable {
-      //FIXME implement me
+      queryInterceptor.enableClasses(knownIndexedTypes);
+      IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
+      if ( indexManager == null ) {
+         throw new SearchException("Unkonwn index referenced");
+      }
+      List<LuceneWork> luceneWorks = indexManager.getSerializer().toLuceneWorks( this.serializedModel );
+      indexManager.performOperations( luceneWorks, null );
       return Boolean.TRUE; //Return value to be ignored
    }
 
@@ -60,7 +77,7 @@ public class IndexUpdateCommand extends BaseRpcCommand implements ReplicableComm
 
    @Override
    public Object[] getParameters() {
-      return new Object[]{ PROTOCOL_VERSION, indexName, serializedModel };
+      return new Object[]{ PROTOCOL_VERSION, indexName, serializedModel, knownIndexedTypes };
    }
 
    @Override
@@ -69,6 +86,7 @@ public class IndexUpdateCommand extends BaseRpcCommand implements ReplicableComm
       if (PROTOCOL_VERSION.equals(protoVersion)) {
          this.indexName = (String) parameters[1];
          this.serializedModel = (byte[]) parameters[2];
+         this.knownIndexedTypes = (Set<Class>) parameters[3];
       }
       else {
          throw new CacheException("Incompatible versions detected");
@@ -83,8 +101,9 @@ public class IndexUpdateCommand extends BaseRpcCommand implements ReplicableComm
    /**
     * This is invoked only on the receiving node, before {@link #perform(InvocationContext)}
     */
-   public void injectComponents(SearchManager searchManager) {
-      this.searchManager = searchManager;
+   public void injectComponents(SearchFactoryImplementor searchFactory, QueryInterceptor queryInterceptor) {
+      this.searchFactory = searchFactory;
+      this.queryInterceptor = queryInterceptor;
    }
 
    public void setSerializedWorkList(byte[] serializedModel) {
@@ -93,6 +112,10 @@ public class IndexUpdateCommand extends BaseRpcCommand implements ReplicableComm
 
    public void setIndexName(String indexName) {
       this.indexName = indexName;
+   }
+
+   public void setKnownIndexedTypes(Set<Class> knownIndexedTypes) {
+      this.knownIndexedTypes = knownIndexedTypes;
    }
 
 }
