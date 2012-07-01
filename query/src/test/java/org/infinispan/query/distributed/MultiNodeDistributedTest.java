@@ -18,16 +18,19 @@
  */
 package org.infinispan.query.distributed;
 
-import static org.infinispan.query.helper.TestQueryHelperFactory.createCacheQuery;
-
 import java.util.List;
 
 import javax.transaction.TransactionManager;
 
+import junit.framework.Assert;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.query.CacheQuery;
+import org.infinispan.query.Search;
+import org.infinispan.query.SearchManager;
 import org.infinispan.query.test.Person;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.testng.annotations.Test;
@@ -46,8 +49,12 @@ public class MultiNodeDistributedTest extends MultipleCacheManagersTest {
       ConfigurationBuilder cacheCfg = getDefaultClusteredCacheConfig(CacheMode.DIST_SYNC, transactionsEnabled());
       cacheCfg.indexing()
          .enable()
+         //only originator of each write takes care for index write
          .indexLocalOnly(true)
+         //use our custom IndexManager to wire up the remoting delegation via custom commands
          .addProperty("hibernate.search.default.indexmanager", org.infinispan.query.indexmanager.InfinispanIndexManager.class.getName())
+         //specify the managed index is to be shared across the nodes
+         .addProperty("hibernate.search.default.directory_provider", "infinispan")
          .addProperty("hibernate.search.lucene_version", "LUCENE_CURRENT");
       List<Cache<String, Person>> caches = createClusteredCaches(2, cacheCfg);
       cache1 = caches.get(0);
@@ -56,12 +63,6 @@ public class MultiNodeDistributedTest extends MultipleCacheManagersTest {
 
    protected boolean transactionsEnabled() {
       return false;
-   }
-
-   private void prepareTestData() throws Exception {
-      storeOn(cache1, "k1", new Person("K. Firt", "Is not a characted from the matrix", 1));
-      storeOn(cache2, "k2", new Person("K. Seycond", "Is a pilot", 1));
-      storeOn(cache2, "k3", new Person("K. Theerd", "Forgot the fundamental laws", 1));
    }
 
    private void storeOn(Cache<String, Person> cache, String key, Person person) throws Exception {
@@ -73,13 +74,25 @@ public class MultiNodeDistributedTest extends MultipleCacheManagersTest {
    }
 
    public void testSimple() throws Exception {
-      prepareTestData();
-      CacheQuery cacheQuery = createCacheQuery(cache2, "blurb", "pilot");
+      assertIndexSize(0);
+      //depending on test run, the index master selection might pick either cache
+      storeOn(cache1, "k1", new Person("K. Firt", "Is not a characted from the matrix", 1));
+      assertIndexSize(1);
+      storeOn(cache1, "k2", new Person("K. Seycond", "Is a pilot", 1));
+      assertIndexSize(2);
+      storeOn(cache2, "k3", new Person("K. Theerd", "Forgot the fundamental laws", 1));
+      assertIndexSize(3);
+   }
 
-      List<Object> found = cacheQuery.list();
+   private void assertIndexSize(int expectedIndexSize) {
+      assertIndexSize(cache1, expectedIndexSize);
+      assertIndexSize(cache2, expectedIndexSize);
+   }
 
-      assert found.size() == 1;
-      assert ((Person)found.get(0)).getName().equals("K. Seycond");
+   private void assertIndexSize(Cache<String, Person> cache, int expectedIndexSize) {
+      SearchManager searchManager = Search.getSearchManager(cache);
+      CacheQuery query = searchManager.getQuery(new MatchAllDocsQuery(), Person.class);
+      Assert.assertEquals(expectedIndexSize, query.list().size());
    }
 
 }
