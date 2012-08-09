@@ -25,7 +25,6 @@ package org.infinispan.io;
 import net.jcip.annotations.NotThreadSafe;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 
 /**
  * Extends ByteArrayOutputStream, but exposes the internal buffer. Using this, callers don't need to call toByteArray()
@@ -57,12 +56,6 @@ public final class ExposedByteArrayOutputStream extends ByteArrayOutputStream {
       super(size);
    }
 
-   public ExposedByteArrayOutputStream(byte[] bytes) {
-      if (bytes == null || bytes.length == 0) throw new IllegalArgumentException("Null or empty byte arrays not allowed");
-      buf = bytes;
-      count = bytes.length;
-   }
-
    /**
     * Creates a new byte array output stream, with a buffer capacity of the specified size, in bytes.
     *
@@ -82,11 +75,6 @@ public final class ExposedByteArrayOutputStream extends ByteArrayOutputStream {
     */
    public final byte[] getRawBuffer() {
       return buf;
-   }
-
-   public final void set(byte[] b) {
-      this.buf = b;
-      this.count = b.length;
    }
 
    @Override
@@ -149,21 +137,5 @@ public final class ExposedByteArrayOutputStream extends ByteArrayOutputStream {
    @Override
    public final int size() {
       return count;
-   }
-
-   @Override
-   public boolean equals(Object thatObject) {
-      if (thatObject instanceof ExposedByteArrayOutputStream) {
-         ExposedByteArrayOutputStream that = (ExposedByteArrayOutputStream) thatObject;
-         if (this == that) return true;
-         if (this.buf == that.buf) return true;
-         if (this.count != that.count) return false;
-         for (int i=0; i<count; i++) {
-            if (this.buf[i] != that.buf[i]) return false;
-         }
-         return true;
-      } else {
-         return false;
-      }
    }
 }
