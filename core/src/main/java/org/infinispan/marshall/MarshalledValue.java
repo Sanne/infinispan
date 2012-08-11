@@ -259,7 +259,7 @@ public final class MarshalledValue implements Serializable {
          if (thatRaw == null) {
             thatRaw = that.serialize();
          }
-         return Arrays.equals(thisRaw.getRaw(), thatRaw.getRaw());
+         return thisRaw.equals(thatRaw);
       }
    }
 
