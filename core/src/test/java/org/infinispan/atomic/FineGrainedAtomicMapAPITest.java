@@ -31,7 +31,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.transaction.TransactionManager;
 
 import org.infinispan.Cache;
-import org.infinispan.config.Configuration;
+import org.infinispan.configuration.cache.CacheMode;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.transaction.LockingMode;
@@ -46,14 +47,12 @@ import org.testng.annotations.Test;
 public class FineGrainedAtomicMapAPITest extends MultipleCacheManagersTest {
 
    protected void createCacheManagers() throws Throwable {
-      Configuration c = getDefaultClusteredConfig(Configuration.CacheMode.REPL_SYNC, true)
-            .fluent()
-               .transaction()
+      ConfigurationBuilder configurationBuilder = getDefaultClusteredCacheConfig(CacheMode.REPL_SYNC, true);
+      configurationBuilder.transaction()
                   .transactionMode(TransactionMode.TRANSACTIONAL)
                   .lockingMode(LockingMode.PESSIMISTIC)
-                  .locking().lockAcquisitionTimeout(100l)
-            .build();
-      createClusteredCaches(2, "atomic", c);
+                  .locking().lockAcquisitionTimeout(100l);
+      createCluster( configurationBuilder, 2 );
    }
 
    @Test(enabled=true)
