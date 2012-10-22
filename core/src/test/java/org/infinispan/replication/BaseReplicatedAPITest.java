@@ -26,6 +26,7 @@ import static org.infinispan.context.Flag.CACHE_MODE_LOCAL;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.infinispan.AdvancedCache;
 import org.infinispan.commands.write.ClearCommand;
@@ -197,21 +198,31 @@ public abstract class BaseReplicatedAPITest extends MultipleCacheManagersTest {
       final AdvancedCache cache2 = cache(1, "replication").getAdvancedCache();
       final Object key = "testReplaceCompare";
 
-      assert ! cache1.replace(key, "something", "goal");
+//      assert ! cache1.replace(key, "something", "goal");
       assert cache1.get(key) == null;
-      assert cache2.get(key) == null;
+//      assert cache2.get(key) == null;
 
+//      expectRpc(cache1, ReplaceCommand.class);
       assert ! cache2.replace(key, "something", "goal");
+//      waitForRpc(cache1);
       assert cache1.get(key) == null;
       assert cache2.get(key) == null;
 
+      expectRpc(cache2, PutKeyValueCommand.class);
       assert null == cache1.put(key, "goal-1");
+      waitForRpc(cache2);
       assert cache1.get(key).equals("goal-1");
       assert cache2.get(key).equals("goal-1");
 
+      expectRpc(cache2, ReplaceCommand.class);
       assert cache1.replace(key, "goal-1", "goal-2");
+      waitForRpc(cache2);
+//      expectRpc(cache1, ReplaceCommand.class);
       assert ! cache2.replace(key, "goal-not", "goal-problem");
+//      waitForRpc(cache1);
+      expectRpc(cache1, ReplaceCommand.class);
       assert cache2.replace(key, "goal-2", "goal-ok");
+      waitForRpc(cache1);
       assert cache1.get(key).equals("goal-ok");
       assert cache2.get(key).equals("goal-ok");
 
@@ -219,7 +230,9 @@ public abstract class BaseReplicatedAPITest extends MultipleCacheManagersTest {
       assert cache1.get(key).equals("messWithCaches");
       assert cache2.get(key).equals("goal-ok");
 
+      expectRpc(cache1, ReplaceCommand.class);
       assert cache2.replace(key, "goal-ok", "trouble");
+      waitForRpc(cache1);
       assert cache1.get(key).equals("trouble"); // <-- currently happening. To be discussed?
       assert cache2.get(key).equals("trouble");
    }
@@ -278,7 +291,7 @@ public abstract class BaseReplicatedAPITest extends MultipleCacheManagersTest {
 
    private void waitForRpc(AdvancedCache cache) {
       if (!isSync) {
-         replListener(cache).waitForRpc();
+         replListener(cache).waitForRpc(5, TimeUnit.SECONDS);
       }
    }
 }
