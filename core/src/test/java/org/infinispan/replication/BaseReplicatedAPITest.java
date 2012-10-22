@@ -42,9 +42,10 @@ import org.testng.annotations.Test;
 public abstract class BaseReplicatedAPITest extends MultipleCacheManagersTest {
 
    protected boolean isSync;
+   protected boolean isTransactional = false;
 
    protected void createCacheManagers() throws Throwable {
-      ConfigurationBuilder build = getDefaultClusteredCacheConfig(isSync ? CacheMode.REPL_SYNC : CacheMode.REPL_ASYNC, true);
+      ConfigurationBuilder build = getDefaultClusteredCacheConfig(isSync ? CacheMode.REPL_SYNC : CacheMode.REPL_ASYNC, isTransactional);
       build.clustering().stateTransfer().timeout(10000);
       createClusteredCaches(2, "replication", build);
    }
@@ -175,8 +176,9 @@ public abstract class BaseReplicatedAPITest extends MultipleCacheManagersTest {
       assert cache1.get("key") == null;
       assert cache2.get("key").equals("value2");
 
-      cache1.replace("key", "value1"); // should do nothing since there is nothing to replace on cache1
+      Object returned = cache1.replace("key", "value1"); // should do nothing since there is nothing to replace on cache1
 
+      assert returned == null;
       assert cache1.get("key") == null;
       assert cache2.get("key").equals("value2");
 
@@ -188,6 +190,38 @@ public abstract class BaseReplicatedAPITest extends MultipleCacheManagersTest {
 
       assert cache1.get("key").equals("value1");
       assert cache2.get("key").equals("value1");
+   }
+
+   public void testReplaceComparing() {
+      final AdvancedCache cache1 = cache(0, "replication").getAdvancedCache();
+      final AdvancedCache cache2 = cache(1, "replication").getAdvancedCache();
+      final Object key = "testReplaceCompare";
+
+      assert ! cache1.replace(key, "something", "goal");
+      assert cache1.get(key) == null;
+      assert cache2.get(key) == null;
+
+      assert ! cache2.replace(key, "something", "goal");
+      assert cache1.get(key) == null;
+      assert cache2.get(key) == null;
+
+      assert null == cache1.put(key, "goal-1");
+      assert cache1.get(key).equals("goal-1");
+      assert cache2.get(key).equals("goal-1");
+
+      assert cache1.replace(key, "goal-1", "goal-2");
+      assert ! cache2.replace(key, "goal-not", "goal-problem");
+      assert cache2.replace(key, "goal-2", "goal-ok");
+      assert cache1.get(key).equals("goal-ok");
+      assert cache2.get(key).equals("goal-ok");
+
+      assert cache1.withFlags(CACHE_MODE_LOCAL).replace(key, "goal-ok", "messWithCaches");
+      assert cache1.get(key).equals("messWithCaches");
+      assert cache2.get(key).equals("goal-ok");
+
+      assert cache2.replace(key, "goal-ok", "trouble");
+      assert cache1.get(key).equals("trouble"); // <-- currently happening. To be discussed?
+      assert cache2.get(key).equals("trouble");
    }
 
    public void testReplaceWithOldVal() {
