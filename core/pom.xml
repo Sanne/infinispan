@@ -262,5 +262,11 @@
             </plugins>
          </build>
       </profile>
+      <profile>
+         <id>noCoreTests</id>
+         <properties>
+            <maven.test.skip>true</maven.test.skip>
+         </properties>
+      </profile>
    </profiles>
 </project>
