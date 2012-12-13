@@ -22,8 +22,11 @@
  */
 package org.infinispan.query.performance;
 
+import java.util.concurrent.TimeUnit;
+
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.test.Person;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
@@ -45,10 +48,19 @@ public class CrazyWriter {
 
    private void loop() {
       System.out.println("entering loop");
-      for (int i=0; i<Integer.MAX_VALUE; i++) {
-         cache.put("K-" + String.valueOf(i), new Person("V-" + String.valueOf(i), "HUMM" + String.valueOf(i*3), i));
-         if (i%LOOP_OUTPUT==0) {
-            System.out.println("inserted " + i + "!");
+      long previousTimestamp = 0;
+      for (int i = 0; i < Integer.MAX_VALUE; i++) {
+         cache.put(
+               "K-" + String.valueOf(i),
+               new Person("V-" + String.valueOf(i), "HUMM" + String.valueOf(i * 3), i));
+         if (i % LOOP_OUTPUT == 0) {
+            long current = System.nanoTime();
+            long interval = TimeUnit.MILLISECONDS.convert(current - previousTimestamp, TimeUnit.NANOSECONDS);
+            if (previousTimestamp != 0) {
+               System.out.println("inserted " + i + "! Inserted " + LOOP_OUTPUT
+                     + " elements in " + interval + " milliseconds");
+            }
+            previousTimestamp = current;
          }
       }
    }
@@ -58,26 +70,25 @@ public class CrazyWriter {
       try {
          CrazyWriter cw = new CrazyWriter(cacheManager);
          cw.loop();
-      }
-      finally {
+      } finally {
          cacheManager.stop();
       }
    }
 
    static EmbeddedCacheManager createCacheManager() throws Exception {
-      ConfigurationBuilder cfg = TestCacheManagerFactory.getDefaultCacheConfiguration(false);
-      cfg
-         .indexing()
-            .enable()
-            .indexLocalOnly(false)
-//            .addProperty("default.directory_provider", "filesystem")
-//            .addProperty("lucene_version", "LUCENE_CURRENT")
-//            .addProperty("default.indexwriter.merge_factor", "50")
-//            .addProperty("default.sharding_strategy.nbr_of_shards", "12")
-//            .addProperty("default.​indexwriter.ram_buffer_size", "400")
-            .addProperty("​default.indexmanager", "near-real-time");
-//            .addProperty("​default.​indexwriter.use_compound_file", "false");
-//            .addProperty("​default.​indexwriter.exclusive_index_use", "true")
+      ConfigurationBuilder cfg = TestCacheManagerFactory
+            .getDefaultCacheConfiguration(false);
+      cfg.eviction().strategy(EvictionStrategy.NONE);
+      cfg.expiration().disableReaper();
+      cfg.indexing().enable().indexLocalOnly(false)
+            .addProperty("default.directory_provider", "filesystem")
+            .addProperty("lucene_version", "LUCENE_CURRENT")
+            .addProperty("default.indexwriter.merge_factor", "30")
+            .addProperty("default.sharding_strategy.nbr_of_shards", "12")
+            .addProperty("default.​indexwriter.ram_buffer_size", "400")
+            .addProperty("default.indexmanager", "near-real-time")
+            .addProperty("​default.​indexwriter.use_compound_file", "false");
+      // .addProperty("​default.​indexwriter.exclusive_index_use", "true");
       return TestCacheManagerFactory.createCacheManager(cfg);
    }
 

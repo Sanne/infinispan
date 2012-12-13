@@ -191,7 +191,7 @@ public class QueryInterceptor extends CommandInterceptor {
       // The key is going to be the documentID for Lucene.
       // The object parameter is the actual value that needs to be removed from lucene.
       if (value == null) throw new NullPointerException("Cannot handle a null value!");
-      searchFactory.getWorker().performWork(new Work<Object>(value, keyToString(key), WorkType.UPDATE), transactionContext);
+      searchFactory.getWorker().performWork(new Work<Object>(value, keyToString(key), WorkType.ADD), transactionContext);
    }
 
    private Object extractValue(Object wrappedValue) {
