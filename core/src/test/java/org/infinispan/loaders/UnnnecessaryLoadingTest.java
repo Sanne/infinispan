@@ -22,27 +22,32 @@
  */
 package org.infinispan.loaders;
 
+import static org.testng.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.Set;
+
 import org.infinispan.Cache;
-import org.infinispan.config.CacheLoaderManagerConfig;
-import org.infinispan.config.Configuration;
+import org.infinispan.config.ConfigurationBeanVisitor;
+import org.infinispan.configuration.Builder;
+import org.infinispan.configuration.BuiltBy;
+import org.infinispan.configuration.cache.AbstractLoaderConfiguration;
+import org.infinispan.configuration.cache.AbstractLoaderConfigurationBuilder;
+import org.infinispan.configuration.cache.CacheLoaderConfiguration;
+import org.infinispan.configuration.cache.CacheLoaderConfigurationBuilder;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.cache.LoadersConfigurationBuilder;
 import org.infinispan.container.entries.InternalCacheEntry;
 import org.infinispan.context.Flag;
 import org.infinispan.loaders.decorators.ChainingCacheStore;
-import org.infinispan.loaders.dummy.DummyInMemoryCacheStore;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.test.SingleCacheManagerTest;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.test.fwk.CleanupAfterMethod;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.infinispan.test.fwk.TestInternalCacheEntryFactory;
+import org.infinispan.util.TypedProperties;
 import org.testng.annotations.Test;
-
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.Collections;
-import java.util.Set;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * A test to ensure stuff from a cache store is not loaded unnecessarily if it already exists in memory, or if the
@@ -59,13 +64,14 @@ public class UnnnecessaryLoadingTest extends SingleCacheManagerTest {
 
    @Override
    protected EmbeddedCacheManager createCacheManager() throws Exception {
-      Configuration cfg = getDefaultStandaloneConfig(true);
-      cfg.setInvocationBatchingEnabled(true);
-      CacheLoaderManagerConfig clmc = new CacheLoaderManagerConfig();
-      clmc.addCacheLoaderConfig(new CountingCacheStoreConfig());
-      clmc.addCacheLoaderConfig(new DummyInMemoryCacheStore.Cfg());
-      cfg.setCacheLoaderManagerConfig(clmc);
-      return TestCacheManagerFactory.createCacheManager(cfg);
+      ConfigurationBuilder builder = TestCacheManagerFactory.getDefaultCacheConfiguration(true);
+      builder
+         .invocationBatching()
+            .enable()
+         .loaders()
+            .addLoader(CountingCacheLoaderConfigurationBuilder.class)
+         ;
+      return TestCacheManagerFactory.createCacheManager(builder);
    }
 
    @Override
@@ -175,33 +181,8 @@ public class UnnnecessaryLoadingTest extends SingleCacheManagerTest {
       countingCS.numContains = 0;
    }
 
-   public static class CountingCacheStore extends AbstractCacheStore {
+   public static class CountingCacheStore extends AbstractCacheLoader {
       public int numLoads, numContains;
-
-      @Override
-      public void store(InternalCacheEntry entry) throws CacheLoaderException {
-      }
-
-      @Override
-      public void fromStream(ObjectInput inputStream) throws CacheLoaderException {
-      }
-
-      @Override
-      public void toStream(ObjectOutput outputStream) throws CacheLoaderException {
-      }
-
-      @Override
-      public void clear() throws CacheLoaderException {
-      }
-
-      @Override
-      public boolean remove(Object key) throws CacheLoaderException {
-         return false;
-      }
-
-      @Override
-      protected void purgeInternal() throws CacheLoaderException {
-      }
 
       @Override
       public InternalCacheEntry load(Object key) throws CacheLoaderException {
@@ -230,19 +211,79 @@ public class UnnnecessaryLoadingTest extends SingleCacheManagerTest {
          return false;
       }
 
+      private void incrementLoads() {
+         numLoads++;
+      }
+
+      @Override
+      public void start() throws CacheLoaderException {
+      }
+
+      @Override
+      public void stop() throws CacheLoaderException {
+      }
+
       @Override
       public Class<? extends CacheLoaderConfig> getConfigurationClass() {
          return CountingCacheStoreConfig.class;
       }
+   }
 
-      private void incrementLoads() {
-         numLoads++;
+   @BuiltBy(CountingCacheLoaderConfigurationBuilder.class)
+   public static class CountingCacheStoreConfig extends AbstractLoaderConfiguration implements CacheLoaderConfiguration, CacheLoaderConfig {
+      public CountingCacheStoreConfig() {
+         super(new TypedProperties());
+      }
+
+      @Override
+      public void accept(ConfigurationBeanVisitor visitor) {
+      }
+
+      @Override
+      public String getCacheLoaderClassName() {
+         return "";
+      }
+
+      @Override
+      public void setCacheLoaderClassName(String s) {
+      }
+
+      @Override
+      public ClassLoader getClassLoader() {
+         return CountingCacheStoreConfig.class.getClassLoader();
+      }
+
+      @Override
+      public CacheLoaderConfig clone() {
+         return this;
       }
    }
 
-   public static class CountingCacheStoreConfig extends AbstractCacheStoreConfig {
-      public CountingCacheStoreConfig() {
-         setCacheLoaderClassName(CountingCacheStore.class.getName());
+   public static class CountingCacheLoaderConfigurationBuilder
+      extends AbstractLoaderConfigurationBuilder<CountingCacheStoreConfig,CountingCacheLoaderConfigurationBuilder>
+      implements CacheLoaderConfigurationBuilder<CountingCacheStoreConfig,CountingCacheLoaderConfigurationBuilder> {
+
+      public CountingCacheLoaderConfigurationBuilder(LoadersConfigurationBuilder builder) {
+         super(builder);
+      }
+
+      @Override
+      public void validate() {
+      }
+
+      @Override
+      public CountingCacheStoreConfig create() {
+         return new CountingCacheStoreConfig();
+      }
+
+      @Override
+      public Builder<?> read(CountingCacheStoreConfig template) {
+         return null;
+      }
+
+      @Override
+      public CountingCacheLoaderConfigurationBuilder self() {
+         return this;
       }
    }
 }
