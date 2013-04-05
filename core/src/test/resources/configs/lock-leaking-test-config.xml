@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:infinispan:config:6.0 http://www.infinispan.org/schemas/infinispan-config-6.0.xsd"
+    xmlns="urn:infinispan:config:6.0">
+
+    <global>
+        <globalJmxStatistics
+            enabled="false"
+            cacheManagerName="StressTestLockingCacheManager"
+            allowDuplicateDomains="true" />
+        <transport
+            clusterName="StressTestLockingCluster" />
+        <shutdown
+            hookBehavior="DONT_REGISTER" />
+    </global>
+
+    <default>
+        <locking
+            lockAcquisitionTimeout="20000"
+            writeSkewCheck="false"
+            concurrencyLevel="500"
+            useLockStriping="false" />
+
+        <transaction
+            transactionMode="TRANSACTIONAL"
+            autoCommit="true"
+            syncCommitPhase="false"
+            lockingMode="PESSIMISTIC" />
+
+        <clustering
+            mode="replication">
+            <stateTransfer
+                timeout="480000"
+                fetchInMemoryState="true" />
+        </clustering>
+    </default>
+
+</infinispan>
