@@ -29,10 +29,10 @@ package org.infinispan.query;
  * @author Manik Surtani
  * @since 4.0
  */
-public interface Transformer {
+public interface Transformer<T> {
 
-   Object fromString(String s);
+   T fromString(String s);
 
-   String toString(Object customType);
+   String toString(T customType);
 
 }
