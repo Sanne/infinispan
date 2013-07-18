@@ -13,14 +13,14 @@
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-core</artifactId>
-         <version>5.2.6.Final</version>
+         <version>5.2.4.Final-redhat-1</version>
       </dependency>
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-core</artifactId>
          <type>test-jar</type>
          <scope>test</scope>
-         <version>5.2.6.Final</version>
+         <version>5.2.4.Final-redhat-1</version>
       </dependency>
    </dependencies>
 </project>

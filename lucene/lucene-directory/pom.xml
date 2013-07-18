@@ -26,12 +26,6 @@
             
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-lucene-v4</artifactId>
-            
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -61,12 +55,6 @@
                         </goals>
                         <configuration>
                             <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.infinispan</groupId>
-                                    <artifactId>infinispan-lucene-v4</artifactId>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.infinispan</groupId>
                                     <artifactId>infinispan-lucene-v3</artifactId>

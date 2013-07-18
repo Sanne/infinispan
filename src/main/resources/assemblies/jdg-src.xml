@@ -20,18 +20,29 @@
             <includes>
                 <include>pom.xml</include>
                 <include>README*</include>
+                <include>bom/**</include>
                 <include>parent/**</include>
+                <include>commons/**</include>
                 <include>core/**</include>
                 <include>tools/**</include>
-                <include>cachestore/pom.xml</include>
-                <include>cachestore/jdbc/**</include>
-                <include>cachestore/remote/**</include>
-                <include>client/**</include>
+                <include>query/**</include>
+                <include>query-dsl/**</include>
+                <include>remote-query/**</include>
+                <include>lucene/pom.xml</include>
+                <include>lucene/lucene-directory/**</include>
+                <include>lucene/lucene-v3/**</include>
+                <include>persistence/pom.xml</include>
+                <include>persistence/jdbc/**</include>
+                <include>persistence/remote/**</include>
                 <include>server/pom.xml</include>
                 <include>server/core/**</include>
                 <include>server/hotrod/**</include>
                 <include>server/memcached/**</include>
                 <include>server/rest/**</include>
+                <include>client/**</include>
+                <include>cli/**</include>
+                <include>cdi/extension/**</include>
+                <include>compatibility52x/**</include>
                 <include>rhq-plugin/**</include>
             </includes>
             <excludes>

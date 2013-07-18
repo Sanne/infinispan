@@ -46,24 +46,12 @@
          <includes>
             <include>org.infinispan:infinispan-core</include>
             <include>org.infinispan:infinispan-rhq-plugin</include>
-            <include>org.infinispan:infinispan-tree</include>
             <include>org.infinispan:infinispan-query</include>
-            <include>org.infinispan:infinispan-server-memcached</include>
-            <include>org.infinispan:infinispan-server-hotrod</include>
-            <include>org.infinispan:infinispan-server-websocket</include>
-            <include>org.infinispan:infinispan-client-hotrod</include>
             <include>org.infinispan:infinispan-lucene-directory</include>
-            <include>org.infinispan:infinispan-spring</include>
             <include>org.infinispan:infinispan-cli-client</include>
             <include>org.infinispan:infinispan-cli-server</include>
             <include>org.infinispan:infinispan-cachestore-jdbc</include>
             <include>org.infinispan:infinispan-cachestore-remote</include>
-            <include>org.infinispan:infinispan-gui-demo</include>
-            <include>org.infinispan:infinispan-ec2-demo</include>
-            <include>org.infinispan:infinispan-distexec-demo</include>
-            <include>org.infinispan:infinispan-directory-demo</include>
-            <include>org.infinispan:infinispan-nearcache-demo</include>
-            <include>org.infinispan:infinispan-lucene-demo</include>
             <include>org.infinispan:infinispan-cdi</include>
          </includes>
 
@@ -196,11 +184,8 @@
          <includeSubModules>false</includeSubModules>
          <includes>
             <include>org.infinispan:infinispan-rhq-plugin</include>
-            <include>org.infinispan:infinispan-tree</include>
             <include>org.infinispan:infinispan-query</include>
-            <include>org.infinispan:infinispan-client-hotrod</include>
             <include>org.infinispan:infinispan-lucene-directory</include>
-            <include>org.infinispan:infinispan-spring</include>
             <include>org.infinispan:infinispan-cli-client</include>
             <include>org.infinispan:infinispan-cli-server</include>
          </includes>
@@ -394,147 +379,6 @@
 
          <binaries>
             <outputDirectory>modules/cachestores/${module.basedir.name}</outputDirectory>
-            <outputFileNameMapping>
-               ${module.artifactId}.${module.extension}
-            </outputFileNameMapping>
-            <unpack>false</unpack>
-         </binaries>
-      </moduleSet>
-
-      <!-- Demo war apps -->
-      <moduleSet>
-         <includeSubModules>false</includeSubModules>
-         <includes>
-            <include>org.infinispan:infinispan-gridfs-webdav</include>
-            <include>org.infinispan:infinispan-ec2-demoui</include>
-            <include>org.infinispan:infinispan-nearcache-client</include>
-         </includes>
-
-         <sources>
-            <includeModuleDirectory>false</includeModuleDirectory>
-            <fileSets>
-               <fileSet>
-                  <directory>target</directory>
-                  <outputDirectory>modules/${module.basedir.name}</outputDirectory>
-                  <includes>
-                     <include>*.jar</include>
-                  </includes>
-                  <excludes>
-                     <exclude>*tests.jar</exclude>
-                     <exclude>*sources.jar</exclude>
-                  </excludes>
-               </fileSet>
-            </fileSets>
-         </sources>
-
-         <binaries>
-            <outputDirectory>modules/demos/${module.basedir.name}</outputDirectory>
-            <outputFileNameMapping>
-               ${module.artifactId}.${module.extension}
-            </outputFileNameMapping>
-            <unpack>false</unpack>
-         </binaries>
-      </moduleSet>
-
-      <!-- Demos only! -->
-      <moduleSet>
-         <includeSubModules>false</includeSubModules>
-         <includes>
-            <include>org.infinispan:infinispan-gui-demo</include>
-            <include>org.infinispan:infinispan-ec2-demo</include>
-            <include>org.infinispan:infinispan-distexec-demo</include>
-            <include>org.infinispan:infinispan-directory-demo</include>
-            <include>org.infinispan:infinispan-nearcache-demo</include>
-            <include>org.infinispan:infinispan-lucene-demo</include>
-         </includes>
-         <sources>
-            <includeModuleDirectory>false</includeModuleDirectory>
-
-            <fileSets>
-               <!-- Executable resources -->
-               <fileSet>
-                  <directory>src/main/release</directory>
-                  <outputDirectory></outputDirectory>
-                  <lineEnding>unix</lineEnding>
-                  <includes>
-                     <include>**/*.sh</include>
-                     <include>**/*.py</include>
-                     <include>**/*.rb</include>
-                  </includes>
-                  <fileMode>0755</fileMode>
-               </fileSet>
-
-               <fileSet>
-                  <directory>src/main/release</directory>
-                  <outputDirectory></outputDirectory>
-                  <lineEnding>dos</lineEnding>
-                  <includes>
-                     <include>**/*.cmd</include>
-                     <include>**/*.bat</include>
-                  </includes>
-                  <fileMode>0644</fileMode>
-               </fileSet>
-
-               <!-- Configuration resources -->
-               <fileSet>
-                  <directory>src/main/release</directory>
-                  <outputDirectory></outputDirectory>
-                  <lineEnding>unix</lineEnding>
-                  <includes>
-                     <include>**/*.properties</include>
-                     <include>**/*.xml</include>
-                     <include>**/*.xsd</include>
-                     <include>**/*.html</include>
-                     <include>**/*.js</include>
-                     <include>**/*.css</include>
-                  </includes>
-               </fileSet>
-
-               <!-- Binary resources -->
-               <fileSet>
-                  <directory>src/main/release</directory>
-                  <outputDirectory></outputDirectory>
-                  <lineEnding>keep</lineEnding>
-                  <includes>
-                     <include>**/*.gz</include>
-                  </includes>
-               </fileSet>
-
-               <!-- Schema -->
-               <fileSet>
-                  <directory>target/classes</directory>
-                  <outputDirectory>etc</outputDirectory>
-                  <lineEnding>unix</lineEnding>
-                  <includes>
-                     <include>**/*.xsd</include>
-                  </includes>
-               </fileSet>
-
-               <!-- EULAs and license files -->
-               <fileSet>
-                  <directory>src/main/release</directory>
-                  <outputDirectory></outputDirectory>
-                  <lineEnding>dos</lineEnding>
-                  <includes>
-                     <include>**/*.txt</include>
-                  </includes>
-               </fileSet>
-
-               <!-- runtime-classpath.txt file -->
-               <fileSet>
-                  <directory>target</directory>
-                  <outputDirectory>modules/demos/${module.basedir.name}</outputDirectory>
-                  <lineEnding>keep</lineEnding>
-                  <includes>
-                     <include>runtime-classpath.txt</include>
-                  </includes>
-               </fileSet>
-            </fileSets>
-
-         </sources>
-
-         <binaries>
-            <outputDirectory>modules/demos/${module.basedir.name}</outputDirectory>
             <outputFileNameMapping>
                ${module.artifactId}.${module.extension}
             </outputFileNameMapping>

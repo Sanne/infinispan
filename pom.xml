@@ -20,16 +20,13 @@
       <module>parent</module>
       <module>commons</module>
       <module>core</module>
-      <module>extended-statistics</module>
       <module>tools</module>
       <module>query</module>
       <module>query-dsl</module>
       <module>remote-query/remote-query-client</module>
       <module>remote-query/remote-query-server</module>
-      <module>tree</module>
       <module>lucene</module>
       <module>lucene/lucene-directory</module>
-      <module>lucene/lucene-v4</module>
       <module>lucene/lucene-v3</module>
       <module>persistence</module>
       <module>persistence/jdbc</module>
@@ -39,33 +36,15 @@
       <module>server/core</module>
       <module>server/memcached</module>
       <module>server/hotrod</module>
-      <module>server/websocket</module>
       <module>server/rest</module>
       <module>client/hotrod-client</module>
       <module>rhq-plugin</module>
-      <module>spring</module>
       <module>cli/cli-server</module>
       <module>cli/cli-client</module>
-      <module>demos/gui</module>
-      <module>demos/ec2</module>
-      <module>demos/distexec</module>
-      <module>demos/ec2-ui</module>
-      <module>demos/directory</module>
-      <module>demos/lucene-directory-demo</module>
-      <module>demos/gridfs-webdav</module>
-      <module>demos/nearcache</module>
-      <module>demos/nearcache-client</module>
       <module>cdi/extension</module>
-      <module>as-modules</module>
-      <module>integrationtests/luceneintegration</module>
-      <module>integrationtests/as-integration</module>
-      <module>integrationtests/compatibility-mode-it</module>
-      <module>integrationtests/cdi-jcache-it</module>
-      <module>jcache</module>
       <module>compatibility52x</module>
       <module>compatibility52x/adaptor52x</module>
       <module>compatibility52x/custom52x-store</module>
-      <module>compatibility52x/cli-migrator52x</module>
    </modules>
 
    <profiles>
@@ -81,7 +60,7 @@
                         <id>javadoc</id>
                         <phase>prepare-package</phase>
                         <goals>
-                           <goal>aggregate</goal>
+                           <goal>aggregate-jar</goal>
                         </goals>
                         <configuration>
                            <quiet>true</quiet>
@@ -93,20 +72,6 @@
                               <link>http://java.sun.com/javase/6/docs/api/</link>
                               <link>http://java.sun.com/javaee/5/docs/api/</link>
                            </links>
-                           <footer>
---&gt;
-                      &lt;!-- Google Analytics --&gt;
-&lt;!--
-&lt;script type='text/javascript'&gt;
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-&lt;/script&gt;
-&lt;script type='text/javascript'&gt;
-try {
-var pageTracker = _gat._getTracker("UA-8601422-4");
-pageTracker._trackPageview();
-} catch(err) {}&lt;/script&gt;
-                     </footer>
                         </configuration>
                      </execution>
                   </executions>
@@ -135,16 +100,12 @@ pageTracker._trackPageview();
                   </executions>
                   <configuration>
                      <descriptors>
-                        <descriptor>src/main/resources/assemblies/bin.xml</descriptor>
-                        <descriptor>src/main/resources/assemblies/all.xml</descriptor>
-                        <descriptor>src/main/resources/assemblies/src.xml</descriptor>
+                        <descriptor>src/main/resources/assemblies/jdg-bin.xml</descriptor>
+                        <descriptor>src/main/resources/assemblies/jdg-src.xml</descriptor>
                      </descriptors>
                      <finalName>${project.artifactId}-${project.version}</finalName>
                      <outputDirectory>${buildDirectory}/distribution</outputDirectory>
                      <workDirectory>${buildDirectory}/assembly/work</workDirectory>
-
-                     
-                     <attach>false</attach>
                   </configuration>
                </plugin>
             </plugins>
@@ -186,7 +147,8 @@ pageTracker._trackPageview();
                   </executions>
                   <configuration>
                      <descriptors>
-                        <descriptor>src/main/resources/assemblies/all.xml</descriptor>
+                        <descriptor>src/main/resources/assemblies/jdg-bin.xml</descriptor>
+                        <descriptor>src/main/resources/assemblies/jdg-src.xml</descriptor>
                      </descriptors>
                      <finalName>${project.artifactId}-${project.version}</finalName>
                      <outputDirectory>${buildDirectory}/distribution</outputDirectory>

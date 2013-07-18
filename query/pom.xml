@@ -32,11 +32,23 @@
       <dependency>
          <groupId>org.hibernate.hql</groupId>
          <artifactId>hibernate-hql-parser</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.antlr.stringtemplate</groupId>
+               <artifactId>stringtemplate</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
          <groupId>org.hibernate.hql</groupId>
          <artifactId>hibernate-hql-lucene</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.antlr.stringtemplate</groupId>
+               <artifactId>stringtemplate</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
@@ -47,6 +59,28 @@
       <dependency>
          <groupId>org.hibernate</groupId>
          <artifactId>hibernate-search-infinispan</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>${project.groupId}</groupId>
+               <artifactId>infinispan-lucene-directory</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.codehaus.jackson</groupId>
+         <artifactId>jackson-mapper-asl</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.codehaus.jackson</groupId>
+               <artifactId>jackson-core-asl</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.codehaus.jackson</groupId>
+         <artifactId>jackson-core-asl</artifactId>
       </dependency>
 
       <dependency>

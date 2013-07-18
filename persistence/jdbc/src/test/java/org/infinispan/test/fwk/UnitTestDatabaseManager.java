@@ -30,28 +30,7 @@ public class UnitTestDatabaseManager {
    private static final String DB_TYPE = System.getProperty("infinispan.test.jdbc.db", "H2");
    private static final String H2_DRIVER = org.h2.Driver.class.getName();
    private static final String NON_EXISTENT_DRIVER = "non.existent.Driver";
-   private static final DatabaseType dt;
-
-   static {
-      String driver = "";
-      try {
-         if (DB_TYPE.equalsIgnoreCase("mysql")) {
-            driver = com.mysql.jdbc.Driver.class.getName();
-            dt = DatabaseType.MYSQL;
-         } else {
-            driver = H2_DRIVER;
-            dt = DatabaseType.H2;
-         }
-         try {
-            Class.forName(driver);
-         } catch (ClassNotFoundException e) {
-            driver = H2_DRIVER;
-            Class.forName(H2_DRIVER);
-         }
-      } catch (ClassNotFoundException e) {
-         throw new RuntimeException(e);
-      }
-   }
+   private static final DatabaseType dt = DatabaseType.H2;
 
    public static ConnectionFactoryConfigurationBuilder<?> configureUniqueConnectionFactory(AbstractJdbcStoreConfigurationBuilder<?, ?> store) {
       switch (dt) {
@@ -61,13 +40,6 @@ public class UnitTestDatabaseManager {
                .driverClass(org.h2.Driver.class)
                .connectionUrl(String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", extractTestName() + userIndex.incrementAndGet()))
                .username("sa");
-      case MYSQL:
-         return store
-            .simpleConnection()
-               .driverClass(com.mysql.jdbc.Driver.class)
-               .connectionUrl("jdbc:mysql://localhost/infinispan?user=ispn&password=ispn")
-               .username("ispn")
-               .password("ispn");
       default:
          throw new RuntimeException("Cannot configure connection for database type "+dt);
       }
