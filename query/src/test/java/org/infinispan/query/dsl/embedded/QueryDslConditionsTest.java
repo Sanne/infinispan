@@ -10,6 +10,7 @@ import org.infinispan.query.dsl.embedded.sample_domain_model.Account;
 import org.infinispan.query.dsl.embedded.sample_domain_model.Address;
 import org.infinispan.query.dsl.embedded.sample_domain_model.Transaction;
 import org.infinispan.query.dsl.embedded.sample_domain_model.User;
+import org.infinispan.query.test.Person;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -416,6 +417,37 @@ public class QueryDslConditionsTest extends AbstractQueryDslTest {
       assertEquals(3, list.size());
    }
 
+   public void testOr4() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      Query q = qf.from(User.class)
+            .having("gender").eq(User.Gender.MALE)
+            .or().having("name").eq("Spider")
+            .and().having("gender").eq(User.Gender.FEMALE)
+            .or().having("surname").like("%oe%")
+            .toBuilder().build();
+      List<User> list = q.list();
+
+      assertEquals(2, list.size());
+      assertEquals("Woman", list.get(0).getSurname());
+      assertEquals("Doe", list.get(1).getSurname());
+   }
+
+   public void testOr5() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      Query q = qf.from(User.class)
+            .having("gender").eq(User.Gender.MALE)
+            .or().having("name").eq("Spider")
+            .or().having("gender").eq(User.Gender.FEMALE)
+            .and().having("surname").like("%oe%")
+            .toBuilder().build();
+      List<User> list = q.list();
+
+      assertEquals(1, list.size());
+      assertEquals("John", list.get(0).getName());
+   }
+
    public void testNot1() throws Exception {
       QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
 
@@ -736,6 +768,20 @@ public class QueryDslConditionsTest extends AbstractQueryDslTest {
       assertEquals(2, list.get(0).getId());
    }
 
+   public void testSortByDate() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      Query q = qf.from(Account.class)
+            .orderBy("creationDate", SortOrder.DESC)
+            .build();
+
+      List<Account> list = q.list();
+      assertEquals(3, list.size());
+      assertEquals(3, list.get(0).getId());
+      assertEquals(2, list.get(1).getId());
+      assertEquals(1, list.get(2).getId());
+   }
+
    public void testSampleDomainQuery3() throws Exception {
       QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
 
@@ -763,6 +809,27 @@ public class QueryDslConditionsTest extends AbstractQueryDslTest {
       assertEquals("Spider", list.get(0).getName());
       assertEquals("Spider", list.get(1).getName());
       assertEquals("John", list.get(2).getName());
+   }
+
+   public void testSampleDomainQuery4Wity2SortingOptions() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      // all users ordered descendingly by name
+      Query q = qf.from(User.class)
+            .orderBy("name", SortOrder.DESC)
+            .orderBy("surname", SortOrder.ASC)
+            .build();
+
+      List<User> list = q.list();
+      assertEquals(3, list.size());
+
+      assertEquals("Spider", list.get(0).getName());
+      assertEquals("Spider", list.get(1).getName());
+      assertEquals("John", list.get(2).getName());
+
+      assertEquals("Man", list.get(0).getSurname());
+      assertEquals("Woman", list.get(1).getSurname());
+      assertEquals("Doe", list.get(2).getSurname());
    }
 
    public void testSampleDomainQuery5() throws Exception {
@@ -1113,6 +1180,57 @@ public class QueryDslConditionsTest extends AbstractQueryDslTest {
       assertEquals(2, list.size());
       assertTrue(Arrays.asList(2, 3).contains(list.get(0).getId()));
       assertTrue(Arrays.asList(2, 3).contains(list.get(1).getId()));
+   }
+
+   public void testSampleDomainQuery26() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      Query q = qf.from(Account.class)
+            .having("creationDate").eq(DATE_FORMAT.parse("2013-01-20"))
+            .toBuilder().build();
+
+      List<Account> list = q.list();
+      assertEquals(1, list.size());
+      assertEquals(3, list.get(0).getId());
+   }
+
+   public void testSampleDomainQuery27() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      Query q = qf.from(Account.class)
+            .having("creationDate").lt(DATE_FORMAT.parse("2013-01-20"))
+            .toBuilder().build();
+
+      List<Account> list = q.list();
+      assertEquals(2, list.size());
+      assertEquals(1, list.get(0).getId());
+      assertEquals(2, list.get(1).getId());
+   }
+
+   public void testSampleDomainQuery28() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      Query q = qf.from(Account.class)
+            .having("creationDate").lte(DATE_FORMAT.parse("2013-01-20"))
+            .toBuilder().build();
+
+      List<Account> list = q.list();
+      assertEquals(3, list.size());
+      assertEquals(1, list.get(0).getId());
+      assertEquals(2, list.get(1).getId());
+      assertEquals(3, list.get(2).getId());
+   }
+
+   public void testSampleDomainQuery29() throws Exception {
+      QueryFactory qf = Search.getSearchManager(cache).getQueryFactory();
+
+      Query q = qf.from(Account.class)
+            .having("creationDate").gt(DATE_FORMAT.parse("2013-01-04"))
+            .toBuilder().build();
+
+      List<Account> list = q.list();
+      assertEquals(1, list.size());
+      assertEquals(3, list.get(0).getId());
    }
 
    @Test(expectedExceptions = IllegalStateException.class)
