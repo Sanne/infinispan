@@ -9,6 +9,7 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ import java.util.Set;
  * @since 6.0
  */
 @Indexed
-public class User {
+public class User implements Serializable {
 
    public enum Gender {
       MALE, FEMALE
