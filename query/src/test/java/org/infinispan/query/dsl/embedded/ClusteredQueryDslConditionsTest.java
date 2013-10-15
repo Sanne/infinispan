@@ -59,8 +59,9 @@ public class ClusteredQueryDslConditionsTest extends MultipleCacheManagersTest {
       cacheCfg.indexing()
             .enable()
             .indexLocalOnly(true)
-            .addProperty("default.directory_provider", "infinispan")
-            .addProperty("lucene_version", "LUCENE_36");
+            .addProperty("default.indexmanager", "org.infinispan.query.indexmanager.InfinispanIndexManager")
+            .addProperty("lucene_version", "LUCENE_36")
+            ;
 
       cacheManagers.get(0).defineConfiguration("custom", cacheCfg.build());
       cacheManagers.get(1).defineConfiguration("custom", cacheCfg.build());

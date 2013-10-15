@@ -13,7 +13,6 @@
         <transaction transactionMode="TRANSACTIONAL"/>
         <indexing enabled="true">
             <properties >
-                <property name="default.directory_provider" value="infinispan" />
                 <property name="default.indexmanager" value="org.infinispan.query.indexmanager.InfinispanIndexManager" />
                 <property name="lucene_version" value="LUCENE_36" />
 
@@ -32,7 +31,7 @@
 
         <indexing enabled="true" indexLocalOnly="true">
             <properties >
-                <property name="default.directory_provider" value="infinispan" />
+                <property name="default.indexmanager" value="org.infinispan.query.indexmanager.InfinispanIndexManager" />
                 <property name="lucene_version" value="LUCENE_36" />
 
                 <property name="default.locking_cachename" value="LuceneIndexesLocking_custom1" />
