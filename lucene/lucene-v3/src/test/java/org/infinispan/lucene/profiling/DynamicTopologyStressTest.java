@@ -79,7 +79,7 @@ public class DynamicTopologyStressTest extends MultipleCacheManagersTest {
          readers[i] = addClusterEnabledCacheManager(cb, transportFlags);
          Cache<Object, Object> cache = readers[i].getCache();
          discardPerNode[i] = TestingUtil.getDiscardForCache(cache);
-         TestingUtil.setDelayForCache(cache, 1, 1);
+         TestingUtil.setDelayForCache(cache, 0, 0, 100, 100);
          TestingUtil.blockUntilViewReceived(cache, i + 1);
       }
    }

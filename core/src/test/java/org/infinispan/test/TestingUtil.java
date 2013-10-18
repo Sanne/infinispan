@@ -1050,13 +1050,16 @@ public class TestingUtil {
     * @return a reference to the DELAY instance being used by the JGroups stack
     * @throws Exception
     */
-   public static DELAY setDelayForCache(Cache<?, ?> cache, int in_delay_millis, int out_delay_millis) throws Exception {
+   public static DELAY setDelayForCache(Cache<?, ?> cache, int in_delay_millis, int out_delay_millis,
+		   int in_delay_nanos, int out_delay_nanos) throws Exception {
       JGroupsTransport jgt = (JGroupsTransport) TestingUtil.extractComponent(cache, Transport.class);
       Channel ch = jgt.getChannel();
       ProtocolStack ps = ch.getProtocolStack();
       DELAY delay = new DELAY();
       delay.setInDelay(in_delay_millis);
       delay.setOutDelay(out_delay_millis);
+      delay.setInDelayNanos(in_delay_nanos);
+      delay.setOutDelayNanos(out_delay_nanos);
       ps.insertProtocol(delay, ProtocolStack.ABOVE, TP.class);
       return delay;
    }
