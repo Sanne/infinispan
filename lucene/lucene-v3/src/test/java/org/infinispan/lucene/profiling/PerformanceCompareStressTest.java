@@ -9,18 +9,15 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-import org.infinispan.Cache;
+import org.infinispan.AdvancedCache;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.lucene.CacheTestSupport;
 import org.infinispan.lucene.DirectoryIntegrityCheck;
 import org.infinispan.lucene.directory.DirectoryBuilder;
-import org.infinispan.manager.CacheContainer;
-import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.test.TestingUtil;
-import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.infinispan.transaction.TransactionMode;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -36,7 +33,6 @@ import org.testng.annotations.Test;
  * @author Sanne Grinovero
  * @since 4.0
  */
-@SuppressWarnings("unchecked")
 @Test(groups = "profiling", testName = "lucene.profiling.PerformanceCompareStressTest", sequential = true)
 public class PerformanceCompareStressTest {
 
@@ -49,16 +45,23 @@ public class PerformanceCompareStressTest {
    /** Concurrent Threads in tests */
    private static final int READER_THREADS = 5;
    private static final int WRITER_THREADS = 1;
-   
-   private static final int CHUNK_SIZE = 512 * 1024;
+
+   private static final int GRID_NODES = 5;
+
+   private static final int CHUNK_SIZE = 256 * 1024;
 
    private static final String indexName = "tempIndexName";
 
-   private static final long DURATION_MS = 2 * 60 * 1000;
+   private static final long DURATION_MS = 12 * 60 * 1000;
 
-   private Cache cache;
-
-   private EmbeddedCacheManager cacheFactory;
+   private ConfigurationBuilder configuration() {
+      ConfigurationBuilder cfg = CacheTestSupport.createTestConfiguration(TransactionMode.NON_TRANSACTIONAL);
+      cfg.clustering().l1().enable();
+      cfg.invocationBatching().disable();
+      cfg.jmxStatistics().disable();
+      cfg.storeAsBinary().disable();
+      return cfg;
+   }
 
    @Test
    public void profileTestRAMDirectory() throws InterruptedException, IOException {
@@ -74,41 +77,64 @@ public class PerformanceCompareStressTest {
       FSDirectory dir = FSDirectory.open(indexDir);
       stressTestDirectory(dir, "FSDirectory");
    }
-   
-   @Test
-   public void profileTestInfinispanDirectoryWithNetworkDelayZero() throws InterruptedException, IOException {
-      // TestingUtil.setDelayForCache(cache, 0, 0);
-      Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
-      stressTestDirectory(dir, "InfinispanClustered-delayedIO:0");
-      verifyDirectoryState();
-   }
 
    @Test
-   public void profileTestInfinispanDirectoryWithNetworkDelay4() throws Exception {
-      TestingUtil.setDelayForCache(cache, 4, 4);
-      Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
-      stressTestDirectory(dir, "InfinispanClustered-delayedIO:4");
-      verifyDirectoryState();
-   }
-
-   @Test
-   public void profileTestInfinispanDirectoryWithHighNetworkDelay40() throws Exception {
-      TestingUtil.setDelayForCache(cache, 40, 40);
-      Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
-      stressTestDirectory(dir, "InfinispanClustered-delayedIO:40");
-      verifyDirectoryState();
-   }
-
-   @Test
-   public void profileInfinispanLocalDirectory() throws InterruptedException, IOException {
-      CacheContainer cacheContainer = CacheTestSupport.createLocalCacheManager();
+   public void profileTestInfinispanDirectoryWithNetworkDelayZero() throws Exception {
+      InfinispanTestGrid grid = new InfinispanTestGrid(configuration(), GRID_NODES, 0 );
       try {
-         cache = cacheContainer.getCache();
+         grid.start();
+         AdvancedCache cache = grid.getCache(0);
+         Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
+         stressTestDirectory(dir, "InfinispanClustered-delayedIO:0");
+         verifyDirectoryState(cache);
+      }
+      finally {
+         grid.close();
+      }
+   }
+
+   @Test
+   public void profileTestInfinispanDirectoryWithNetworkDelay1() throws Exception {
+      InfinispanTestGrid grid = new InfinispanTestGrid(configuration(), GRID_NODES, 1 );
+      try {
+         grid.start();
+         AdvancedCache cache = grid.getCache(0);
+         Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
+         stressTestDirectory(dir, "InfinispanClustered-delayedIO:4");
+         verifyDirectoryState(cache);
+      }
+      finally {
+         grid.close();
+      }
+   }
+
+   @Test
+   public void profileTestInfinispanDirectoryWithHighNetworkDelay4() throws Exception {
+      InfinispanTestGrid grid = new InfinispanTestGrid(configuration(), GRID_NODES, 400 );
+      try {
+         grid.start();
+         AdvancedCache cache = grid.getCache(0);
+         Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
+         stressTestDirectory(dir, "InfinispanClustered-delayedIO:40");
+         verifyDirectoryState(cache);
+      }
+      finally {
+         grid.close();
+      }
+   }
+
+   @Test
+   public void profileInfinispanLocalDirectory() throws Exception {
+      InfinispanTestGrid grid = new InfinispanTestGrid(configuration(), 1, 0 );
+      try {
+         grid.start();
+         AdvancedCache cache = grid.getCache(0);
          Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
          stressTestDirectory(dir, "InfinispanLocal");
-         verifyDirectoryState();
-      } finally {
-         cacheContainer.stop();
+         verifyDirectoryState(cache);
+      }
+      finally {
+         grid.close();
       }
    }
 
@@ -135,23 +161,12 @@ public class PerformanceCompareStressTest {
                + writerTaskCount);
    }
 
-   @BeforeMethod
-   public void beforeTest() {
-      cacheFactory = TestCacheManagerFactory.createClusteredCacheManager(
-            CacheTestSupport.createTestConfiguration(TransactionMode.NON_TRANSACTIONAL));
-      cacheFactory.start();
-      cache = cacheFactory.getCache();
-      cache.clear();
-   }
-
    @AfterMethod
    public void afterTest() {
-      TestingUtil.killCaches(cache);
-      TestingUtil.killCacheManagers(cacheFactory);
       TestingUtil.recursiveFileRemove(indexName);
    }
-   
-   private void verifyDirectoryState() {
+
+   private void verifyDirectoryState(AdvancedCache cache) {
       DirectoryIntegrityCheck.verifyDirectoryStructure(cache, indexName, true);
    }
 
@@ -162,36 +177,15 @@ public class PerformanceCompareStressTest {
     * Suggested test switches:
     * -Xmx2G -Xms2G -XX:MaxPermSize=128M -XX:+HeapDumpOnOutOfMemoryError -Xss512k -XX:HeapDumpPath=/tmp/java_heap -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -Xbatch -server -XX:+UseCompressedOops -XX:+UseLargePages -XX:LargePageSizeInBytes=2m -XX:+AlwaysPreTouch
     */
-   public static void main(String[] args) throws InterruptedException, IOException {
+   public static void main(String[] args) throws Exception {
       PerformanceCompareStressTest test = new PerformanceCompareStressTest();
-      test.beforeTest();
-      try {
-         test.profileTestRAMDirectory();
-      }
-      finally {
-         test.afterTest();
-      }
-      test.beforeTest();
-      try {
-         test.profileTestFSDirectory();
-      }
-      finally {
-         test.afterTest();
-      }
-      test.beforeTest();
-      try {
-         test.profileInfinispanLocalDirectory();
-      }
-      finally {
-         test.afterTest();
-      }
-      test.beforeTest();
-      try {
-         test.profileTestInfinispanDirectoryWithNetworkDelayZero();
-      }
-      finally {
-         test.afterTest();
-      }
+//      test.profileTestRAMDirectory();
+//      test.profileTestFSDirectory();
+//      test.profileInfinispanLocalDirectory();
+      test.profileTestInfinispanDirectoryWithNetworkDelayZero();
+//      test.profileTestInfinispanDirectoryWithHighNetworkDelay4();
+//      test.profileTestInfinispanDirectoryWithHighNetworkDelay40();
+      test.afterTest();
    }
 
 }
