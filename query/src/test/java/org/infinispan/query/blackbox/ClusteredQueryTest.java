@@ -104,7 +104,7 @@ public class ClusteredQueryTest extends MultipleCacheManagersTest {
       populateCache();
 
       // applying sort
-      SortField sortField = new SortField("age", SortField.INT);
+      SortField sortField = new SortField("age", SortField.Type.INT);
       Sort sort = new Sort(sortField);
       cacheQuery.sort(sort);
 
@@ -142,7 +142,7 @@ public class ClusteredQueryTest extends MultipleCacheManagersTest {
       populateCache();
 
       // applying sort
-      SortField sortField = new SortField("age", SortField.INT);
+      SortField sortField = new SortField("age", SortField.Type.INT);
       Sort sort = new Sort(sortField);
       cacheQuery.sort(sort);
 
@@ -196,7 +196,7 @@ public class ClusteredQueryTest extends MultipleCacheManagersTest {
       populateCache();
 
       // applying sort
-      SortField sortField = new SortField("age", SortField.INT);
+      SortField sortField = new SortField("age", SortField.Type.INT);
       Sort sort = new Sort(sortField);
       cacheQuery.sort(sort);
 
@@ -223,7 +223,7 @@ public class ClusteredQueryTest extends MultipleCacheManagersTest {
       cacheQuery.maxResults(1);
 
       // applying sort
-      SortField sortField = new SortField("age", SortField.INT);
+      SortField sortField = new SortField("age", SortField.Type.INT);
       Sort sort = new Sort(sortField);
       cacheQuery.sort(sort);
 
@@ -235,16 +235,8 @@ public class ClusteredQueryTest extends MultipleCacheManagersTest {
 
    private void populateCache() throws ParseException {
       prepareTestData();
-      Query[] queries = new Query[2];
       queryParser = createQueryParser("blurb");
-
-      luceneQuery = queryParser.parse("eats");
-      queries[0] = luceneQuery;
-
-      luceneQuery = queryParser.parse("playing");
-      queries[1] = luceneQuery;
-
-      luceneQuery = luceneQuery.combine(queries);
+      luceneQuery = queryParser.parse("eats OR playing");
       cacheQuery = Search.getSearchManager(cacheAMachine1).getClusteredQuery(luceneQuery);
    }
 

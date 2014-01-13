@@ -10,14 +10,15 @@ import java.util.concurrent.locks.Lock;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.infinispan.CacheManagerServiceProvider;
+import org.hibernate.search.infinispan.CacheManagerService;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.distribution.DistributionManager;
 import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.query.backend.ComponentRegistryServiceProvider;
+import org.infinispan.query.backend.ComponentRegistryService;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.Transport;
@@ -49,13 +50,16 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
    private String cacheName;
    private DirectoryBasedIndexManager indexManager;
    private HashSet<Class> knownTypes = new HashSet<Class>(10);
+   private ServiceManager serviceManager;
 
    @Override
    public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
       this.context = context;
       this.indexManager = indexManager;
-      this.cacheManager = context.requestService(CacheManagerServiceProvider.class);
-      final ComponentRegistry componentsRegistry = context.requestService(ComponentRegistryServiceProvider.class);
+      serviceManager = context.getServiceManager();
+      CacheManagerService cacheManagerService = serviceManager.requestService(CacheManagerService.class);
+      this.cacheManager = cacheManagerService.getEmbeddedCacheManager();
+      final ComponentRegistry componentsRegistry = serviceManager.requestService(ComponentRegistryService.class).getComponentRegistry();
       this.indexName = indexManager.getIndexName();
       this.rpcManager = componentsRegistry.getComponent(RpcManager.class);
       this.cacheName = componentsRegistry.getCacheName();
@@ -65,8 +69,8 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
 
    @Override
    public void close() {
-      context.releaseService(CacheManagerServiceProvider.class);
-      context.releaseService(ComponentRegistryServiceProvider.class);
+      serviceManager.releaseService(ComponentRegistryService.class);
+      serviceManager.releaseService(CacheManagerService.class);
       context = null;
       cacheManager = null;
    }

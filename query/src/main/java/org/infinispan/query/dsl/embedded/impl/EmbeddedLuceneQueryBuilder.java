@@ -58,7 +58,7 @@ class EmbeddedLuceneQueryBuilder extends BaseQueryBuilder<LuceneQuery> {
             //TODO [anistor] sort type is not entirely correct
             PropertyMetadata propMetadata = getPropertyMetadata(parsingResult.getTargetEntity(), sc.getAttributePath());
             DocumentFieldMetadata fm = propMetadata.getFieldMetadata().iterator().next();
-            int sortType = fm.isNumeric() ? SortField.INT : SortField.STRING;
+            SortField.Type sortType = fm.isNumeric() ? SortField.Type.INT : SortField.Type.STRING;
             sortField[i++] = new SortField(sc.getAttributePath(), sortType, sc.getSortOrder() == SortOrder.DESC);
          }
          sort = new Sort(sortField);

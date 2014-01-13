@@ -5,10 +5,10 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.impl.SearchMappingBuilder;
-import org.hibernate.search.infinispan.CacheManagerServiceProvider;
-import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.infinispan.CacheManagerService;
 import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.manager.EmbeddedCacheManager;
 
@@ -34,7 +34,7 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
    private final Map<String, Class<?>> classes;
    private final Properties properties;
    private final SearchMapping searchMapping;
-   private final Map<Class<? extends ServiceProvider<?>>, Object> providedServices;
+   private final Map<Class<? extends Service>, Object> providedServices;
    private final IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
 
    public SearchableCacheConfiguration(Class<?>[] classArray, Properties properties, EmbeddedCacheManager uninitializedCacheManager, ComponentRegistry cr) {
@@ -66,11 +66,11 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
       }
    }
 
-   private static Map<Class<? extends ServiceProvider<?>>, Object> initializeProvidedServices(EmbeddedCacheManager uninitializedCacheManager, ComponentRegistry cr) {
+   private static Map<Class<? extends Service>, Object> initializeProvidedServices(EmbeddedCacheManager uninitializedCacheManager, ComponentRegistry cr) {
       //Register the SelfLoopedCacheManagerServiceProvider to allow custom IndexManagers to access the CacheManager
       HashMap map = new HashMap(2);
-      map.put(CacheManagerServiceProvider.class, uninitializedCacheManager);
-      map.put(ComponentRegistryServiceProvider.class, cr);
+      map.put(CacheManagerService.class, new CacheManagerServiceProvider(uninitializedCacheManager));
+      map.put(ComponentRegistryService.class, new ComponentRegistryService(cr));
       return Collections.unmodifiableMap(map);
    }
 
@@ -105,7 +105,7 @@ public class SearchableCacheConfiguration extends SearchConfigurationBase implem
    }
 
    @Override
-   public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+   public Map<Class<? extends Service>, Object> getProvidedServices(){
       return providedServices;
    }
 

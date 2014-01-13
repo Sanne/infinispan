@@ -414,16 +414,9 @@ public class ClusteredCacheTest extends MultipleCacheManagersTest {
    public void testClear() throws Exception {
       prepareTestData();
       queryParser = createQueryParser("blurb");
-      luceneQuery = queryParser.parse("eats");
+      luceneQuery = queryParser.parse("eats OR playing");
       cacheQuery = Search.getSearchManager(cache1).getQuery(luceneQuery);
 
-      Query[] queries = new Query[2];
-      queries[0] = luceneQuery;
-
-      luceneQuery = queryParser.parse("playing");
-      queries[1] = luceneQuery;
-
-      Query luceneQuery = queries[0].combine(queries);
       CacheQuery cacheQuery = Search.getSearchManager(cache1).getQuery(luceneQuery);
       AssertJUnit.assertEquals(3, cacheQuery.getResultSize());
 
