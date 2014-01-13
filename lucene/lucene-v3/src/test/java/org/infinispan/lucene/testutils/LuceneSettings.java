@@ -3,7 +3,7 @@ package org.infinispan.lucene.testutils;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
@@ -38,7 +38,6 @@ public class LuceneSettings {
       }
       LogMergePolicy mergePolicy = new LogByteSizeMergePolicy();
       mergePolicy.setMaxMergeDocs(maxMergeDocs);
-      mergePolicy.setUseCompoundFile(false);
       indexWriterConfig.setMergePolicy(mergePolicy);
       return new IndexWriter(directory, indexWriterConfig);
    }
