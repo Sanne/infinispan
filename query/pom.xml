@@ -42,6 +42,12 @@
       <dependency>
          <groupId>org.hibernate</groupId>
          <artifactId>hibernate-search-engine</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.tukaani</groupId>
+               <artifactId>xz</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
