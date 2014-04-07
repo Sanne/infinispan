@@ -13,4 +13,22 @@ public interface ExternalizerIds {
 
    Integer FILTER_AND_CONVERTER = 1610;
 
+   Integer LUCENE_QUERY_BOOLEAN = 1650;
+
+   Integer LUCENE_QUERY_TERM = 1651;
+
+   Integer LUCENE_TERM = 1640;
+
+   Integer LUCENE_SORT = 1641;
+
+   Integer LUCENE_SORT_FIELD = 1642;
+
+   Integer LUCENE_TOPDOCS = 1643;
+
+   Integer CLUSTERED_QUERY_TOPDOCS = 1644;
+
+   Integer LUCENE_SCORE_DOC = 1645;
+
+   Integer LUCENE_TOPFIELDDOCS = 1646;
+
 }
