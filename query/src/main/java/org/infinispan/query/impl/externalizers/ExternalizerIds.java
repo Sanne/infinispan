@@ -30,5 +30,7 @@ public interface ExternalizerIds {
    Integer LUCENE_SCORE_DOC = 1645;
 
    Integer LUCENE_TOPFIELDDOCS = 1646;
+   
+   Integer LUCENE_FIELD_SCORE_DOC = 1647;
 
 }
