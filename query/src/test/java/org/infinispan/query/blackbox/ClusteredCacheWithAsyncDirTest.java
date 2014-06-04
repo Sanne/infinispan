@@ -9,7 +9,9 @@ import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.persistence.jdbc.configuration.AbstractJdbcStoreConfigurationBuilder;
+import org.infinispan.test.TestingUtil;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -29,6 +31,15 @@ public class ClusteredCacheWithAsyncDirTest extends ClusteredCacheTest {
       cache1 = cacheManagers.get(0).getCache("JDBCBased_LocalIndex");
       cache2 = cacheManagers.get(1).getCache("JDBCBased_LocalIndex");
    }
+
+    @AfterMethod(alwaysRun=true)
+    protected void clearContent() throws Throwable {
+        //Explicit clear to reset index state as well
+        cache1.clear();
+        cache2.clear();
+        //Deep-clean of any other pending state
+        TestingUtil.clearContent(cacheManagers);
+    }
 
    private EmbeddedCacheManager createCacheManager(int nodeIndex) throws Exception {
       InputStream is = new FileLookup().lookupFileStrict("async-store-config.xml",

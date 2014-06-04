@@ -22,7 +22,9 @@ import org.infinispan.query.test.CustomKey3Transformer;
 import org.infinispan.query.test.Person;
 import org.infinispan.test.MultipleCacheManagersTest;
 import org.infinispan.test.TestingUtil;
+import org.infinispan.test.fwk.CleanupAfterTest;
 import org.testng.AssertJUnit;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import javax.transaction.TransactionManager;
@@ -40,6 +42,7 @@ import static org.infinispan.query.helper.TestQueryHelperFactory.createQueryPars
  * @author Sanne Grinovero
  */
 @Test(groups = "functional", testName = "query.blackbox.ClusteredCacheTest")
+@CleanupAfterTest
 public class ClusteredCacheTest extends MultipleCacheManagersTest {
 
    Cache cache1, cache2;
@@ -55,12 +58,21 @@ public class ClusteredCacheTest extends MultipleCacheManagersTest {
    final String key3 = "MiniGoat";
 
    public ClusteredCacheTest() {
-      cleanup = CleanupPhase.AFTER_METHOD;
+      cleanup = CleanupPhase.AFTER_TEST;
    }
 
    protected void enhanceConfig(ConfigurationBuilder cacheCfg) {
       // meant to be overridden
    }
+
+    @AfterMethod(alwaysRun=true)
+    protected void clearContent() throws Throwable {
+        //Explicit clear to reset index state as well
+        cache1.clear();
+        cache2.clear();
+        //Deep-clean of any other pending state
+        TestingUtil.clearContent(cacheManagers);
+    }
 
    @Override
    protected void createCacheManagers() throws Throwable {
