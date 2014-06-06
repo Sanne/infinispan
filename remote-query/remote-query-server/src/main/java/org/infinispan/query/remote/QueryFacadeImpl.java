@@ -151,15 +151,15 @@ public class QueryFacadeImpl implements QueryFacade {
                Descriptors.FieldDescriptor fd = getFieldDescriptor(md, propertyPath);
                switch (fd.getType()) {
                   case DOUBLE:
-                     return new NullEncodingTwoWayFieldBridge(NumericFieldBridge.DOUBLE_FIELD_BRIDGE, NULL_TOKEN);
+                     return NumericFieldBridge.DOUBLE_FIELD_BRIDGE;
                   case FLOAT:
-                     return new NullEncodingTwoWayFieldBridge(NumericFieldBridge.FLOAT_FIELD_BRIDGE, NULL_TOKEN);
+                     return NumericFieldBridge.FLOAT_FIELD_BRIDGE;
                   case INT64:
                   case UINT64:
                   case FIXED64:
                   case SFIXED64:
                   case SINT64:
-                     return new NullEncodingTwoWayFieldBridge(NumericFieldBridge.LONG_FIELD_BRIDGE, NULL_TOKEN);
+                     return NumericFieldBridge.LONG_FIELD_BRIDGE;
                   case INT32:
                   case FIXED32:
                   case UINT32:
@@ -167,7 +167,7 @@ public class QueryFacadeImpl implements QueryFacade {
                   case SINT32:
                   case BOOL:
                   case ENUM:
-                     return new NullEncodingTwoWayFieldBridge(NumericFieldBridge.INT_FIELD_BRIDGE, NULL_TOKEN);
+                     return NumericFieldBridge.INT_FIELD_BRIDGE;
                   case STRING:
                   case BYTES:
                   case GROUP:
