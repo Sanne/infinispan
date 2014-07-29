@@ -2,7 +2,7 @@ package org.infinispan.query.indexmanager;
 
 import java.util.Properties;
 
-import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
@@ -23,12 +23,19 @@ public class InfinispanIndexManager extends DirectoryBasedIndexManager {
    private InfinispanCommandsBackend remoteMaster;
 
    protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-      BackendQueueProcessor localMaster = BackendFactory.createBackend(this, buildContext, cfg);
+      BackendQueueProcessor localMaster = createLocalLuceneBackend(cfg, buildContext);
       remoteMaster = new InfinispanCommandsBackend();
       remoteMaster.initialize(cfg, buildContext, this);
       //localMaster is already initialized by the BackendFactory
       MasterSwitchDelegatingQueueProcessor joinedMaster = new MasterSwitchDelegatingQueueProcessor(localMaster, remoteMaster);
       return joinedMaster;
+   }
+
+   private BackendQueueProcessor createLocalLuceneBackend(Properties cfg, WorkerBuildContext buildContext) {
+      //Rather than using the BackendFactory, we force specifically the creation of a LuceneBackendQueueProcessor:
+      LuceneBackendQueueProcessor luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
+      luceneBackendQueueProcessor.initialize(cfg, buildContext, this);
+      return luceneBackendQueueProcessor;
    }
 
    protected DirectoryProvider createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {
