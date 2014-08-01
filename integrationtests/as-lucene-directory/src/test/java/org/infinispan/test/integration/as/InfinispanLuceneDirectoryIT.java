@@ -1,6 +1,5 @@
 package org.infinispan.test.integration.as;
 
-import com.google.common.base.Joiner;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -81,10 +80,9 @@ public class InfinispanLuceneDirectoryIT {
 
    @Deployment
    public static Archive<?> deployment() {
-      String dependencies = deps(
-            dep("org.infinispan", Version.MODULE_SLOT),
-            dep("org.infinispan.lucene-directory", Version.MODULE_SLOT)
-      );
+      String dependencies =
+            dep("org.infinispan", Version.MODULE_SLOT) + ", " +
+            dep("org.infinispan.lucene-directory", Version.MODULE_SLOT);
       StringAsset manifest = new StringAsset(
             Descriptors.create(ManifestDescriptor.class).attribute("Dependencies", dependencies).exportAsString());
       return ShrinkWrap.create(WebArchive.class, "lucene.war")
@@ -197,10 +195,6 @@ public class InfinispanLuceneDirectoryIT {
 
    private static String dep(String name, String version) {
       return name + ":" + version + " services";
-   }
-
-   private static String deps(String... dep) {
-      return Joiner.on(", ").join(dep);
    }
 
 }
