@@ -49,21 +49,23 @@ public class PerformanceCompareStressTest {
    private static final int DICTIONARY_SIZE = 800 * 1000;
 
    /** Concurrent Threads in tests */
-   private static final int READER_THREADS = 5;
+   private static final int READER_THREADS = 0;
    private static final int WRITER_THREADS = 1;
 
-   private static final int CHUNK_SIZE = 512 * 1024;
+   private static final int CHUNK_SIZE = 300;//512 * 1024;
 
    private static final String indexName = "tempIndexName";
 
-   private static final long DEFAULT_DURATION_MS = 2 * 60 * 1000;
+   private static final long DEFAULT_DURATION_MS = 2 * 60 * 1000 *20;
    private long durationMs = DEFAULT_DURATION_MS;
 
    private Cache cache;
 
-   private EmbeddedCacheManager cacheFactory;
+   private EmbeddedCacheManager cacheFactory1;
    private Properties results = null;
    private String currentMethod = null;
+
+   private EmbeddedCacheManager cacheFactory2;
 
    @Test
    public void profileTestRAMDirectory() throws InterruptedException, IOException {
@@ -73,7 +75,8 @@ public class PerformanceCompareStressTest {
 
    @Test
    public void profileTestFSDirectory() throws InterruptedException, IOException {
-      File indexDir = new File(TestingUtil.tmpDirectory(this.getClass()), indexName);
+      System.out.println("profileTestFSDirectory");
+      File indexDir = new File(TestingUtil.tmpDirectory(this.getClass()), indexName+"2");
       boolean directoriesCreated = indexDir.mkdirs();
       assert directoriesCreated : "couldn't create directory for FSDirectory test";
       FSDirectory dir = FSDirectory.open(indexDir);
@@ -81,24 +84,26 @@ public class PerformanceCompareStressTest {
    }
 
    @Test
-   public void profileTestInfinispanDirectoryWithNetworkDelayZero() throws InterruptedException, IOException {
-      // TestingUtil.setDelayForCache(cache, 0, 0);
+   public void profileTestInfinispanDirectoryWithNetworkDelayZero() throws Exception {
+      System.out.println("profileTestInfinispanDirectoryWithNetworkDelayZero");
+      TestingUtil.setDelayForCache(cache, 0, 0);
       Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
       stressTestDirectoryInternal(dir, "InfinispanClustered-delayedIO:0");
       verifyDirectoryState();
    }
 
    @Test
-   public void profileTestInfinispanDirectoryWithNetworkDelay4() throws Exception {
-      TestingUtil.setDelayForCache(cache, 4, 4);
+   public void profileTestInfinispanDirectoryWithNetworkDelay1() throws Exception {
+      System.out.println("profileTestInfinispanDirectoryWithNetworkDelay1");
+      TestingUtil.setDelayForCache(cache, 1, 1);
       Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
-      stressTestDirectoryInternal(dir, "InfinispanClustered-delayedIO:4");
+      stressTestDirectoryInternal(dir, "InfinispanClustered-delayedIO:1");
       verifyDirectoryState();
    }
 
    @Test
-   public void profileTestInfinispanDirectoryWithHighNetworkDelay40() throws Exception {
-      TestingUtil.setDelayForCache(cache, 40, 40);
+   public void profileTestInfinispanDirectoryWithHighNetworkDelay4() throws Exception {
+      TestingUtil.setDelayForCache(cache, 4, 4);
       Directory dir = DirectoryBuilder.newDirectoryInstance(cache, cache, cache, indexName).chunkSize(CHUNK_SIZE).create();
       stressTestDirectoryInternal(dir, "InfinispanClustered-delayedIO:40");
       verifyDirectoryState();
@@ -156,33 +161,41 @@ public class PerformanceCompareStressTest {
 
    @BeforeMethod
    public void beforeTest() {
-      cacheFactory = TestCacheManagerFactory.createClusteredCacheManager(
+      cacheFactory1 = TestCacheManagerFactory.createClusteredCacheManager(
             CacheTestSupport.createTestConfiguration(TransactionMode.NON_TRANSACTIONAL));
-      cacheFactory.start();
-      cache = cacheFactory.getCache();
+      cacheFactory2 = TestCacheManagerFactory.createClusteredCacheManager(
+            CacheTestSupport.createTestConfiguration(TransactionMode.NON_TRANSACTIONAL));
+      cacheFactory1.start();
+      cacheFactory2.start();
+      cacheFactory2.getCache();
+      cache = cacheFactory1.getCache();
       cache.clear();
    }
 
    @AfterMethod
    public void afterTest() {
       TestingUtil.killCaches(cache);
-      TestingUtil.killCacheManagers(cacheFactory);
+      TestingUtil.killCacheManagers(cacheFactory1, cacheFactory2);
       TestingUtil.recursiveFileRemove(indexName);
    }
 
    private void verifyDirectoryState() {
-      DirectoryIntegrityCheck.verifyDirectoryStructure(cache, indexName, true);
+//      DirectoryIntegrityCheck.verifyDirectoryStructure(cache, indexName, true);
    }
 
    /**
     * It's much better to compare performance out of the scope of TestNG by
     * running this directly as TestNG enables assertions.
+    * 
+    * -Dlucene.profiling.tests=profileInfinispanLocalDirectory,profileTestInfinispanDirectoryWithNetworkDelayZero
     *
     * Suggested test switches:
     * -Xmx4G -Xms4G -XX:MaxPermSize=128M -XX:+HeapDumpOnOutOfMemoryError -Xss512k -XX:HeapDumpPath=/tmp/java_heap -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -XX:+UseLargePages -XX:LargePageSizeInBytes=2m
     *
     * With detailed GC logging:
     * -Xmx4G -Xms4G -XX:MaxPermSize=32M -XX:+HeapDumpOnOutOfMemoryError -Xss256k -XX:HeapDumpPath=/tmp/java_heap -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -XX:+UseLargePages -XX:LargePageSizeInBytes=2m -XX:+UseLargePages -XX:LargePageSizeInBytes=2m -Xloggc:gc-full.log -XX:+PrintGCDetails -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime
+    * 
+    * -XX:+UnlockCommercialFeatures -XX:+FlightRecorder
     */
    public static void main(String[] args) throws Exception {
       String[] testMethods = System.getProperty("lucene.profiling.tests",

@@ -28,6 +28,7 @@ public class InfinispanIndexOutput {
 
    private static final Log log = LogFactory.getLog(InfinispanIndexOutput.class);
    private static final boolean trace = log.isTraceEnabled();
+   private static final int MIN_BUFFER_SIZE = 20;
    private static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE / 16; //Something reasonable to handle
 
    private final int bufferSize;
@@ -37,7 +38,6 @@ public class InfinispanIndexOutput {
    private final FileMetadata file;
    private final FileCacheKey fileKey;
    private final FileListOperations fileOps;
-   private final IOContext context;
 
    private byte[] buffer;
 
@@ -66,31 +66,30 @@ public class InfinispanIndexOutput {
    }
 
    private static int calibrateBufferSize(final int userBufferSize, final IOContext context) {
+      final int lowerBoundary = Math.max(MIN_BUFFER_SIZE, userBufferSize);
       final FlushInfo flushInfo = context.flushInfo;
       if (flushInfo != null) {
-         final long estimated = flushInfo.estimatedSegmentSize;
-         return calibrationHint(userBufferSize, estimated);
+         return calibrationHint(lowerBoundary, flushInfo.estimatedSegmentSize);
       }
       final MergeInfo mergeInfo = context.mergeInfo;
       if (mergeInfo != null) {
-         final long estimated = mergeInfo.estimatedMergeBytes;
-         return calibrationHint(userBufferSize, estimated);
+         return calibrationHint(lowerBoundary, mergeInfo.estimatedMergeBytes);
       }
-      return userBufferSize;
+      return lowerBoundary;
    }
 
-   private static int calibrationHint(final int userBufferSize, final long estimated) {
-      if (estimated > 0) {
+   private static int calibrationHint(final int lowerBoundary, final long estimated) {
+      if (estimated > MIN_BUFFER_SIZE) {
          //Use average as a simple way to go for largest suggestion as order of magnitude, but slightly conservative.
          //The idea is that a single extra chunk is ok, and the estimated value is usually way too high.
-         final long proposed = (estimated + userBufferSize) / 2;
+         final long proposed = (estimated + lowerBoundary) / 2;
          if (proposed > MAX_BUFFER_SIZE) {
             return MAX_BUFFER_SIZE;
          }
          return (int)proposed;
       }
       else {
-         return userBufferSize;
+         return lowerBoundary;
       }
    }
 
