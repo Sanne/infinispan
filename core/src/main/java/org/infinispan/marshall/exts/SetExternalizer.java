@@ -7,6 +7,7 @@ import org.infinispan.commons.marshall.AbstractExternalizer;
 import org.infinispan.commons.marshall.MarshallUtil;
 import org.infinispan.commons.util.Util;
 import org.infinispan.marshall.core.Ids;
+import org.infinispan.util.concurrent.ConcurrentHashSet;
 import org.jboss.marshalling.util.IdentityIntMap;
 
 import java.io.IOException;
@@ -27,11 +28,13 @@ import java.util.TreeSet;
 public class SetExternalizer extends AbstractExternalizer<Set> {
    private static final int HASH_SET = 0;
    private static final int TREE_SET = 1;
+   private static final int CC_HASH_SET = 2;
    private final IdentityIntMap<Class<?>> numbers = new IdentityIntMap<Class<?>>(2);
 
    public SetExternalizer() {
       numbers.put(HashSet.class, HASH_SET);
       numbers.put(TreeSet.class, TREE_SET);
+      numbers.put(ConcurrentHashSet.class, CC_HASH_SET);
    }
 
    @Override
@@ -56,6 +59,9 @@ public class SetExternalizer extends AbstractExternalizer<Set> {
             Comparator comparator = (Comparator) input.readObject();
             subject = new TreeSet(comparator);
             break;
+         case CC_HASH_SET:
+            subject = new ConcurrentHashSet<>();
+            break;
       }
       int size = UnsignedNumeric.readUnsignedInt(input);
       for (int i = 0; i < size; i++) subject.add(input.readObject());
@@ -69,7 +75,7 @@ public class SetExternalizer extends AbstractExternalizer<Set> {
 
    @Override
    public Set<Class<? extends Set>> getTypeClasses() {
-      return Util.<Class<? extends Set>>asSet(HashSet.class, TreeSet.class);
+      return Util.<Class<? extends Set>>asSet(HashSet.class, TreeSet.class, ConcurrentHashSet.class);
    }
 
 }
