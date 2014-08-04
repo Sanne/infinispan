@@ -1,5 +1,6 @@
 package org.infinispan.lucene.impl;
 
+import org.apache.lucene.store.IOContext;
 import org.infinispan.AdvancedCache;
 import org.infinispan.lucene.ChunkCacheKey;
 import org.infinispan.lucene.FileCacheKey;
@@ -12,13 +13,15 @@ public final class IndexInputContext {
    final FileCacheKey fileKey;
    final FileMetadata fileMetadata;
    final SegmentReadLocker readLocks;
+   final IOContext context;
 
    public IndexInputContext(AdvancedCache<ChunkCacheKey, Object> chunksCache, FileCacheKey fileKey, FileMetadata fileMetadata,
-         SegmentReadLocker readLocks) {
+         SegmentReadLocker readLocks, IOContext context) {
             this.chunksCache = chunksCache;
             this.fileKey = fileKey;
             this.fileMetadata = fileMetadata;
             this.readLocks = readLocks;
+            this.context = context;
    }
 
 }

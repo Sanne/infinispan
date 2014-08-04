@@ -85,7 +85,7 @@ class DirectoryLuceneV4 extends Directory implements DirectoryExtensions {
     */
    @Override
    public IndexOutput createOutput(final String name, final IOContext context) throws IOException {
-      return impl.createOutput(name);
+      return impl.createOutput(name, context);
    }
 
    /**
@@ -93,7 +93,7 @@ class DirectoryLuceneV4 extends Directory implements DirectoryExtensions {
     */
    @Override
    public IndexInput openInput(final String name, final IOContext context) throws IOException {
-      final IndexInputContext indexInputContext = impl.openInput(name);
+      final IndexInputContext indexInputContext = impl.openInput(name, context);
       if ( indexInputContext.readLocks == null ) {
          return new SingleChunkIndexInput(indexInputContext);
       }

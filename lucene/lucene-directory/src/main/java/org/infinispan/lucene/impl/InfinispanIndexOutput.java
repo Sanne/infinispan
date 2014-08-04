@@ -2,6 +2,9 @@ package org.infinispan.lucene.impl;
 
 import java.io.IOException;
 
+import org.apache.lucene.store.FlushInfo;
+import org.apache.lucene.store.IOContext;
+import org.apache.lucene.store.MergeInfo;
 import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.context.Flag;
@@ -25,6 +28,7 @@ public class InfinispanIndexOutput {
 
    private static final Log log = LogFactory.getLog(InfinispanIndexOutput.class);
    private static final boolean trace = log.isTraceEnabled();
+   private static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE / 16; //Something reasonable to handle
 
    private final int bufferSize;
    private final Cache<ChunkCacheKey, Object> chunksCache;
@@ -33,6 +37,7 @@ public class InfinispanIndexOutput {
    private final FileMetadata file;
    private final FileCacheKey fileKey;
    private final FileListOperations fileOps;
+   private final IOContext context;
 
    private byte[] buffer;
 
@@ -45,18 +50,47 @@ public class InfinispanIndexOutput {
    private long filePosition = 0;
    private int currentChunkNumber = 0;
 
-   public InfinispanIndexOutput(final AdvancedCache<FileCacheKey, FileMetadata> metadataCache, final AdvancedCache<ChunkCacheKey, Object> chunksCache, final FileCacheKey fileKey, final int bufferSize, final FileListOperations fileList) {
+   public InfinispanIndexOutput(final AdvancedCache<FileCacheKey, FileMetadata> metadataCache, final AdvancedCache<ChunkCacheKey, Object> chunksCache, final FileCacheKey fileKey, final int userBufferSize, final FileListOperations fileList, IOContext context) {
       this.metadataCache = metadataCache;
       this.chunksCache = chunksCache;
       this.chunksCacheForStorage = chunksCache.withFlags(Flag.IGNORE_RETURN_VALUES);
       this.fileKey = fileKey;
-      this.bufferSize = bufferSize;
+      this.bufferSize = calibrateBufferSize(userBufferSize, context);
       this.fileOps = fileList;
       this.buffer = new byte[this.bufferSize];
       this.firstChunkBuffer = buffer;
-      this.file = new FileMetadata(bufferSize);
+      this.file = new FileMetadata(this.bufferSize);
       if (trace) {
          log.tracef("Opened new IndexOutput for file:%s in index: %s", fileKey.getFileName(), fileKey.getIndexName());
+      }
+   }
+
+   private static int calibrateBufferSize(final int userBufferSize, final IOContext context) {
+      final FlushInfo flushInfo = context.flushInfo;
+      if (flushInfo != null) {
+         final long estimated = flushInfo.estimatedSegmentSize;
+         return calibrationHint(userBufferSize, estimated);
+      }
+      final MergeInfo mergeInfo = context.mergeInfo;
+      if (mergeInfo != null) {
+         final long estimated = mergeInfo.estimatedMergeBytes;
+         return calibrationHint(userBufferSize, estimated);
+      }
+      return userBufferSize;
+   }
+
+   private static int calibrationHint(final int userBufferSize, final long estimated) {
+      if (estimated > 0) {
+         //Use average as a simple way to go for largest suggestion as order of magnitude, but slightly conservative.
+         //The idea is that a single extra chunk is ok, and the estimated value is usually way too high.
+         final long proposed = (estimated + userBufferSize) / 2;
+         if (proposed > MAX_BUFFER_SIZE) {
+            return MAX_BUFFER_SIZE;
+         }
+         return (int)proposed;
+      }
+      else {
+         return userBufferSize;
       }
    }
 

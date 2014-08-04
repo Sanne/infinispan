@@ -3,6 +3,7 @@ package org.infinispan.lucene.impl;
 import java.io.IOException;
 
 import org.apache.lucene.store.BufferedIndexOutput;
+import org.apache.lucene.store.IOContext;
 import org.infinispan.AdvancedCache;
 import org.infinispan.lucene.ChunkCacheKey;
 import org.infinispan.lucene.FileCacheKey;
@@ -22,9 +23,9 @@ public final class CheckSummingIndexOutput extends BufferedIndexOutput {
 
    private final InfinispanIndexOutput delegateOutput;
 
-   public CheckSummingIndexOutput(AdvancedCache<FileCacheKey, FileMetadata> metadataCache, AdvancedCache<ChunkCacheKey, Object> chunksCache, FileCacheKey fileKey, int bufferSize, FileListOperations fileList) {
+   public CheckSummingIndexOutput(AdvancedCache<FileCacheKey, FileMetadata> metadataCache, AdvancedCache<ChunkCacheKey, Object> chunksCache, FileCacheKey fileKey, int bufferSize, FileListOperations fileList, IOContext context) {
       super();
-      delegateOutput = new InfinispanIndexOutput(metadataCache, chunksCache, fileKey, bufferSize, fileList);
+      delegateOutput = new InfinispanIndexOutput(metadataCache, chunksCache, fileKey, bufferSize, fileList, context);
    }
 
    @Override
