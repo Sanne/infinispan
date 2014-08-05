@@ -1,8 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<infinispan
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="urn:infinispan:config:7.0 http://www.infinispan.org/schemas/infinispan-config-7.0.xsd"
-      xmlns="urn:infinispan:config:7.0">
+<?xml version='1.0' encoding='UTF-8'?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:infinispan:config:7.0 http://www.infinispan.org/schemas/infinispan-config-7.0.xsd" xmlns="urn:infinispan:config:7.0">
 
    <cache-container default-cache="default" statistics="false">
       <jmx duplicate-domains="true" />
@@ -70,5 +67,73 @@
          <indexing index="NONE" />
       </replicated-cache>
    </cache-container>
+
+        <local-cache name="default" />
+
+       <distributed-cache name="dist_lucene" owners="2" segments="512">
+          <locking acquire-timeout="3000" concurrency-level="1000" />
+          <transaction mode="NONE" />
+          <indexing index="LOCAL">
+             <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
+             <property name="default.exclusive_index_use">true</property>
+             <property name="default.chunk_size">128000</property>
+             <property name="default.indexwriter.merge_factor">30</property>
+             <property name="default.indexwriter.merge_max_size">1024</property>
+             <property name="default.indexwriter.ram_buffer_size">256</property>
+             <property name="default.metadata_cachename">lucene_metadata_repl</property>
+             <property name="default.data_cachename">lucene_data_dist</property>
+             <property name="default.locking_cachename">lucene_locking_repl</property>
+             <property name="hibernate.search.lucene_version">LUCENE_48</property>
+          </indexing>
+       </distributed-cache>
+
+       <replicated-cache name="repl_ram">
+          <locking acquire-timeout="3000" concurrency-level="1000"></locking>
+          <transaction mode="NONE" />
+          <indexing index="ALL">
+             <property name="default.directory_provider">ram</property>
+             <property name="default.indexmanager">near-real-time</property>
+             <property name="default.exclusive_index_use">true</property>
+             <property name="hibernate.search.lucene_version">LUCENE_48</property>
+          </indexing>
+       </replicated-cache>
+
+       <local-cache name="local_ram">
+          <locking acquire-timeout="3000" concurrency-level="1000"></locking>
+          <transaction mode="NONE" />
+          <indexing index="ALL">
+             <property name="default.directory_provider">ram</property>
+             <property name="default.indexmanager">near-real-time</property>
+             <property name="default.exclusive_index_use">true</property>
+             <property name="hibernate.search.lucene_version">LUCENE_48</property>
+          </indexing>
+       </local-cache>
+
+       <local-cache name="local_fs">
+          <locking acquire-timeout="3000" concurrency-level="1000"></locking>
+          <transaction mode="NONE" />
+          <indexing index="ALL">
+             <property name="default.directory_provider">filesystem</property>
+             <property name="default.indexmanager">near-real-time</property>
+             <property name="default.indexBase">/tmp/ispn_fs_index/${log4j.file.prefix}</property>
+             <property name="default.exclusive_index_use">true</property>
+             <property name="hibernate.search.default.locking_strategy">single</property>
+             <property name="hibernate.search.lucene_version">LUCENE_48</property>
+          </indexing>
+       </local-cache>
+
+       <replicated-cache name="lucene_metadata_repl" mode="SYNC" remote-timeout="25000">
+          <indexing index="NONE" />
+       </replicated-cache>
+
+       <distributed-cache name="lucene_data_dist" mode="SYNC" remote-timeout="25000">
+          <indexing index="NONE" />
+       </distributed-cache>
+
+       <replicated-cache name="lucene_locking_repl" mode="SYNC" remote-timeout="25000">
+          <indexing index="NONE" />
+       </replicated-cache>
+
+    </cache-container>
 
 </infinispan>
