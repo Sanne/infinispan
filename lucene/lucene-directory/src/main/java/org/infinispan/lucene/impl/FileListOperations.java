@@ -41,7 +41,7 @@ public final class FileListOperations {
       final FileListCacheValue fileList = getFileList();
       boolean done = fileList.add(fileName);
       if (done) {
-         cacheNoRetrieve.put(fileListCacheKey, fileList);
+         cacheNoRetrieve.putAsync(fileListCacheKey, fileList);
          if (trace)
             log.trace("Updated file listing: added " + fileName);
       }
@@ -66,7 +66,7 @@ public final class FileListOperations {
       FileListCacheValue fileList = getFileList();
       boolean done = fileList.addAndRemove(toAdd, toRemove);
       if (done) {
-         cacheNoRetrieve.put(fileListCacheKey, fileList);
+         cacheNoRetrieve.putAsync(fileListCacheKey, fileList);
          if (trace && done) {
             log.trace("Updated file listing: added " + toAdd + " and removed " + toRemove);
          }
@@ -96,7 +96,7 @@ public final class FileListOperations {
       FileListCacheValue fileList = getFileList();
       boolean done = fileList.remove(fileName);
       if (done) {
-         cacheNoRetrieve.put(fileListCacheKey, fileList);
+         cacheNoRetrieve.putAsync(fileListCacheKey, fileList);
          if (trace)
             log.trace("Updated file listing: removed " + fileName);
       }
