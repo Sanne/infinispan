@@ -9,13 +9,13 @@ import org.infinispan.Cache;
 import org.infinispan.commons.api.BasicCacheContainer;
 import org.infinispan.commons.util.Util;
 import org.infinispan.context.Flag;
+import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.CacheQuery;
 import org.infinispan.query.Search;
 import org.infinispan.query.SearchManager;
 import org.infinispan.query.queries.faceting.Car;
 import org.infinispan.test.MultipleCacheManagersTest;
-import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.testng.annotations.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,9 +35,10 @@ import static org.junit.Assert.assertEquals;
 @Test(groups = "profiling", testName = "query.distributed.PerfTest", singleThreaded = true)
 public class PerfTest extends MultipleCacheManagersTest {
 
-   private static final int NUM_NODES = 4;
-   private static final int LOG_ON_EACH = 2000;
-   private static final int NUMBER_OF_ITERATIONS = 50;
+   private static final int NUM_NODES = 5;
+   private static final int LOG_ON_EACH = 50000;
+   private static final int NUMBER_OF_ITERATIONS = 500;
+   private static final String CACHE_NAME = "dist_lucene";
 
    private static final String[] neededCacheNames = new String[]{
          BasicCacheContainer.DEFAULT_CACHE_NAME,
@@ -49,10 +50,10 @@ public class PerfTest extends MultipleCacheManagersTest {
    @Override
    protected void createCacheManagers() throws Throwable {
       for (int i = 0; i < NUM_NODES; i++) {
-         EmbeddedCacheManager cacheManager = TestCacheManagerFactory.fromXml("indexing-perf.xml");
+         EmbeddedCacheManager cacheManager = new DefaultCacheManager("indexing-perf.xml");
          registerCacheManager(cacheManager);
       }
-      waitForClusterToForm(neededCacheNames);
+//      waitForClusterToForm(neededCacheNames);
    }
 
    public void testIndexing() throws Exception {
@@ -79,7 +80,7 @@ public class PerfTest extends MultipleCacheManagersTest {
    }
 
    private Cache<String, Car> getWriteOnlyCache(int cacheId) {
-      Cache<String, Car> cache = cache(cacheId);
+      Cache<String, Car> cache = manager(cacheId).getCache(CACHE_NAME);
       AdvancedCache<String,Car> advancedCache = cache.getAdvancedCache();
       AdvancedCache<String, Car> withFlags = advancedCache.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_INDEX_CLEANUP);
       return withFlags;
@@ -87,7 +88,7 @@ public class PerfTest extends MultipleCacheManagersTest {
 
    private void verifyFindsCar(int expectedCount, String carMake) {
       for (int i = 0; i < NUM_NODES; i++) {
-         verifyFindsCar(cache(i), expectedCount, carMake);
+         verifyFindsCar(manager(i).getCache(CACHE_NAME), expectedCount, carMake);
       }
    }
 

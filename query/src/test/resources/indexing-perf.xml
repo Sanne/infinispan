@@ -70,9 +70,9 @@
 
         <local-cache name="default" />
 
-       <distributed-cache name="dist_lucene" owners="2" segments="512">
+       <distributed-cache name="dist_lucene" owners="2" segments="512" batching="true">
           <locking acquire-timeout="3000" concurrency-level="1000" />
-          <transaction mode="NONE" />
+          <transaction mode="NON_XA" />
           <indexing index="LOCAL">
              <property name="default.indexmanager">org.infinispan.query.indexmanager.InfinispanIndexManager</property>
              <property name="default.exclusive_index_use">true</property>

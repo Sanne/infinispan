@@ -58,7 +58,7 @@ public class PerformanceCompareStressTest {
 
    private static final String indexName = "tempIndexName";
 
-   private static final long DEFAULT_DURATION_MS = 2 * 60 * 1000;
+   private static final long DEFAULT_DURATION_MS = 5 * 60 * 1000;
    private long durationMs = DEFAULT_DURATION_MS;
 
    private final Map<Integer,EmbeddedCacheManager> cacheManagers = new HashMap<>();
