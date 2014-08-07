@@ -1,7 +1,6 @@
 package org.infinispan.query.test;
 
 import org.hibernate.search.annotations.*;
-import org.hibernate.search.bridge.builtin.StringBridge;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -9,7 +8,6 @@ import java.util.Date;
 /**
  * @author Navin Surtani
  */
-@ProvidedId(bridge = @FieldBridge(impl = StringBridge.class))
 @Indexed(index = "person")
 @FullTextFilterDefs({
       @FullTextFilterDef(name = "personFilter", impl = PersonBlurbFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
