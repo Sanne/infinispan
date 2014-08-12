@@ -4,7 +4,6 @@ import org.infinispan.commons.configuration.Builder;
 import org.infinispan.commons.util.TypedProperties;
 import org.infinispan.commons.util.Util;
 import org.infinispan.commons.CacheConfigurationException;
-import org.infinispan.commons.CacheException;
 import org.infinispan.remoting.transport.Transport;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
@@ -205,16 +204,7 @@ public class TransportConfigurationBuilder extends AbstractGlobalConfigurationBu
    }
 
    public TransportConfigurationBuilder defaultTransport() {
-      //Load it from this same classloader, as it's included in the same jar.
-      //Do NOT use Util#loadClass(String, ClassLoader) as it attempts additional
-      //classloaders which we don't need.
-      final Transport transport;
-      try {
-         Class<?> transportClass = Class.forName(DEFAULT_TRANSPORT, true, this.getClass().getClassLoader());
-         transport = (Transport) transportClass.newInstance();
-      } catch (ReflectiveOperationException cause) {
-         throw new CacheException(cause);
-      }
+      Transport transport = Util.getInstance(DEFAULT_TRANSPORT, this.getGlobalConfig().getClassLoader());
       transport(transport);
       return this;
    }
