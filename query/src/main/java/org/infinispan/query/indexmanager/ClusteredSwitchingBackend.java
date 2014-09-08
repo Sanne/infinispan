@@ -68,7 +68,7 @@ final class ClusteredSwitchingBackend implements LazyInitializableBackend {
     * not without disabling index exclusivity which implies the lock will be
     * available in a shorter time.
     */
-   private static final int MAX_LOCK_ACQUISITION_ATTEMPTS = 2;
+   private static final int MAX_LOCK_ACQUISITION_ATTEMPTS = 1000;
 
    private final Address localAddress;
    private final RpcManager rpcManager;
