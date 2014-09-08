@@ -26,6 +26,8 @@ import org.infinispan.util.logging.LogFactory;
  */
 final class IndexManagerBasedLockController implements IndexLockController {
 
+   static final long LOCK_WAIT_MILLISECONDS = 10;
+
    private static final Log log = LogFactory.getLog(IndexManagerBasedLockController.class, Log.class);
 
    private final DirectoryBasedIndexManager indexManager;
@@ -62,7 +64,7 @@ final class IndexManagerBasedLockController implements IndexLockController {
          }
          else {
             try {
-               final boolean obtained = lock.obtain( 10000 );
+               final boolean obtained = lock.obtain(LOCK_WAIT_MILLISECONDS);
                if (obtained) {
                   lock.close();
                   return true;
