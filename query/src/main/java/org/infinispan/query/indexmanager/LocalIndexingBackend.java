@@ -1,6 +1,7 @@
 package org.infinispan.query.indexmanager;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -8,6 +9,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.infinispan.query.logging.Log;
 import org.infinispan.util.logging.LogFactory;
+import org.jboss.logging.Logger;
 
 /**
  * The IndexingBackend which directly couples to the Hibernate Search backend.
@@ -20,6 +22,7 @@ import org.infinispan.util.logging.LogFactory;
 final class LocalIndexingBackend implements IndexingBackend {
 
    private static final Log log = LogFactory.getLog(LocalIndexingBackend.class, Log.class);
+
    private final BackendQueueProcessor localBackend;
 
    public LocalIndexingBackend(BackendQueueProcessor localBackend) {
@@ -29,7 +32,9 @@ final class LocalIndexingBackend implements IndexingBackend {
    @Override
    public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor, DirectoryBasedIndexManager indexManager) {
       log.applyingChangeListLocally(workList);
+      Instant time = TimeBudget.startStopwatch();
       localBackend.applyWork(workList, monitor);
+      TimeBudget.stopStopWatch(time, "LocalIndexingBackend applying WorkList in: ");
    }
 
    @Override
