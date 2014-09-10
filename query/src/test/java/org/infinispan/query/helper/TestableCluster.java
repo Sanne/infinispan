@@ -45,6 +45,8 @@ public final class TestableCluster<K, V> {
 
    private final Random rand = new Random();
 
+   private volatile boolean stopped = false;
+
    @GuardedBy("itself")
    private final Set<Node> allNodes = new HashSet<>();
 
@@ -65,6 +67,7 @@ public final class TestableCluster<K, V> {
    }
 
    public void startNewNode(boolean waitForClusterFormation) {
+      checkStopped();
       synchronized (allNodes) {
          final EmbeddedCacheManager cacheManager;
          try {
@@ -84,6 +87,7 @@ public final class TestableCluster<K, V> {
    }
 
    public void killAll() {
+      stopped = true;
       log.info("SHUTDOWN - killing all nodes aggressively");
       synchronized (allNodes) {
          for (Node n : allNodes) {
@@ -94,11 +98,13 @@ public final class TestableCluster<K, V> {
    }
 
    public void killRandomNode() {
+      checkStopped();
       final Node node = takeAnyNode();
       killNode(node);
    }
 
    public void killMasterNodeForIndex() {
+      checkStopped();
       //Needs to lock around the selection, or the master role might change
       synchronized (allNodes) {
          final Node masterNode = takeMasterNode();
@@ -107,6 +113,7 @@ public final class TestableCluster<K, V> {
    }
 
    private void killNode(final Node node) {
+      checkStopped();
       synchronized (allNodes) {
          String description = node.kill();
          Assert.assertTrue(allNodes.remove(node));
@@ -119,6 +126,7 @@ public final class TestableCluster<K, V> {
     * Returns a node to the pool
     */
    public void returnNode(Node node) {
+      checkStopped();
       //If this is the master node and another thread
       //is looking for it, hand it off directly:
       if (node.isMasterNodeForIndex(indexName)) {
@@ -131,6 +139,7 @@ public final class TestableCluster<K, V> {
    }
 
    public void storeOnAnyNode(K key, V value) throws Exception {
+      checkStopped();
       Node node = takeAnyNode();
       try {
          storeOn(node, key, value);
@@ -141,6 +150,7 @@ public final class TestableCluster<K, V> {
    }
 
    public synchronized void resizeRandomInRange(int min, int max) {
+      checkStopped();
       Assert.assertTrue(min < max);
       synchronized (allNodes) {
          final int currentSize = allNodes.size();
@@ -191,6 +201,7 @@ public final class TestableCluster<K, V> {
    }
 
    public Node takeAnyNode() {
+      checkStopped();
       Node polledNode = availableNodes.poll();
       if (polledNode != null) {
          return polledNode;
@@ -215,6 +226,7 @@ public final class TestableCluster<K, V> {
          Node masterNode = null;
          int loop = 0;
          while (masterNode == null) {
+            checkStopped();
             masterNode = exchangerForMaster.poll(200, TimeUnit.MILLISECONDS);
             if (masterNode == null) {
                //Makes sure the exchanger is refilled from the pool
@@ -230,6 +242,12 @@ public final class TestableCluster<K, V> {
       } catch (InterruptedException e) {
          Thread.currentThread().interrupt();
          throw new RuntimeException("Interrupted while waiting for the Master node to be available", e);
+      }
+   }
+
+   private final void checkStopped() {
+      if (stopped) {
+         throw new IllegalStateException("This cluster was stopped");
       }
    }
 
