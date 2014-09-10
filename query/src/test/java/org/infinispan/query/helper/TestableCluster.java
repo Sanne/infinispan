@@ -8,7 +8,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,7 +23,6 @@ import org.infinispan.query.Search;
 import org.infinispan.query.SearchManager;
 import org.infinispan.query.indexmanager.InfinispanIndexManager;
 import org.infinispan.query.logging.Log;
-import org.infinispan.remoting.transport.Address;
 import org.infinispan.test.TestingUtil;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.jboss.logging.Logger;
@@ -86,6 +84,7 @@ public final class TestableCluster<K, V> {
    }
 
    public void killAll() {
+      log.info("SHUTDOWN - killing all nodes aggressively");
       synchronized (allNodes) {
          for (Node n : allNodes) {
             n.kill();
@@ -163,6 +162,7 @@ public final class TestableCluster<K, V> {
    }
 
    private void storeOn(final Node node, K key, V value) throws Exception {
+      log.trace("Storing something on node: " + node);
       Assert.assertNotNull(node);
       Assert.assertNotNull(node.advancedCache);
       Assert.assertNotNull(key);
@@ -197,7 +197,7 @@ public final class TestableCluster<K, V> {
       }
       else {
          //Might be useful to log this when figuring out why there is no quick progress:
-         //System.out.println("Scarce resources! Thread blocked in wait for available node");
+         System.out.println("Scarce resources! Thread blocked in wait for available node");
          try {
             return availableNodes.take();
          } catch (InterruptedException e) {
@@ -209,19 +209,22 @@ public final class TestableCluster<K, V> {
 
    @GuardedBy("allNodes")//Role of the node might change during invocation if you don't hold this lock
    private Node takeMasterNode() {
+      //Set this flag so that other threads will start helping us
       requestMasterNode.set(true);
       try {
          Node masterNode = null;
+         int loop = 0;
          while (masterNode == null) {
-            masterNode = exchangerForMaster.poll(1, TimeUnit.SECONDS);
+            masterNode = exchangerForMaster.poll(200, TimeUnit.MILLISECONDS);
             if (masterNode == null) {
                //Makes sure the exchanger is refilled from the pool
                //when this is driven by a single threaded test:
                returnNode(takeAnyNode());
             }
-         }
-         if (masterNode == null) {
-            throw new RuntimeException("Timed out while waiting for the Master node to be available");
+            loop++;
+            if (loop > 1000) {
+               throw new RuntimeException("Timed out while waiting for the Master node to be available");
+            }
          }
          return masterNode;
       } catch (InterruptedException e) {
@@ -243,6 +246,7 @@ public final class TestableCluster<K, V> {
 
       private String kill() {
          this.alive = false;
+         log.warn("Killing node: " + this);
          String name = cacheManager.getAddress().toString();
          //TODO disconnect me first from network
          advancedCache.stop();
@@ -264,6 +268,10 @@ public final class TestableCluster<K, V> {
 
       public Cache getCache() {
          return this.advancedCache;
+      }
+
+      public String toString() {
+         return cacheManager.getAddress().toString();
       }
 
    }
