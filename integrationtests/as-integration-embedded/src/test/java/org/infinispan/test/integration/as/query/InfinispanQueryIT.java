@@ -58,7 +58,8 @@ public class InfinispanQueryIT {
       String manifest = Descriptors.create(ManifestDescriptor.class)
             .attribute("Dependencies",
                     "org.infinispan:"       + Version.MODULE_SLOT + " services, "
-                  + "org.infinispan.query:" + Version.MODULE_SLOT + " services")
+                  + "org.infinispan.query:" + Version.MODULE_SLOT + " services, "
+                  + "org.infinispan.lucene-directory:" + Version.MODULE_SLOT + " services" )
                   .exportAsString();
       return new StringAsset(manifest);
    }

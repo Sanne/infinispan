@@ -11,10 +11,10 @@
         <module name="org.apache.lucene" slot="${lucene4.slot}"/>
         <module name="org.hibernate.hql.parser" slot="${slot}"/>
         <module name="org.hibernate.hql.lucene" slot="${slot}"/>
-        <module name="org.hibernate.search.engine" slot="${hibernate.search.slot}" export="true"/>
+        <module name="org.hibernate.search.engine" slot="${hibernate.search.slot}" export="true" />
         <module name="org.infinispan" slot="${slot}"/>
         <module name="org.infinispan.objectfilter" slot="${slot}"/>
-        <module name="org.infinispan.lucene-directory" slot="${slot}" services="export" />
+        <module name="org.hibernate.search.infinispan-integration" slot="5.0.0-SNAPSHOT" />
         <module name="org.jboss.logging" />
     </dependencies>
 </module>
