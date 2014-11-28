@@ -96,7 +96,7 @@ public class AsynchronousInvocationTest extends AbstractInfinispanTest {
                                InboundInvocationHandlerImpl.class);
 
       GetKeyValueCommand getKeyValueCommand =
-            new GetKeyValueCommand("key", InfinispanCollections.<Flag>emptySet(), false, new InternalEntryFactoryImpl());
+            new GetKeyValueCommand("key", InfinispanCollections.<Flag>emptySet());
       PutKeyValueCommand putKeyValueCommand =
             new PutKeyValueCommand("key", "value", false, null,
                                    new EmbeddedMetadata.Builder().build(), InfinispanCollections.<Flag>emptySet(), AnyEquivalence.getInstance());
@@ -106,7 +106,7 @@ public class AsynchronousInvocationTest extends AbstractInfinispanTest {
       nonBlockingCacheRpcCommand = new ClusteredGetCommand(cacheName);
       blockingNonCacheRpcCommand = new CacheTopologyControlCommand();
       //the GetKeyValueCommand is not replicated, but I only need a command that returns false in canBlock()
-      nonBlockingNonCacheRpcCommand = new GetKeyValueCommand("key", InfinispanCollections.<Flag>emptySet(), false, new InternalEntryFactoryImpl());
+      nonBlockingNonCacheRpcCommand = new GetKeyValueCommand("key", InfinispanCollections.<Flag>emptySet());
       blockingSingleRpcCommand = new SingleRpcCommand(cacheName, putKeyValueCommand);
       nonBlockingSingleRpcCommand = new SingleRpcCommand(cacheName, getKeyValueCommand);
       blockingMultipleRpcCommand = new MultipleRpcCommand(Arrays.<ReplicableCommand>asList(putKeyValueCommand, putKeyValueCommand), cacheName);
