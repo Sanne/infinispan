@@ -13,6 +13,7 @@ import org.infinispan.metadata.Metadata;
 import org.infinispan.atomic.Delta;
 import org.infinispan.commands.control.LockControlCommand;
 import org.infinispan.commands.module.ModuleCommandInitializer;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.DistributedExecuteCommand;
 import org.infinispan.commands.read.EntrySetCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
@@ -628,6 +629,11 @@ public class CommandsFactoryImpl implements CommandsFactory {
    @Override
    public GetKeysInGroupCommand buildGetKeysInGroupCommand(Set<Flag> flags, String groupName) {
       return new GetKeysInGroupCommand(flags, groupName).setGroupManager(groupManager);
+   }
+
+   @Override
+   public ContainsKeyValueCommand buildContainsKeyValueCommand(Object key, Set<Flag> explicitFlags) {
+      return new ContainsKeyValueCommand(key, explicitFlags);
    }
 
    @Override

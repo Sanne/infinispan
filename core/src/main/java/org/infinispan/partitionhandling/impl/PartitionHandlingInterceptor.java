@@ -2,6 +2,7 @@ package org.infinispan.partitionhandling.impl;
 
 import org.infinispan.commands.LocalFlagAffectedCommand;
 import org.infinispan.commands.read.AbstractDataCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.EntryRetrievalCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
@@ -102,6 +103,25 @@ public class PartitionHandlingInterceptor extends CommandInterceptor {
       Object result;
       try {
          result = super.visitGetKeyValueCommand(ctx, command);
+      } catch (RpcException e) {
+         if (performPartitionCheck(ctx, command)) {
+            // We must have received an AvailabilityException from one of the owners.
+            // There is no way to verify the cause here, but there isn't any other way to get an invalid get response.
+            throw getLog().degradedModeKeyUnavailable(key);
+         } else {
+            throw e;
+         }
+      }
+      postOperationPartitionCheck(ctx, command, key, result);
+      return result;
+   }
+
+   @Override
+   public final Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
+      Object key = command.getKey();
+      Object result;
+      try {
+         result = super.visitContainsKeyValueCommand(ctx, command);
       } catch (RpcException e) {
          if (performPartitionCheck(ctx, command)) {
             // We must have received an AvailabilityException from one of the owners.

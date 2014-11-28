@@ -4,6 +4,7 @@ package org.infinispan.interceptors;
 import org.infinispan.commands.VisitableCommand;
 import org.infinispan.commands.control.LockControlCommand;
 import org.infinispan.commands.read.AbstractDataCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
 import org.infinispan.commands.tx.CommitCommand;
@@ -83,6 +84,16 @@ public class CallInterceptor extends CommandInterceptor {
       Object ret = command.perform(ctx);
       if (ret != null) {
          notifyCacheEntryVisit(ctx, command, ((CacheEntry) ret).getValue());
+      }
+      return ret;
+   }
+
+   @Override
+   public Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
+      if (trace) log.trace("Executing command: " + command + ".");
+      Object ret = command.perform(ctx);
+      if (ret == Boolean.TRUE) {
+         notifyCacheEntryVisit(ctx, command, ret);
       }
       return ret;
    }

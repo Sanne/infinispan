@@ -4,6 +4,7 @@ import org.infinispan.commands.CommandsFactory;
 import org.infinispan.commands.FlagAffectedCommand;
 import org.infinispan.commands.control.LockControlCommand;
 import org.infinispan.commands.read.AbstractDataCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
 import org.infinispan.commands.remote.recovery.TxCompletionNotificationCommand;
@@ -64,6 +65,10 @@ public class PessimisticLockingInterceptor extends AbstractTxLockingInterceptor 
 
    @Override
    public final Object visitGetKeyValueCommand(InvocationContext ctx, GetKeyValueCommand command) throws Throwable {
+      return visitDataReadCommand(ctx, command);
+   }
+   @Override
+   public final Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
       return visitDataReadCommand(ctx, command);
    }
    @Override

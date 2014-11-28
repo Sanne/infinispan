@@ -1,6 +1,7 @@
 package org.infinispan.interceptors.compat;
 
 import org.infinispan.commands.MetadataAwareCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.EntryRetrievalCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
@@ -80,6 +81,25 @@ public abstract class BaseTypeConverterInterceptor extends CommandInterceptor {
       }
       return null;
    }
+
+   @Override
+   public Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
+      Object key = command.getKey();
+      TypeConverter<Object, Object, Object, Object> converter =
+            determineTypeConverter(command.getFlags());
+      if (ctx.isOriginLocal()) {
+         command.setKey(converter.boxKey(key));
+      }
+      Object ret = invokeNextInterceptor(ctx, command);
+      if (ret != null) {
+         if (command.getRemotelyFetchedValue() == null) {
+            return converter.unboxValue(ret);
+         }
+         return ret;
+      }
+      return null;
+   }
+
 
    @Override
    public Object visitGetCacheEntryCommand(InvocationContext ctx, GetCacheEntryCommand command) throws Throwable {

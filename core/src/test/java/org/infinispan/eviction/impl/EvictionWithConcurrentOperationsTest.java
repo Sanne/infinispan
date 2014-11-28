@@ -2,6 +2,7 @@ package org.infinispan.eviction.impl;
 
 import org.infinispan.Cache;
 import org.infinispan.commands.VisitableCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
 import org.infinispan.commands.write.PutKeyValueCommand;
@@ -571,6 +572,11 @@ public class EvictionWithConcurrentOperationsTest extends SingleCacheManagerTest
 
       @Override
       public Object visitGetKeyValueCommand(InvocationContext ctx, GetKeyValueCommand command) throws Throwable {
+         return handle(ctx, command, beforeGet, afterGet);
+      }
+
+      @Override
+      public Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
          return handle(ctx, command, beforeGet, afterGet);
       }
 

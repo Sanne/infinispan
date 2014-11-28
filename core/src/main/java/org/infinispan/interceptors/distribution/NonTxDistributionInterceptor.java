@@ -2,6 +2,7 @@ package org.infinispan.interceptors.distribution;
 
 import org.infinispan.commands.FlagAffectedCommand;
 import org.infinispan.commands.read.AbstractDataCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
 import org.infinispan.commands.read.RemoteFetchingCommand;
@@ -60,6 +61,17 @@ public class NonTxDistributionInterceptor extends BaseDistributionInterceptor {
       catch (SuspectException e) {
          //retry
          return visitGetCacheEntryCommand(ctx, command);
+      }
+   }
+
+   @Override
+   public Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
+      try {
+         return visitRemoteFetchingCommand(ctx, command, false);
+      }
+      catch (SuspectException e) {
+         //retry
+         return visitContainsKeyValueCommand(ctx, command);
       }
    }
 

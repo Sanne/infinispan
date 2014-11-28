@@ -5,6 +5,7 @@ import org.infinispan.container.entries.CacheEntry;
 import org.infinispan.commands.FlagAffectedCommand;
 import org.infinispan.commands.control.LockControlCommand;
 import org.infinispan.commands.read.AbstractDataCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
 import org.infinispan.commands.tx.CommitCommand;
@@ -130,6 +131,16 @@ public class TxDistributionInterceptor extends BaseDistributionInterceptor {
       } catch (SuspectException e) {
          // retry
          return visitGetKeyValueCommand(ctx, command);
+      }
+   }
+
+   @Override
+   public Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
+      try {
+         return visitGetCommand(ctx, command, false);
+      } catch (SuspectException e) {
+         // retry
+         return visitContainsKeyValueCommand(ctx, command);
       }
    }
 

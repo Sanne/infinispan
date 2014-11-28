@@ -8,6 +8,7 @@ import org.infinispan.Cache;
 import org.infinispan.commands.CommandsFactory;
 import org.infinispan.commands.VisitableCommand;
 import org.infinispan.commands.control.LockControlCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.EntryRetrievalCommand;
 import org.infinispan.commands.read.EntrySetCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
@@ -297,6 +298,11 @@ public class TxInterceptor extends CommandInterceptor implements JmxStatisticsEx
 
    @Override
    public Object visitGetKeyValueCommand(InvocationContext ctx, GetKeyValueCommand command) throws Throwable {
+      return enlistReadAndInvokeNext(ctx, command);
+   }
+
+   @Override
+   public final Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable {
       return enlistReadAndInvokeNext(ctx, command);
    }
 

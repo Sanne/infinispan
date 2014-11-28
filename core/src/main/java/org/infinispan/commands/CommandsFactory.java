@@ -10,6 +10,7 @@ import org.infinispan.iteration.impl.EntryRetriever;
 import org.infinispan.metadata.Metadata;
 import org.infinispan.atomic.Delta;
 import org.infinispan.commands.control.LockControlCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.DistributedExecuteCommand;
 import org.infinispan.commands.read.EntrySetCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
@@ -148,6 +149,14 @@ public interface CommandsFactory {
     * @return a GetCacheEntryCommand
     */
    GetCacheEntryCommand buildGetCacheEntryCommand(Object key, Set<Flag> explicitFlags);
+
+   /**
+    * Builds a ContainsKeyValueCommand
+    * @param key key to get
+    * @param flags Command flags provided by cache
+    * @return a ContainsKeyValueCommand
+    */
+   ContainsKeyValueCommand buildContainsKeyValueCommand(Object key, Set<Flag> explicitFlags);
 
    /**
     * Builds a KeySetCommand

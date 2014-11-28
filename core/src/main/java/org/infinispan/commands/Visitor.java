@@ -1,6 +1,7 @@
 package org.infinispan.commands;
 
 import org.infinispan.commands.control.LockControlCommand;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.DistributedExecuteCommand;
 import org.infinispan.commands.read.EntryRetrievalCommand;
 import org.infinispan.commands.read.EntrySetCommand;
@@ -47,6 +48,8 @@ public interface Visitor {
    Object visitGetKeyValueCommand(InvocationContext ctx, GetKeyValueCommand command) throws Throwable;
 
    Object visitGetCacheEntryCommand(InvocationContext ctx, GetCacheEntryCommand command) throws Throwable;
+
+   Object visitContainsKeyValueCommand(InvocationContext ctx, ContainsKeyValueCommand command) throws Throwable;
 
    Object visitKeySetCommand(InvocationContext ctx, KeySetCommand command) throws Throwable;
 

@@ -149,7 +149,7 @@ public class MarshalledValueTest extends MultipleCacheManagersTest {
       log.trace(TestingUtil.extractComponent(cache1, InterceptorChain.class).toString());
       cache1.put("key", value);
       assertTrue(cache1.containsKey("key"));
-      assertSerializationCounts(1, 1);
+      assertSerializationCounts(1, 0);
 
       DataContainer dc1 = TestingUtil.extractComponent(cache1, DataContainer.class);
 
@@ -158,7 +158,7 @@ public class MarshalledValueTest extends MultipleCacheManagersTest {
       assertTrue(o instanceof MarshalledValue);
       MarshalledValue mv = (MarshalledValue) o;
       assertEquals(value, cache1.get("key"));
-      assertSerializationCounts(1, 2);
+      assertSerializationCounts(1, 1);
       assertSerialized(mv);
 
       // now on cache 2
@@ -170,7 +170,7 @@ public class MarshalledValueTest extends MultipleCacheManagersTest {
       assertSerialized(mv); // this proves that unmarshalling on the recipient cache instance is lazy
 
       assertEquals(value, cache2.get("key"));
-      assertSerializationCounts(1, 3);
+      assertSerializationCounts(1, 2);
       assertSerialized(mv);
    }
 

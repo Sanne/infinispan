@@ -3,6 +3,7 @@ package org.infinispan.commands;
 import org.infinispan.commands.control.LockControlCommand;
 import org.infinispan.commands.module.ExtendedModuleCommandFactory;
 import org.infinispan.commands.module.ModuleCommandFactory;
+import org.infinispan.commands.read.ContainsKeyValueCommand;
 import org.infinispan.commands.read.DistributedExecuteCommand;
 import org.infinispan.commands.read.GetCacheEntryCommand;
 import org.infinispan.commands.read.GetKeyValueCommand;
@@ -127,6 +128,9 @@ public class RemoteCommandsFactory {
                break;
             case GetKeysInGroupCommand.COMMAND_ID:
                command = new GetKeysInGroupCommand();
+               break;
+            case ContainsKeyValueCommand.COMMAND_ID:
+               command = new ContainsKeyValueCommand();
                break;
             case GetCacheEntryCommand.COMMAND_ID:
                command = new GetCacheEntryCommand();
