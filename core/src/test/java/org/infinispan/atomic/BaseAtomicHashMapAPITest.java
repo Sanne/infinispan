@@ -12,10 +12,12 @@ import org.infinispan.transaction.TransactionMode;
 import org.infinispan.transaction.lookup.DummyTransactionManagerLookup;
 import org.infinispan.util.concurrent.IsolationLevel;
 import org.infinispan.util.concurrent.TimeoutException;
+import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -561,6 +563,40 @@ public abstract class BaseAtomicHashMapAPITest extends MultipleCacheManagersTest
       assertMap(expectedMap, map2);
    }
 
+   public void testInsertDeleteInsertCycle() throws Exception {
+      final Cache<String, Object> cache1 = cache(0, "atomic");
+      final Cache<String, Object> cache2 = cache(1, "atomic");
+
+      assertSize(cache1, 0);
+      assertSize(cache2, 0);
+      final String AMKEY = "A key for test org.infinispan.atomic.BaseAtomicHashMapAPITest.testInsertDeleteInsertCycle()";
+
+      {
+         TestingUtil.getTransactionManager(cache1).begin();
+         Map<Object, Object> am = createAtomicMap(cache1, AMKEY);
+         am.put("k1", "v1");
+         TestingUtil.getTransactionManager(cache1).commit();
+      }
+      {
+         TestingUtil.getTransactionManager(cache1).begin();
+         Map<Object, Object> am = createAtomicMap(cache1, AMKEY);
+         am.put("k3", "v3");
+         removeAtomicMap(cache1, AMKEY); //!
+         am = createAtomicMap(cache1, AMKEY);
+         am.put("k2", "v2");
+         TestingUtil.getTransactionManager(cache1).commit();
+      }
+      final boolean fails;
+      {
+         TestingUtil.getTransactionManager(cache1).begin();
+         Map<Object, Object> am = createAtomicMap(cache1, AMKEY);
+         //'k1' should no longer exist as we had killed the whole am instance in previous transaction
+         fails = am.containsKey("k1");
+         TestingUtil.getTransactionManager(cache1).commit();
+      }
+      Assert.assertFalse(fails);
+   }
+
    public void testDuplicateValue() {
       final Cache<String, Object> cache = cache(0, "atomic");
       assertSize(cache, 0);
@@ -733,4 +769,9 @@ public abstract class BaseAtomicHashMapAPITest extends MultipleCacheManagersTest
    protected final <CK, K, V> Map<K, V> createAtomicMap(Cache<CK, Object> cache, CK key) {
       return createAtomicMap(cache, key, true);
    }
+
+   protected <CK> void removeAtomicMap(Cache<CK, Object> cache, CK key) {
+      AtomicMapLookup.removeAtomicMap(cache, key);
+   }
+
 }
