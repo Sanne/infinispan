@@ -71,17 +71,17 @@ public class NoopSegmentReadLockerTest extends DistributedSegmentReadLockerTest 
    }
 
    private void assertFileAfterDeletion(Cache cache) {
-      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(INDEX_NAME));
+      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(INDEX_NAME, -1));
       AssertJUnit.assertNotNull(fileList);
       AssertJUnit.assertFalse(fileList.contains(filename));
 
-      FileMetadata metadata = (FileMetadata) cache.get(new FileCacheKey(INDEX_NAME, filename));
+      FileMetadata metadata = (FileMetadata) cache.get(new FileCacheKey(INDEX_NAME, filename, -1));
       AssertJUnit.assertNotNull(metadata);
       long totalFileSize = metadata.getSize();
       int chunkNumbers = (int)(totalFileSize / CHUNK_SIZE);
 
       for(int i = 0; i < chunkNumbers; i++) {
-         AssertJUnit.assertNotNull(cache.get(new ChunkCacheKey(INDEX_NAME, filename, i, CHUNK_SIZE)));
+         AssertJUnit.assertNotNull(cache.get(new ChunkCacheKey(INDEX_NAME, filename, i, CHUNK_SIZE, -1)));
       }
 
       boolean fileNameExistsInCache = false;
@@ -99,7 +99,7 @@ public class NoopSegmentReadLockerTest extends DistributedSegmentReadLockerTest 
    }
 
    private void verifyDirectoryStructure(Cache cache) {
-      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(INDEX_NAME));
+      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(INDEX_NAME, -1));
       AssertJUnit.assertNotNull(fileList);
       int fileListCacheKeyInstances = 0;
 
@@ -121,7 +121,7 @@ public class NoopSegmentReadLockerTest extends DistributedSegmentReadLockerTest 
             AssertJUnit.assertTrue(value instanceof FileMetadata);
             FileMetadata metadata = (FileMetadata) value;
             long totalFileSize = metadata.getSize();
-            long actualFileSize = DirectoryIntegrityCheck.deepCountFileSize(fileCacheKey, cache);
+            long actualFileSize = DirectoryIntegrityCheck.deepCountFileSize(fileCacheKey, cache, -1);
             AssertJUnit.assertEquals(actualFileSize, totalFileSize);
 
             if(filename.contains(this.filename)) {

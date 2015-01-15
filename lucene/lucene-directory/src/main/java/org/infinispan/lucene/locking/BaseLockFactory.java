@@ -24,11 +24,13 @@ public class BaseLockFactory extends LockFactory {
    private final Cache<?, ?> cache;
    private final String indexName;
    private final BaseLuceneLock defLock;
+   private final int affinitySegmentId;
 
-   public BaseLockFactory(Cache<?, ?> cache, String indexName) {
+   public BaseLockFactory(Cache<?, ?> cache, String indexName, int affinitySegmentId) {
+      this.affinitySegmentId = affinitySegmentId;
       this.cache = cache.getAdvancedCache().withFlags(Flag.SKIP_INDEXING);
       this.indexName = indexName;
-      defLock = new BaseLuceneLock(this.cache, indexName, DEF_LOCK_NAME);
+      defLock = new BaseLuceneLock(this.cache, indexName, DEF_LOCK_NAME, affinitySegmentId);
    }
 
    /**
@@ -44,7 +46,7 @@ public class BaseLockFactory extends LockFactory {
       }
       else {
          // this branch is never taken with current Lucene version.
-         lock = new BaseLuceneLock(cache, indexName, lockName);
+         lock = new BaseLuceneLock(cache, indexName, lockName, affinitySegmentId);
       }
       if (log.isTraceEnabled()) {
          log.tracef("Lock prepared, not acquired: %s for index %s", lockName, indexName);
@@ -62,7 +64,7 @@ public class BaseLockFactory extends LockFactory {
          defLock.clearLock();
       }
       else {
-         new BaseLuceneLock(cache, indexName, lockName).clearLock();
+         new BaseLuceneLock(cache, indexName, lockName, affinitySegmentId).clearLock();
       }
       if (log.isTraceEnabled()) {
          log.tracef("Removed lock: %s for index %s", lockName, indexName);

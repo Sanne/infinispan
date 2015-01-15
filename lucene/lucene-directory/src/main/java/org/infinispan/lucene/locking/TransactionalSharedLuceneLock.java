@@ -35,12 +35,12 @@ class TransactionalSharedLuceneLock extends Lock implements Closeable {
    private final TransactionManager tm;
    private final FileCacheKey keyOfLock;
 
-   TransactionalSharedLuceneLock(Cache<?, ?> cache, String indexName, String lockName, TransactionManager tm) {
+   TransactionalSharedLuceneLock(Cache<?, ?> cache, String indexName, String lockName, TransactionManager tm, int affinitySegmentId) {
       this.noCacheStoreCache = (Cache<FileCacheKey, FileCacheKey>) cache.getAdvancedCache().withFlags(Flag.SKIP_CACHE_STORE, Flag.SKIP_CACHE_LOAD, Flag.SKIP_INDEXING);
       this.lockName = lockName;
       this.indexName = indexName;
       this.tm = tm;
-      this.keyOfLock = new FileCacheKey(indexName, lockName);
+      this.keyOfLock = new FileCacheKey(indexName, lockName, affinitySegmentId);
    }
 
    /**

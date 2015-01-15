@@ -39,6 +39,7 @@ final class DirectoryLoaderAdaptor {
    private final ContainsKeyVisitor containsKeyVisitor = new ContainsKeyVisitor();
    private final String indexName;
    private final int autoChunkSize;
+   private final int affinitySegmentId;
 
    /**
     * Create a new DirectoryLoaderAdaptor.
@@ -46,11 +47,13 @@ final class DirectoryLoaderAdaptor {
     * @param directory The {@link org.apache.lucene.store.Directory} to which delegate actual IO operations
     * @param indexName the index name
     * @param autoChunkSize index segments might be large; we'll split them in chunks of this amount of bytes
+    * @param affinitySegmentId
     */
-   protected DirectoryLoaderAdaptor(final Directory directory, String indexName, int autoChunkSize) {
+   protected DirectoryLoaderAdaptor(final Directory directory, String indexName, int autoChunkSize, int affinitySegmentId) {
       this.directory = directory;
       this.indexName = indexName;
       this.autoChunkSize = autoChunkSize;
+      this.affinitySegmentId = affinitySegmentId;
    }
 
    /**
@@ -89,7 +92,7 @@ final class DirectoryLoaderAdaptor {
       }
       int collectedKeys = 0;
       //First we collect the (single) FileListCacheKey
-      FileListCacheKey rootKey = new FileListCacheKey(indexName);
+      FileListCacheKey rootKey = new FileListCacheKey(indexName, affinitySegmentId);
       if (keysToExclude==null || ! keysToExclude.contains(rootKey)) { //unless it was excluded
          if (keysCollector.add(rootKey) ) { //unless it was already collected
             collectedKeys++;
@@ -100,7 +103,7 @@ final class DirectoryLoaderAdaptor {
          String[] listAll = directory.listAll();
          for (String fileName : listAll) {
             if (collectedKeys >= maxElements) return;
-            FileCacheKey key = new FileCacheKey(indexName, fileName);
+            FileCacheKey key = new FileCacheKey(indexName, fileName, affinitySegmentId);
             if (keysToExclude == null || !keysToExclude.contains(key)) {
                if (keysCollector.add(key)) {
                   if (++collectedKeys >= maxElements) return;
@@ -112,7 +115,7 @@ final class DirectoryLoaderAdaptor {
             int numChunksInt = figureChunksNumber(fileName);
             for (int i = 0; i < numChunksInt; i++) {
                //Inner loop: we actually have several Chunks per file name
-               ChunkCacheKey key = new ChunkCacheKey(indexName, fileName, i, autoChunkSize);
+               ChunkCacheKey key = new ChunkCacheKey(indexName, fileName, i, autoChunkSize, affinitySegmentId);
                if (keysToExclude == null || !keysToExclude.contains(key)) {
                   if (keysCollector.add(key)) {
                      if (++collectedKeys >= maxElements) return;

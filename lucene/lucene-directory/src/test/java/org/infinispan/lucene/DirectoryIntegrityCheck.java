@@ -29,11 +29,14 @@ public class DirectoryIntegrityCheck {
     *           The name of the unique index stored in the cache
     */
    public static void verifyDirectoryStructure(Cache cache, String indexName) {
-      verifyDirectoryStructure(cache, indexName, false);
+      verifyDirectoryStructure(cache, indexName, false, -1);
+   }
+   public static void verifyDirectoryStructure(Cache cache, String indexName, int affinitySegmentId) {
+      verifyDirectoryStructure(cache, indexName, false, affinitySegmentId);
    }
 
-   public static void verifyDirectoryStructure(Cache cache, String indexName, boolean wasAStressTest) {
-      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(indexName));
+   public static void verifyDirectoryStructure(Cache cache, String indexName, boolean wasAStressTest, int affinitySegmentId) {
+      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(indexName, affinitySegmentId));
       AssertJUnit.assertNotNull(fileList);
       int fileListCacheKeyInstances = 0;
       for (Object key : cache.keySet()) {
@@ -64,7 +67,7 @@ public class DirectoryIntegrityCheck {
             AssertJUnit.assertTrue(value instanceof FileMetadata);
             FileMetadata metadata = (FileMetadata) value;
             long totalFileSize = metadata.getSize();
-            long actualFileSize = deepCountFileSize(fileCacheKey, cache);
+            long actualFileSize = deepCountFileSize(fileCacheKey, cache, affinitySegmentId);
             AssertJUnit.assertEquals(actualFileSize, totalFileSize);
             AssertJUnit.assertTrue(fileCacheKey + " should not have existed", fileList.contains(fileCacheKey.getFileName()));
          } else if (key instanceof FileListCacheKey) {
@@ -89,8 +92,8 @@ public class DirectoryIntegrityCheck {
       }
    }
 
-   private static void verifyReadlockExists(Cache cache, String indexName, String filename) {
-      FileReadLockKey readLockKey = new FileReadLockKey(indexName, filename);
+   private static void verifyReadlockExists(Cache cache, String indexName, String filename, int affinitySegmentId) {
+      FileReadLockKey readLockKey = new FileReadLockKey(indexName, filename, affinitySegmentId);
       Object readLockValue = cache.get(readLockKey);
       AssertJUnit.assertNotNull(readLockValue);
       AssertJUnit.assertTrue(readLockValue instanceof Integer);
@@ -107,14 +110,14 @@ public class DirectoryIntegrityCheck {
     *           the cache storing the chunks
     * @return the total size adding all found chunks up
     */
-   public static long deepCountFileSize(FileCacheKey fileCacheKey, Cache cache) {
+   public static long deepCountFileSize(FileCacheKey fileCacheKey, Cache cache, int affinitySegmentId) {
       String indexName = fileCacheKey.getIndexName();
       String fileName = fileCacheKey.getFileName();
       long accumulator = 0;
       FileMetadata metadata = (FileMetadata) cache.get(fileCacheKey);
       int bufferSize = metadata.getBufferSize();
       for (int i = 0;; i++) {
-         ChunkCacheKey chunkKey = new ChunkCacheKey(indexName, fileName, i, bufferSize);
+         ChunkCacheKey chunkKey = new ChunkCacheKey(indexName, fileName, i, bufferSize, affinitySegmentId);
          byte[] buffer = (byte[]) cache.get(chunkKey);
          if (buffer == null) {
             AssertJUnit.assertFalse(cache.containsKey(chunkKey));
@@ -126,8 +129,8 @@ public class DirectoryIntegrityCheck {
       }
    }
 
-   public static void assertFileNotExists(Cache cache, String indexName, String fileName, long maxWaitForCondition) throws InterruptedException {
-      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(indexName));
+   public static void assertFileNotExists(Cache cache, String indexName, String fileName, long maxWaitForCondition, int affinitySegmentId) throws InterruptedException {
+      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(indexName, affinitySegmentId));
       AssertJUnit.assertNotNull(fileList);
       AssertJUnit.assertFalse(fileList.contains(fileName)); //check is in sync: no waiting allowed in this case
       boolean allok = false;
@@ -135,11 +138,11 @@ public class DirectoryIntegrityCheck {
          Thread.sleep(10);
          maxWaitForCondition -= 10;
          allok=true;
-         FileMetadata metadata = (FileMetadata) cache.get(new FileCacheKey(indexName, fileName));
+         FileMetadata metadata = (FileMetadata) cache.get(new FileCacheKey(indexName, fileName, affinitySegmentId));
          if (metadata!=null) allok=false;
          for (int i = 0; i < 100; i++) {
             //bufferSize set to 0 as metadata might not be available, and it's not part of equals/hashcode anyway.
-            ChunkCacheKey key = new ChunkCacheKey(indexName, fileName, i, 0);
+            ChunkCacheKey key = new ChunkCacheKey(indexName, fileName, i, 0, affinitySegmentId);
             if (cache.get(key)!=null) allok=false;
          }
       }
@@ -150,18 +153,18 @@ public class DirectoryIntegrityCheck {
     * Verified the file exists and has a specified value for readLock;
     * Consider that null should be interpreted as value 1;
     */
-   public static void assertFileExistsHavingRLCount(Cache cache, String fileName, String indexName, int expectedReadcount, int chunkSize, boolean expectRegisteredInFat) {
-      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(indexName));
+   public static void assertFileExistsHavingRLCount(Cache cache, String fileName, String indexName, int expectedReadcount, int chunkSize, boolean expectRegisteredInFat, int affinitySegmentId) {
+      FileListCacheValue fileList = (FileListCacheValue) cache.get(new FileListCacheKey(indexName, affinitySegmentId));
       AssertJUnit.assertNotNull(fileList);
       AssertJUnit.assertTrue(fileList.contains(fileName) == expectRegisteredInFat);
-      FileMetadata metadata = (FileMetadata) cache.get(new FileCacheKey(indexName, fileName));
+      FileMetadata metadata = (FileMetadata) cache.get(new FileCacheKey(indexName, fileName, affinitySegmentId));
       AssertJUnit.assertNotNull(metadata);
       long totalFileSize = metadata.getSize();
       int chunkNumbers = (int)(totalFileSize / chunkSize);
       for (int i = 0; i < chunkNumbers; i++) {
-         AssertJUnit.assertNotNull(cache.get(new ChunkCacheKey(indexName, fileName, i, metadata.getBufferSize())));
+         AssertJUnit.assertNotNull(cache.get(new ChunkCacheKey(indexName, fileName, i, metadata.getBufferSize(), affinitySegmentId)));
       }
-      FileReadLockKey readLockKey = new FileReadLockKey(indexName,fileName);
+      FileReadLockKey readLockKey = new FileReadLockKey(indexName, fileName, affinitySegmentId);
       Object value = cache.get(readLockKey);
       if (expectedReadcount <= 1) {
          AssertJUnit.assertTrue("readlock value is " + value, value == null || Integer.valueOf(1).equals(value));

@@ -27,11 +27,11 @@ class BaseLuceneLock extends Lock implements Closeable {
    private final String indexName;
    private final FileCacheKey keyOfLock;
 
-   BaseLuceneLock(Cache<?, ?> cache, String indexName, String lockName) {
+   BaseLuceneLock(Cache<?, ?> cache, String indexName, String lockName, final int affinitySegmentId) {
       this.noCacheStoreCache = (Cache<Object, Object>) cache.getAdvancedCache().withFlags(Flag.SKIP_CACHE_STORE, Flag.SKIP_CACHE_LOAD);
       this.lockName = lockName;
       this.indexName = indexName;
-      this.keyOfLock = new FileCacheKey(indexName, lockName);
+      this.keyOfLock = new FileCacheKey(indexName, lockName, affinitySegmentId);
    }
 
    /**

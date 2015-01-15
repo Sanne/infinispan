@@ -39,10 +39,12 @@ public class TransactionalLockFactory extends LockFactory {
    private final String indexName;
    private final TransactionManager tm;
    private final TransactionalSharedLuceneLock defLock;
+   private final int affinitySegmentId;
 
-   public TransactionalLockFactory(Cache<?, ?> cache, String indexName) {
+   public TransactionalLockFactory(Cache<?, ?> cache, String indexName, int affinitySegmentId) {
       this.cache = cache;
       this.indexName = indexName;
+      this.affinitySegmentId = affinitySegmentId;
       tm = cache.getAdvancedCache().getTransactionManager();
       if (tm == null) {
          ComponentStatus status = cache.getAdvancedCache().getComponentRegistry().getStatus();
@@ -55,7 +57,7 @@ public class TransactionalLockFactory extends LockFactory {
             throw new CacheException("Failed looking up TransactionManager: the cache is not running");
          }
       }
-      defLock = new TransactionalSharedLuceneLock(cache, indexName, DEF_LOCK_NAME, tm);
+      defLock = new TransactionalSharedLuceneLock(cache, indexName, DEF_LOCK_NAME, tm, affinitySegmentId);
    }
 
    /**
@@ -71,7 +73,7 @@ public class TransactionalLockFactory extends LockFactory {
       }
       else {
          // this branch is never taken with current Lucene version.
-         lock = new TransactionalSharedLuceneLock(cache, indexName, lockName, tm);
+         lock = new TransactionalSharedLuceneLock(cache, indexName, lockName, tm, affinitySegmentId);
       }
       if (log.isTraceEnabled()) {
          log.tracef("Lock prepared, not acquired: %s for index %s", lockName, indexName);
@@ -89,7 +91,7 @@ public class TransactionalLockFactory extends LockFactory {
          defLock.clearLockSuspending();
       }
       else {
-         new TransactionalSharedLuceneLock(cache, indexName, lockName, tm).clearLockSuspending();
+         new TransactionalSharedLuceneLock(cache, indexName, lockName, tm, affinitySegmentId).clearLockSuspending();
       }
       if (log.isTraceEnabled()) {
          log.tracef("Removed lock: %s for index %s", lockName, indexName);

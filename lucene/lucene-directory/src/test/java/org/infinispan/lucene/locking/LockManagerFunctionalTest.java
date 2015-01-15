@@ -59,7 +59,7 @@ public class LockManagerFunctionalTest extends MultipleCacheManagersTest {
    }
 
    protected LockFactory makeLockFactory(Cache<?,?> cache, String commonIndexName) {
-      return new BaseLockFactory(cache, commonIndexName);
+      return new BaseLockFactory(cache, commonIndexName, -1);
    }
 
 }

@@ -17,7 +17,7 @@ public class TransactionalLockManagerFunctionalTest extends LockManagerFunctiona
 
    @Override
    protected LockFactory makeLockFactory(Cache cache, String commonIndexName) {
-      return new TransactionalLockFactory(cache, commonIndexName);
+      return new TransactionalLockFactory(cache, commonIndexName, -1);
    }
 
    @Override
