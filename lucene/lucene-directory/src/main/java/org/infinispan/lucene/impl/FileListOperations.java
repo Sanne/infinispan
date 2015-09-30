@@ -1,16 +1,20 @@
 package org.infinispan.lucene.impl;
 
-import net.jcip.annotations.GuardedBy;
+import java.io.Serializable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+
 import org.infinispan.AdvancedCache;
-import org.infinispan.context.Flag;
+import org.infinispan.commons.api.functional.EntryView.ReadWriteEntryView;
+import org.infinispan.commons.api.functional.FunctionalMap.ReadWriteMap;
+import org.infinispan.commons.api.functional.Param.FutureMode;
+import org.infinispan.functional.impl.FunctionalMapImpl;
+import org.infinispan.functional.impl.ReadWriteMapImpl;
 import org.infinispan.lucene.FileCacheKey;
 import org.infinispan.lucene.FileListCacheKey;
 import org.infinispan.lucene.FileMetadata;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Collects operations on the existing fileList, stored as a Set<String> having key
@@ -27,21 +31,17 @@ public final class FileListOperations {
    private final FileListCacheKey fileListCacheKey;
    private final AdvancedCache<FileListCacheKey, Object> cache;
    private final String indexName;
-   private final AdvancedCache<FileListCacheKey, FileListCacheValue> cacheNoRetrieve;
-   private final Lock readLock;
-   private final Lock writeLock;
    private final boolean writeAsync;
+   private final ReadWriteMap<FileListCacheKey, FileListCacheValue> readWriteMap;
 
    @SuppressWarnings("unchecked")
    public FileListOperations(AdvancedCache<?, ?> cache, String indexName, boolean writeAsync) {
       this.writeAsync = writeAsync;
       this.cache = (AdvancedCache<FileListCacheKey, Object>) cache;
-      this.cacheNoRetrieve = (AdvancedCache<FileListCacheKey, FileListCacheValue>) cache.withFlags(Flag.IGNORE_RETURN_VALUES);
       this.indexName = indexName;
       this.fileListCacheKey = new FileListCacheKey(indexName);
-      ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
-      readLock = lock.readLock();
-      writeLock = lock.writeLock();
+      FunctionalMapImpl<FileListCacheKey, FileListCacheValue> functionalMap = (FunctionalMapImpl<FileListCacheKey, FileListCacheValue>) FunctionalMapImpl.create(cache);
+      readWriteMap = ReadWriteMapImpl.create(functionalMap).withParams(writeAsync ? FutureMode.ASYNC : FutureMode.COMPLETED);
    }
 
    /**
@@ -49,17 +49,19 @@ public final class FileListOperations {
     * @param fileName
     */
    void addFileName(final String fileName) {
-      writeLock.lock();
-      try {
-         final FileListCacheValue fileList = getFileList();
-         boolean done = fileList.add(fileName);
+      Function<ReadWriteEntryView<FileListCacheKey, FileListCacheValue>, Boolean> f = (Serializable & Function<ReadWriteEntryView<FileListCacheKey, FileListCacheValue>, Boolean>) view -> {
+         final FileListCacheValue list = view.find().map(e -> e).orElse(new FileListCacheValue());
+         boolean done = list.add(fileName);
          if (done) {
-            updateFileList(fileList);
-            if (trace)
-               log.trace("Updated file listing: added " + fileName);
+            view.set(list);
          }
-      } finally {
-         writeLock.unlock();
+         return done;
+      };
+      CompletableFuture<Boolean> listUpdated = readWriteMap.eval(fileListCacheKey, f);
+      if (!writeAsync) {
+         Boolean done = listUpdated.join();
+         if (trace && done)
+            log.trace("Updated file listing: added " + fileName);
       }
    }
 
@@ -79,18 +81,19 @@ public final class FileListOperations {
     * @param toAdd
     */
    public void removeAndAdd(final String toRemove, final String toAdd) {
-      writeLock.lock();
-      try {
-         FileListCacheValue fileList = getFileList();
-         boolean done = fileList.addAndRemove(toAdd, toRemove);
+      Function<ReadWriteEntryView<FileListCacheKey, FileListCacheValue>, Boolean> f = (Serializable & Function<ReadWriteEntryView<FileListCacheKey, FileListCacheValue>, Boolean>) view -> {
+         final FileListCacheValue list = view.find().map(e -> e).orElse(new FileListCacheValue());
+         boolean done = list.addAndRemove(toAdd, toRemove);
          if (done) {
-            updateFileList(fileList);
-            if (trace) {
-               log.trace("Updated file listing: added " + toAdd + " and removed " + toRemove);
-            }
+            view.set(list);
          }
-      } finally {
-         writeLock.unlock();
+         return done;
+      };
+      CompletableFuture<Boolean> listUpdated = readWriteMap.eval(fileListCacheKey, f);
+      if (!writeAsync) {
+         Boolean done = listUpdated.join();
+         if (trace && done)
+            log.trace("Updated file listing: added " + toAdd + " and removed " + toRemove);
       }
    }
 
@@ -98,12 +101,7 @@ public final class FileListOperations {
     * @return an array containing all names of existing "files"
     */
    public String[] listFilenames() {
-      readLock.lock();
-      try {
          return getFileList().toArray();
-      } finally {
-         readLock.unlock();
-      }
    }
 
    /**
@@ -111,12 +109,8 @@ public final class FileListOperations {
     * @return true if there is such a named file in this index
     */
    public boolean fileExists(final String fileName) {
-      readLock.lock();
-      try {
+         // Not using the lambda as we prefer to cache the whole list locally, if it's a distributed cache
          return getFileList().contains(fileName);
-      } finally {
-         readLock.unlock();
-      }
    }
 
    /**
@@ -124,38 +118,25 @@ public final class FileListOperations {
     * @param fileName
     */
    public void deleteFileName(final String fileName) {
-      writeLock.lock();
-      try {
-         FileListCacheValue fileList = getFileList();
-         boolean done = fileList.remove(fileName);
+      Function<ReadWriteEntryView<FileListCacheKey, FileListCacheValue>, Boolean> f = (Serializable & Function<ReadWriteEntryView<FileListCacheKey, FileListCacheValue>, Boolean>) view -> {
+         final FileListCacheValue list = view.find().map(e -> e).orElse(new FileListCacheValue());
+         boolean done = list.remove(fileName);
          if (done) {
-            updateFileList(fileList);
-            if (trace)
-               log.trace("Updated file listing: removed " + fileName);
+            view.set(list);
          }
-      } finally {
-         writeLock.unlock();
-      }
-   }
-
-   /**
-    * Makes sure the Cache is updated.
-    * @param fileList the new content
-    */
-   @GuardedBy("writeLock")
-   private void updateFileList(FileListCacheValue fileList) {
-      if (writeAsync) {
-         cacheNoRetrieve.putAsync(fileListCacheKey, fileList);
-      }
-      else {
-         cacheNoRetrieve.put(fileListCacheKey, fileList);
+         return done;
+      };
+      CompletableFuture<Boolean> listUpdated = readWriteMap.eval(fileListCacheKey, f);
+      if (!writeAsync) {
+         Boolean done = listUpdated.join();
+         if (trace && done)
+            log.trace("Updated file listing: removed " + fileName);
       }
    }
 
    /**
     * @return the current list of files being part of the index
     */
-   @GuardedBy("writeLock")
    private FileListCacheValue getFileList() {
       FileListCacheValue fileList = (FileListCacheValue) cache.get(fileListCacheKey);
       if (fileList == null) {
