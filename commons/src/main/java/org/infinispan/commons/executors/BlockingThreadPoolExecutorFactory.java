@@ -53,7 +53,7 @@ public class BlockingThreadPoolExecutorFactory implements ThreadPoolExecutorFact
             new SynchronousQueue<Runnable>() :
             new LinkedBlockingQueue<Runnable>(queueLength);
 
-      return new ThreadPoolExecutor(coreThreads, maxThreads, keepAlive,
+      return new ThreadPoolExecutor(0, maxThreads, 3000, //FIXME: temporary hack setting "corethreads" hardcoded to zero.
             TimeUnit.MILLISECONDS, queue, threadFactory,
             new ThreadPoolExecutor.CallerRunsPolicy());
    }
