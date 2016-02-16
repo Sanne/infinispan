@@ -8,14 +8,12 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.FileHelper;
 import org.infinispan.hibernate.search.impl.DefaultCacheManagerService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -98,6 +96,8 @@ public class StoredIndexTest {
     * @param createSchema set to false to not drop an existing schema
     */
    private void startNode(boolean createSchema) {
+      Path tempTestDataDir = TestConstants.getTempTestDataDir();
+      System.setProperty( "tempTestDataDir", tempTestDataDir.toAbsolutePath().toString() );
       node = new FullTextSessionBuilder()
             .setProperty("hibernate.search.default.directory_provider", "infinispan")
             .setProperty(DefaultCacheManagerService.INFINISPAN_CONFIGURATION_RESOURCENAME, "filesystem-loading-infinispan.xml")
@@ -153,18 +153,6 @@ public class StoredIndexTest {
    @AfterClass
    public static void shutdownConnectionPool() {
       ClusterSharedConnectionProvider.realStop();
-   }
-
-   /**
-    * The test configuration for Infinispan is setup to offload indexes in java.io.tmpdir: clean them up. This is
-    * particularly important when changing Infinispan versions as the binary format is not necessarily compatible across
-    * releases.
-    */
-   @AfterClass
-   public static void removeFileSystemStoredIndexes() throws IOException {
-      Path targetDir = TestConstants.getTargetDir(StoredIndexTest.class);
-      FileHelper.delete(targetDir.resolve("LuceneIndexesData"));
-      FileHelper.delete(targetDir.resolve("LuceneIndexesMetaData"));
    }
 
 }
