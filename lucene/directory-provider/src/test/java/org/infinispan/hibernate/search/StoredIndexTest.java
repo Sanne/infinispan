@@ -7,14 +7,15 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.testsupport.TestConstants;
 import org.infinispan.hibernate.search.impl.DefaultCacheManagerService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import java.nio.file.Path;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,6 +27,9 @@ import java.util.List;
 public class StoredIndexTest {
 
    private FullTextSessionBuilder node;
+
+   @ClassRule
+   public static TemporaryFolder temporaryFolderFolder = new TemporaryFolder();
 
    @Test
    public void testRestartingNode() {
@@ -96,8 +100,6 @@ public class StoredIndexTest {
     * @param createSchema set to false to not drop an existing schema
     */
    private void startNode(boolean createSchema) {
-      Path tempTestDataDir = TestConstants.getTempTestDataDir();
-      System.setProperty( "tempTestDataDir", tempTestDataDir.toAbsolutePath().toString() );
       node = new FullTextSessionBuilder()
             .setProperty("hibernate.search.default.directory_provider", "infinispan")
             .setProperty(DefaultCacheManagerService.INFINISPAN_CONFIGURATION_RESOURCENAME, "filesystem-loading-infinispan.xml")
@@ -143,7 +145,8 @@ public class StoredIndexTest {
     * database with all data we need for the second phase of the test.
     */
    @BeforeClass
-   public static void prepareConnectionPool() {
+   public static void prepareConnectionPool() throws IOException {
+      System.setProperty("tempTestDataDir", temporaryFolderFolder.newFolder().getAbsolutePath());
       ClusterSharedConnectionProvider.realStart();
    }
 
