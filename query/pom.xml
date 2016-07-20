@@ -44,6 +44,12 @@
       <dependency>
          <groupId>org.hibernate</groupId>
          <artifactId>hibernate-search-engine</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.apache.lucene</groupId>
+               <artifactId>lucene-backward-codecs</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
