@@ -1248,7 +1248,23 @@
                 <version>${version.org.wildfly.maven-plugin}</version>
              </plugin>
          </plugins>
+
+         <plugin>
+            <groupId>com.github.alexcojocaru</groupId>
+            <artifactId>elasticsearch-maven-plugin</artifactId>
+            <version>5.7</version>
+            <dependencies>
+                <!-- This to allow redirecting the output from Elasticsearch -->
+               <dependency>
+                  <groupId>org.apache.logging.log4j</groupId>
+                  <artifactId>log4j-core</artifactId>
+                  <version>${version.log4j}</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+
       </pluginManagement>
+
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
